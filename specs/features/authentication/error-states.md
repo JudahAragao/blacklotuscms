@@ -9,25 +9,25 @@ feature: "authentication"
 # Authentication Error States
 
 ## ERR-01: Unauthorized
-- **Condição:** Nenhuma autenticacao fornecida
+- **Condition:** Nenhuma authentication fornecida
 - **Código HTTP:** 401
 - **Mensagem:** "Unauthorized. Provide a valid API Key or log in."
-- **Ação:** Bloqueia acesso
+- **Ação:** Blocks acesso
 
 ## ERR-02: Forbidden
-- **Condição:** Usuario autenticado mas sem capability necessaria
+- **Condition:** User autenticado mas sem capability necessaria
 - **Código HTTP:** 403
 - **Mensagem:** "No permission to perform this action"
-- **Ação:** Log de tentativa com userId
+- **Ação:** Log de tentativa with userId
 
 ## ERR-03: Rate Limit Exceeded
-- **Condição:** API Key excedeu rate limit
+- **Condition:** API Key excedeu rate limit
 - **Código HTTP:** 429
 - **Mensagem:** "Request limit exceeded (Rate Limit)"
 - **Código:** RATE_LIMIT_EXCEEDED
 
 ## ERR-04: Internal Auth Error
-- **Condição:** Erro interno durante autenticacao
+- **Condition:** Erro interno durante authentication
 - **Código HTTP:** 500
 - **Mensagem:** "Internal authentication error"
 - **Ação:** Log do erro

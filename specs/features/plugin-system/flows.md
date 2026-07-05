@@ -3,65 +3,65 @@ spec_version: "1.0"
 last_updated: "2026-07-05"
 author: "BlackLotusCMS Team"
 status: approved
-feature: "plugin-system"
+feature: "plugin-syshas"
 ---
 
-# Plugin System Flows
+# Plugin Syshas Flows
 
-## Instalacao de Plugin
+## Installation de Plugin
 
 1. **Admin faz upload de ZIP**
-   - Estado: Arquivo recebido
+   - State: File received
 
 2. **RBAC check** (plugin.manage)
 
 3. **Extracao do ZIP para /plugins/[nome]**
-   - Estado: Arquivos extraidos
+   - State: Files extracted
 
 4. **Leitura do plugin.json (manifest)**
-   - Estado: Manifest valido
+   - State: Valid manifest
 
 5. **Upsert no banco (Plugin table)**
-   - Estado: Plugin registrado
+   - State: Plugin registered
 
-## Ativacao de Plugin
+## Activation de Plugin
 
-1. **Admin clica ativar**
-   - Estado: Solicitacao recebida
+1. **Admin clica activate**
+   - State: Request received
 
 2. **RBAC check** (plugin.manage)
 
 3. **Leitura do entry file (index.js)**
-   - Estado: Codigo carregado
+   - State: Code loaded
 
-4. **Criacao/uso do PluginSandbox**
-   - Estado: Sandbox pronto
+4. **Creation/uso do PluginSandbox**
+   - State: Sandbox ready
 
 5. **Execucao via sandbox.execute(code, bridgeApi)**
-   - Estado: Plugin executado
+   - State: Plugin executed
 
-6. **Atualizacao isActive = true**
-   - Estado: Plugin ativo
+6. **Update isActive = true**
+   - State: Active plugin
 
-## Acesso a Dados pelo Plugin
+## Access a Dados pelo Plugin
 
 1. **Plugin chama bridge.db.read(model, query)**
-   - Estado: Chamada recebida
+   - State: Call received
 
 2. **checkPermission('read', model)**
    - Verifica PluginPermission no banco
-   - Estado: Permissao verificada
+   - State: Permission verified
 
 3. **Rate limit check** (50 req/s)
-   - Estado: Dentro do limite
+   - State: Within limit
 
-4. **Sanitizacao dos dados** (remove forbidden fields)
-   - Estado: Dados seguros retornados
+4. **Sanitization dos data** (remove forbidden fields)
+   - State: Secure data returned
 
 ## Boot na Inicializacao
 
 1. **PluginService.boot() busca plugins ativos**
-   - Estado: Lista de plugins
+   - State: Plugin list
 
 2. **Para cada plugin: ler entry, criar sandbox, executar**
-   - Estado: Plugins carregados
+   - State: Plugins loaded

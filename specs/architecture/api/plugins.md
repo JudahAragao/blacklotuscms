@@ -15,7 +15,7 @@ module: "plugins"
 - **Auth:** Required
 - **RBAC:** `plugin.manage`
 
-**Request:** multipart/form-data com campo "file" (ZIP)
+**Request:** multipart/form-data with campo "file" (ZIP)
 
 **Response 200:**
 ```json
@@ -41,4 +41,4 @@ module: "plugins"
 - **Auth:** Required
 - **RBAC:** `plugin.manage`
 
-**Gerencia permissoes pendentes/aprovadas/denegadas entre plugins e o sistema.**
+**Gerencia permissions pendentes/aprovadas/denegadas entre plugins e o system.**

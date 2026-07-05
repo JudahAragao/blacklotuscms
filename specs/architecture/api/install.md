@@ -23,7 +23,7 @@ module: "install"
 ### EP-02: Complete Installation
 - **Method:** `POST`
 - **Path:** `/api/install`
-- **Auth:** Public (apenas antes da instalacao)
+- **Auth:** Public (apenas antes da installation)
 
 **Request:**
 ```json
@@ -40,7 +40,7 @@ module: "install"
   "uploadDir": "./public/uploads",
   "sandboxMemoryLimit": "512",
   "sandboxTimeout": "30",
-  "adminEmail": "admin@example.com",
+  "adminEmail": "admin@example.with",
   "adminPassword": "password",
   "adminConfirmPassword": "password"
 }
@@ -52,7 +52,7 @@ module: "install"
 ```
 
 **Erros possíveis:**
-- `400` — Validacao do formulario falhou
+- `400` — Validcao do formulario falhou
 - `500` — Falha ao conectar ao banco ou criar tabelas
 
 ### EP-03: Health Check

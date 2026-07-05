@@ -30,7 +30,7 @@ module: "media"
 - **Auth:** Required
 - **RBAC:** `media.upload`
 
-**Request:** multipart/form-data com campo "file"
+**Request:** multipart/form-data with campo "file"
 
 **Response 201:**
 ```json
@@ -38,7 +38,7 @@ module: "media"
 ```
 
 **Erros possíveis:**
-- `400` — Arquivo não enviado
+- `400` — File não enviado
 - `401` — AUTH_UNAUTHORIZED
 - `403` — AUTH_FORBIDDEN
 - `500` — Erro no processamento da imagem

@@ -3,7 +3,7 @@ spec_version: "1.0"
 last_updated: "2026-07-05"
 author: "BlackLotusCMS Team"
 status: approved
-module: "comments"
+module: "withments"
 ---
 
 # API - Comments
@@ -12,7 +12,7 @@ module: "comments"
 
 ### EP-01: Create Comment
 - **Method:** `POST`
-- **Path:** `/api/v1/public/comments`
+- **Path:** `/api/v1/public/withments`
 - **Auth:** Public
 - **RBAC:** N/A
 
@@ -32,7 +32,7 @@ module: "comments"
 
 ### EP-02: List Comments for Post
 - **Method:** `GET`
-- **Path:** `/api/v1/public/comments?postId=uuid`
+- **Path:** `/api/v1/public/withments?postId=uuid`
 - **Auth:** Public (apenas approved)
 - **RBAC:** N/A
 
@@ -45,7 +45,7 @@ module: "comments"
 - **Method:** `DELETE`
 - **Path:** (via admin)
 - **Auth:** Required
-- **RBAC:** `comment.manage`
+- **RBAC:** `withment.manage`
 
 **Erros possíveis:**
 - `401` — AUTH_UNAUTHORIZED

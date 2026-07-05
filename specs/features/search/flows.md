@@ -8,20 +8,20 @@ feature: "search"
 
 # Search Flows
 
-## Busca Global
+## Search Global
 
-1. **Tema/usuario envia query**
-   - Estado: Query recebida
+1. **Theme/usuario envia query**
+   - State: Query received
 
-2. **Validacao: query.length >= 3**
-   - Estado: Query valida
+2. **Validcao: query.length >= 3**
+   - State: Valid query
 
-3. **Prisma query com OR**
+3. **Prisma query with OR**
    - title contains (insensitive)
    - content contains (insensitive)
    - metaValues value array_contains
    - Filtro: status = "published"
-   - Estado: Resultados obtidos
+   - State: Results obtained
 
 4. **Mapeamento para ThemePostDTO**
-   - Estado: Dados formatados
+   - State: Data formatted

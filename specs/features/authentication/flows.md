@@ -10,47 +10,47 @@ feature: "authentication"
 
 ## Login
 
-1. **Usuario acessa /auth/login**
-   - Estado: Formulario exibido
+1. **User acessa /auth/login**
+   - State: Form displayed
 
 2. **Envia credenciais (email + password)**
-   - Estado: Dados recebidos
+   - State: Data received
 
 3. **NextAuth CredentialsProvider authorize()**
-   - Busca User por email
+   - Search User por email
    - Compara bcrypt hash
-   - Estado: Credenciais validadas
+   - State: Credentials validadas
 
 4. **JWT callback: token.id = user.id, token.role = user.role**
-   - Estado: Token JWT criado
+   - State: JWT token created
 
 5. **Session callback: session.user.id = token.id**
-   - Estado: Sessao disponivel
+   - State: Session available
 
 ## API Key Auth
 
-1. **Requisicao com header Authorization: Bearer bl_xxx**
-   - Estado: Header detectado no proxy
+1. **Requisicao with header Authorization: Bearer bl_xxx**
+   - State: Header detected in proxy
 
 2. **ApiKeyService.validateKey()**
-   - Busca por SHA-256 hash
+   - Search por SHA-256 hash
    - Verifica expiracao
-   - Estado: Chave validada
+   - State: Key validated
 
 3. **Rate limit check (in-memory cache)**
-   - Estado: Dentro do limite ou erro 429
+   - State: Within limit ou erro 429
 
 4. **Headers injetados: x-api-user-id, x-api-user-role**
-   - Estado: Requisicao prossegue com identidade
+   - State: Requisicao prossegue with identidade
 
 ## RBAC Check
 
 1. **withApiAuth middleware**
    - Tenta NextAuth session
    - Se nao, tenta API Key headers
-   - Estado: Identidade obtida
+   - State: Identity obtained
 
 2. **hasCapability(role, capability)**
-   - Se Administrador: retorna true
-   - Senao: verifica capability JSON (nested paths suportados)
-   - Estado: Autorizado ou 403
+   - Se Administrador: returns true
+   - Otherwise: verifica capability JSON (nested paths supported)
+   - State: Authorized or 403

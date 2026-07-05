@@ -5,7 +5,7 @@ author: "BlackLotusCMS Team"
 status: approved
 ---
 
-# Design System - BlackLotusCMS
+# Design Syshas - BlackLotusCMS
 
 ## Visual Identity: "Aura Noir"
 
@@ -28,7 +28,7 @@ status: approved
 
 ### Components (Admin)
 - **Rich Text Editor:** TipTap with extensions (highlight, image, link, placeholder, underline)
-- **Media Picker:** Custom component with upload preview
+- **Media Picker:** Custom withponent with upload preview
 - **Post Editor:** Full editor with meta fields, taxonomy selection
 - **Skeleton:** Loading states
 - **Toaster:** Sonner for notifications (dark theme, top-right)

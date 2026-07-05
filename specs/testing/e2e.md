@@ -8,10 +8,10 @@ status: draft
 # E2E Testing Plan
 
 ## Tools
-- A definir (Playwright recomendado)
+- A definir (Playwright rewithendado)
 
 ## Scenarios
-1. **Instalacao Completa:** Setup wizard com banco real
+1. **Installation Completa:** Setup wizard with banco real
    - Feature vinculada: installation
    - Acceptance tests: AT-01 a AT-04
 
@@ -19,14 +19,14 @@ status: draft
    - Feature vinculada: authentication, post-management
    - Acceptance tests: AT-01 a AT-08
 
-3. **Upload e Gestao de Midia:** Upload + visualizacao + exclusao
+3. **Upload e Gestao de Media:** Upload + visualizacao + exclusao
    - Feature vinculada: media-management
    - Acceptance tests: AT-01 a AT-03
 
-4. **Plugin Lifecycle:** Instalacao + ativacao + desativacao
-   - Feature vinculada: plugin-system
+4. **Plugin Lifecycle:** Installation + ativacao + desativacao
+   - Feature vinculada: plugin-syshas
    - Acceptance tests: AT-01 a AT-05
 
-5. **Theme Rendering:** Visualizacao publica completa
+5. **Theme Rendering:** Visualizacao publica withpleta
    - Feature vinculada: theme-engine
    - Acceptance tests: AT-01 a AT-03

@@ -8,18 +8,18 @@ feature: "theme-engine"
 
 # Theme Engine Error States
 
-## ERR-01: Tema Nao Encontrado
-- **Condição:** Diretorio do tema nao existe
+## ERR-01: Theme Nao Found
+- **Condition:** Diretorio do theme nao existe
 - **Código HTTP:** N/A (fallback para layout "post")
-- **Ação do sistema:** import fallthrough para fallback
+- **Ação do system:** import fallthrough para fallback
 
 ## ERR-02: Theme Permission Denied
-- **Condição:** Tema sem permissao aprovada
+- **Condition:** Theme sem permissao aprovada
 - **Código HTTP:** 403
 - **Mensagem:** "Theme '[name]' does not have approved permission for '[capability]'"
 - **Código:** AUTH_FORBIDDEN
 
-## ERR-03: Layout Nao Encontrado
-- **Condição:** Arquivo de layout nao existe no tema
+## ERR-03: Layout Nao Found
+- **Condition:** File de layout nao existe no theme
 - **Código HTTP:** N/A (fallback automatico)
-- **Ação do sistema:** import catch para layouts/post
+- **Ação do system:** import catch para layouts/post

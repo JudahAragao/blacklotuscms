@@ -14,7 +14,7 @@ module: "posts"
 - **Method:** `GET`
 - **Path:** `/api/v1/posts/:type`
 - **Auth:** Public (apenas posts published)
-- **RBAC:** N/A (dados públicos)
+- **RBAC:** N/A (data públicos)
 
 **Response 200:**
 ```json
@@ -46,7 +46,7 @@ module: "posts"
 - `403` — AUTH_FORBIDDEN
 - `404` — RESOURCE_NOT_FOUND (PostType não existe)
 - `409` — Slug duplicado
-- `422` — Validação de MetaFields falhou
+- `422` — Validção de MetaFields falhou
 
 ### EP-03: Get Post by ID
 - **Method:** `GET`

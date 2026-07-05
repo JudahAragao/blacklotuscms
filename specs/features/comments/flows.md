@@ -3,41 +3,41 @@ spec_version: "1.0"
 last_updated: "2026-07-05"
 author: "BlackLotusCMS Team"
 status: approved
-feature: "comments"
+feature: "withments"
 ---
 
 # Comments Flows
 
-## Criar Comentario
+## Criar Comment
 
 1. **Visitante preenche formulario**
    - postId, author, email, content, parentId?
-   - Estado: Dados recebidos
+   - State: Data received
 
-2. **Validacao Zod** (CreateCommentSchema)
-   - Estado: Dados validados
+2. **Validcao Zod** (CreateCommentSchema)
+   - State: Validated data
 
 3. **Verificacao de captcha** (se habilitado)
-   - Estado: Captcha validado
+   - State: Captcha validado
 
 4. **Anti-spam check**
    - Blacklist de palavras
    - Contagem de links (>2 = spam)
-   - Estado: Classificado
+   - State: Classified
 
 5. **Determinacao de status**
    - Se spam: status = "spam"
    - Se auto_approve: status = "approved"
-   - Senao: status = "pending"
-   - Estado: Status definido
+   - Otherwise: status = "pending"
+   - State: Status defined
 
-6. **Criacao no banco**
-   - Estado: Comentario criado
+6. **Creation no banco**
+   - State: Comment created
 
-## Moderar Comentario
+## Moderar Comment
 
-1. **Admin visualiza comentarios pendentes**
-   - Estado: Lista exibida
+1. **Admin visualiza withentarios pendentes**
+   - State: List displayed
 
 2. **Admin aprova/denega/exclui**
-   - Estado: Acao tomada
+   - State: Action taken

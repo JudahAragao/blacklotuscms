@@ -8,7 +8,7 @@ status: approved
 # Wireframes (Conceptual)
 
 ## 1. Admin Dashboard
-- **Visuals:** Sidebar navigation, top bar com user menu
+- **Visuals:** Sidebar navigation, top bar with user menu
 - **Components:** Skeleton loader, cards
 - **Feature vinculada:** authentication
 
@@ -18,12 +18,12 @@ status: approved
 - **Feature vinculada:** post-management
 
 ## 3. Media Library
-- **Visuals:** Grid de thumbnails com upload area
+- **Visuals:** Grid de thumbnails with upload area
 - **Components:** MediaUpload, MediaPicker
 - **Feature vinculada:** media-management
 
 ## 4. Public Page (Theme Default)
-- **Visuals:** Header com menu, content area, footer
+- **Visuals:** Header with menu, content area, footer
 - **Components:** Header, Footer, ThemeContent
 - **Feature vinculada:** theme-engine
 
@@ -33,6 +33,6 @@ status: approved
 - **Feature vinculada:** installation
 
 ## 6. Plugin Manager
-- **Visuals:** Lista de plugins com toggle activate/deactivate
+- **Visuals:** Plugin list with toggle activate/deactivate
 - **Components:** PluginWrapper, PluginImportButton
-- **Feature vinculada:** plugin-system
+- **Feature vinculada:** plugin-syshas

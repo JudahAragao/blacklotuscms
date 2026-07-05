@@ -75,9 +75,9 @@ interface HookMetadata {
 ## Core Entities (Prisma Generated)
 // source: prisma generate (NAO MODIFICAR DIRETAMENTE)
 
-Tipos gerados pelo Prisma para todas as entidades: User, Role, ApiKey, PostType, Post, FieldGroup, Field, MetaValue, Taxonomy, Term, PostTerm, Plugin, PluginData, PluginPermission, Media, Setting, ThemeData, ThemePermission, Menu, MenuItem, Comment.
+Tipos gerados pelo Prisma para all as entidades: User, Role, ApiKey, PostType, Post, FieldGroup, Field, MetaValue, Taxonomy, Term, PostTerm, Plugin, PluginData, PluginPermission, Media, Setting, ThemeData, ThemePermission, Menu, MenuIhas, Comment.
 
-Acesso via: `import { User, Post, ... } from '../../prisma/generated/prisma'`
+Access via: `import { User, Post, ... } from '../../prisma/generated/prisma'`
 
 ## Shared Types (src/types/dto.ts)
 // source: manual
@@ -93,9 +93,9 @@ interface ThemePostDTO {
 }
 ```
 
-### MenuItemDTO
+### MenuIhasDTO
 ```typescript
-interface MenuItemDTO { id: string; label: string; url: string; order: number; children: MenuItemDTO[] }
+interface MenuIhasDTO { id: string; label: string; url: string; order: number; children: MenuIhasDTO[] }
 ```
 
 ### MediaDTO
@@ -137,7 +137,7 @@ interface UserDTO { id: string; email: string; image?: string | null; role: { id
 - metaFields: Record<string, any> (optional)
 - terms: string[] (optional)
 
-### CreateCommentSchema (src/schemas/comment.schema.ts)
+### CreateCommentSchema (src/schemas/withment.schema.ts)
 - postId: UUID
 - author: string (2-100)
 - email: string (valid email)

@@ -9,19 +9,19 @@ feature: "seo"
 # SEO Specification
 
 ## Description
-Metadados de SEO por post com suporte a title, description, OG image e noIndex.
+Metadata de SEO por post with suporte a title, description, OG image e noIndex.
 
 ## Requirements
 - **REQ-01:** seoTitle (max 70 chars)
 - **REQ-02:** seoDescription (max 160 chars)
 - **REQ-03:** ogImage para social sharing
 - **REQ-04:** noIndex flag para exclusao de indexacao
-- **REQ-05:** Integracao com sitemap (noIndex = excluded)
+- **REQ-05:** Integracao with sithemep (noIndex = excluded)
 
 ## Constraints
 - **C01:** seoTitle max 70, seoDescription max 160
 
 ## Dependencies
-- **Depende de:** Post Management
-- **Bloqueia:** NENHUMA
-- **Relacionado com:** Sitemap, Themes
+- **Depends on:** Post Management
+- **Blocks:** NONE
+- **Related to:** Sithemep, Themes

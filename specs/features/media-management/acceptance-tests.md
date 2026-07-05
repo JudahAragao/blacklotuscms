@@ -9,19 +9,19 @@ feature: "media-management"
 # Media Management Acceptance Tests
 
 ## AT-01: Upload de Imagem
-- **DADO** usuario autenticado com permissao media.upload
-- **QUANDO** envia arquivo JPEG via POST /api/v1/media
-- **ENTAO** arquivo e convertido para WebP, thumbnail gerado, registro criado
+- **GIVEN** usuario autenticado with permissao media.upload
+- **WHEN** envia arquivo JPEG via POST /api/v1/media
+- **THEN** arquivo e convertido para WebP, thumbnail gerado, registro criado
 - **Referencia:** FR08
 
-## AT-02: Upload Sem Permissao
-- **DADO** usuario sem capability media.upload
-- **QUANDO** envia arquivo via POST /api/v1/media
-- **ENTAO** retorna erro 403
+## AT-02: Upload Sem Permission
+- **GIVEN** usuario sem capability media.upload
+- **WHEN** envia arquivo via POST /api/v1/media
+- **THEN** retorna erro 403
 - **Referencia:** FR08, FR02
 
-## AT-03: Exclusao de Midia
-- **DADO** media existente no banco e storage
-- **QUANDO** exclusao e solicitada com permissao media.manage
-- **ENTAO** arquivo fisico e registro sao removidos
+## AT-03: Deletion de Media
+- **GIVEN** media existente no banco e storage
+- **WHEN** exclusao e solicitada with permissao media.manage
+- **THEN** arquivo fisico e registro sao removidos
 - **Referencia:** FR08

@@ -7,32 +7,32 @@ status: approved
 
 # User Flows - BlackLotusCMS
 
-## 1. Primeira Instalacao
+## 1. Primeira Installation
 Docker up -> /install -> Form -> Database Setup -> Admin Created -> /auth/login
 - Feature vinculada: installation
-- Fluxo documentado em: specs/features/installation/flows.md
+- Flow documentado em: specs/features/installation/flows.md
 
-## 2. Criacao de Conteudo
+## 2. Creation de Conteudo
 Login -> Admin -> Posts -> New -> Editor -> Save -> Published
 - Feature vinculada: post-management
-- Fluxo documentado em: specs/features/post-management/flows.md
+- Flow documentado em: specs/features/post-management/flows.md
 
-## 3. Upload de Midia
+## 3. Upload de Media
 Login -> Admin -> Media -> Upload -> WebP Convert -> Library
 - Feature vinculada: media-management
-- Fluxo documentado em: specs/features/media-management/flows.md
+- Flow documentado em: specs/features/media-management/flows.md
 
-## 4. Instalacao de Plugin
+## 4. Installation de Plugin
 Login -> Admin -> Plugins -> Upload ZIP -> Activate -> Sandbox Execute
-- Feature vinculada: plugin-system
-- Fluxo documentado em: specs/features/plugin-system/flows.md
+- Feature vinculada: plugin-syshas
+- Flow documentado em: specs/features/plugin-syshas/flows.md
 
 ## 5. Visitante Acessa Site
 / -> Theme Layout -> Posts List -> Post Single -> Comments
 - Feature vinculada: theme-engine
-- Fluxo documentado em: specs/features/theme-engine/flows.md
+- Flow documentado em: specs/features/theme-engine/flows.md
 
-## 6. Busca Publica
+## 6. Search Publica
 /search?q=query -> SearchService -> Results -> Theme Layout
 - Feature vinculada: search
-- Fluxo documentado em: specs/features/search/flows.md
+- Flow documentado em: specs/features/search/flows.md

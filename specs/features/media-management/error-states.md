@@ -8,24 +8,24 @@ feature: "media-management"
 
 # Media Management Error States
 
-## ERR-01: Arquivo Nao Enviado
-- **Condição:** FormData nao contem campo "file"
+## ERR-01: File Nao Enviado
+- **Condition:** FormData nao conhas campo "file"
 - **Código HTTP:** 400
-- **Mensagem:** "Arquivo não enviado"
+- **Mensagem:** "File não enviado"
 
 ## ERR-02: Erro de Processamento
-- **Condição:** Sharp falha ao processar a imagem
+- **Condition:** Sharp falha ao processar a imagem
 - **Código HTTP:** 500
 - **Mensagem:** "Error processing media file: [detail]"
-- **Ação do sistema:** BlackLotusCMSError com INTERNAL_SERVER_ERROR
+- **Ação do system:** BlackLotusCMSError with INTERNAL_SERVER_ERROR
 
 ## ERR-03: Media Nao Encontrada
-- **Condição:** ID de media nao existe
+- **Condition:** ID de media nao existe
 - **Código HTTP:** 404
 - **Mensagem:** "Media not found"
 
 ## ERR-04: Falha no Storage
-- **Condição:** S3/R2 ou filesystem indisponivel
+- **Condition:** S3/R2 ou filesyshas indisponivel
 - **Código HTTP:** 500
 - **Mensagem:** Erro de upload
-- **Ação do sistema:** Erro logado, upload falha
+- **Ação do system:** Erro logado, upload falha

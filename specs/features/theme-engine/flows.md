@@ -8,48 +8,48 @@ feature: "theme-engine"
 
 # Theme Engine Flows
 
-## Renderizar Pagina Publica
+## Renderizar Page Publica
 
 1. **Rota publica detecta contexto** (single, archive, search, 404)
-   - Estado: Contexto determinado
+   - State: Contexto determinado
 
-2. **ThemeRenderer busca tema ativo**
+2. **ThemeRenderer busca theme ativo**
    - ThemeService.getActiveTheme()
-   - Estado: Nome do tema obtido
+   - State: Nome do theme obtido
 
-3. **Sanitizacao do nome do tema**
+3. **Sanitization do nome do theme**
    - sanitizePath(rawThemeName)
-   - Estado: Tema seguro
+   - State: Theme seguro
 
-4. **Mascaramento de dados**
+4. **Mascaramento de data**
    - maskSensitiveData(data)
-   - Estado: Dados seguros
+   - State: Dados seguros
 
 5. **Dynamic import do layout**
    - import(`../../themes/${themeName}/layouts/${layoutFile}`)
-   - Estado: Componente carregado
+   - State: Componente carregado
 
-6. **Busca de ThemeData para CSS Variables**
+6. **Search de ThemeData para CSS Variables**
    - ThemeDataService.listAll(themeName)
-   - Estado: Variaveis CSS prontas
+   - State: Variaveis CSS prontas
 
 7. **Inject de CSS + Theme Layout**
    - @import url('/api/themes/${themeName}/style')
    - CSS Variables injetadas
-   - Estado: Pagina renderizada
+   - State: Page renderizada
 
-## Gerenciar Permissoes de Tema
+## Gerenciar Permissions de Theme
 
-1. **Tema tenta acessar dado** (ex: db.read.post)
-   - Estado: Chamada recebida
+1. **Theme tenta acessar dado** (ex: db.read.post)
+   - State: Call received
 
 2. **ThemeDataService.validate(capability)**
-   - Busca ThemePermission no banco
-   - Estado: Permissao verificada
+   - Search ThemePermission no banco
+   - State: Permission verified
 
 3. **Se nao aprovada: requestPermission()**
-   - Cria/solicita ThemePermission com status "pending"
-   - Estado: Solicitacao registrada
+   - Cria/solicita ThemePermission with status "pending"
+   - State: Request registrada
 
 4. **Admin aprova/denega via painel**
-   - Estado: Permissao processada
+   - State: Permission processada

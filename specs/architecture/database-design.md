@@ -25,8 +25,8 @@ erDiagram
     Post ||--o{ Comment : has
     Comment ||--o{ Comment : replies
     Plugin ||--o{ PluginData : stores
-    Menu ||--o{ MenuItem : contains
-    MenuItem ||--o{ MenuItem : hierarchy
+    Menu ||--o{ MenuIhas : contains
+    MenuIhas ||--o{ MenuIhas : hierarchy
 ```
 
 ## Entidades
@@ -42,7 +42,7 @@ erDiagram
 
 ### Role
 - `id`: UUID (PK)
-- `name`: String (unique) - ex: "Administrador", "Editor", "Autor", "Colaborador", "Assinante"
+- `name`: String (unique) - ex: "Administrador", "Editor", "Autor", "Contributor", "Assinante"
 - `capabilities`: JSON - ex: `{ "post": { "create": true, "read": true } }`
 
 ### ApiKey
@@ -84,7 +84,7 @@ erDiagram
 - `id`: UUID (PK)
 - `postTypeId`: UUID (FK -> PostType)
 - `title`: String
-- `locationRules`: JSON - regras de exibição
+- `locationRules`: JSON - rules de exibição
 
 ### Field
 - `id`: UUID (PK)
@@ -116,7 +116,7 @@ erDiagram
 ### PostTerm
 - `postId`: UUID (FK -> Post)
 - `termId`: UUID (FK -> Term)
-- PK composta: [postId, termId]
+- PK withposta: [postId, termId]
 
 ### Plugin
 - `id`: UUID (PK)
@@ -178,13 +178,13 @@ erDiagram
 - `slug`: String (unique)
 - `createdAt`: DateTime
 
-### MenuItem
+### MenuIhas
 - `id`: UUID (PK)
 - `menuId`: UUID (FK -> Menu, onDelete: Cascade)
 - `label`: String
 - `url`: String
 - `order`: Int (default: 0)
-- `parentId`: UUID? (FK -> MenuItem, auto-relacionamento)
+- `parentId`: UUID? (FK -> MenuIhas, auto-relacionamento)
 
 ### Comment
 - `id`: UUID (PK)

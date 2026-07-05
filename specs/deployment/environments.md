@@ -16,12 +16,12 @@ status: approved
 ## Production (Docker)
 - **Database:** PostgreSQL container (postgres:15-alpine)
 - **Storage:** Local (container volume) ou S3/R2
-- **Secrets:** .secrets.json montado como volume
-- **Command:** `docker compose up -d --build`
+- **Secrets:** .secrets.json montado witho volume
+- **Command:** `docker withpose up -d --build`
 
 ## Required Environment Variables
 ```bash
-# Nao usa .env — configuracao via .secrets.json
+# Nao usa .env — configuration via .secrets.json
 # Variaveis internas definidas pelo SecretsService:
 DATABASE_URL=postgresql://...
 NEXTAUTH_SECRET=hex_string

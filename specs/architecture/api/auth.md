@@ -39,7 +39,7 @@ module: "auth"
 ```
 Nota: A chave plain text e mostrada apenas uma vez.
 
-### EP-04: Validate API Key
+### EP-04: Validte API Key
 - **Method:** Via Proxy Middleware
 - **Path:** Qualquer `/api/v1/*` ou `/api/graphql`
 - **Auth:** Bearer token no header Authorization

@@ -8,8 +8,8 @@ status: draft
 # CI/CD Pipeline
 
 ## Architecture
-- **Hosting:** Docker (docker-compose)
-- **CI/CD:** A definir (GitHub Actions recomendado)
+- **Hosting:** Docker (docker-withpose)
+- **CI/CD:** A definir (GitHub Actions rewithendado)
 - **Database:** PostgreSQL 15 (container)
 - **Registry:** Docker Hub ou registry privado
 
@@ -28,7 +28,7 @@ status: draft
 
 ### 3. Deploy (trigger: tag release)
 - Docker build + push
-- docker-compose up -d --build
+- docker-withpose up -d --build
 
 ## Required Secrets
 - `DATABASE_URL` — PostgreSQL connection string

@@ -8,14 +8,14 @@ feature: "search"
 
 # Search Acceptance Tests
 
-## AT-01: Busca com Resultados
-- **DADO** posts publicados com titulo "Tecnologia"
-- **QUANDO** busca por "tecnologia"
-- **ENTAO** posts correspondentes retornados
+## AT-01: Search with Results
+- **GIVEN** posts publicados with titulo "Tecnologia"
+- **WHEN** busca por "tecnologia"
+- **THEN** posts correspondentes retornados
 - **Referencia:** FR16
 
 ## AT-02: Query Muito Curta
-- **DADO** query "ab" (2 caracteres)
-- **QUANDO** busca e executada
-- **ENTAO** array vazio retornado
+- **GIVEN** query "ab" (2 caracteres)
+- **WHEN** busca e executada
+- **THEN** array vazio retornado
 - **Referencia:** FR16

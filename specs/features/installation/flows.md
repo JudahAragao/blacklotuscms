@@ -8,61 +8,61 @@ feature: "installation"
 
 # Installation Flows
 
-## Fluxo de Instalacao
+## Flow de Installation
 
-1. **Usuario acessa qualquer rota**
+1. **User acessa qualquer rota**
    - Proxy verifica: SecretsService.isInstalled()
-   - Estado: Nao instalado
+   - State: Nao instalado
 
 2. **Redirect para /install**
-   - Estado: Wizard exibido
+   - State: Wizard exibido
 
-3. **Usuario preenche formulario**
+3. **User preenche formulario**
    - Database config
    - Storage config
    - Admin credentials
-   - Estado: Formulario completo
+   - State: Form withpleto
 
-4. **Validacao do formulario**
+4. **Validcao do formulario**
    - InstallService.validateForm()
-   - Estado: Dados validados
+   - State: Validated data
 
 5. **Construcao do DATABASE_URL**
    - BuildDatabaseUrl()
-   - Estado: URL pronta
+   - State: URL pronta
 
 6. **Geracao de NEXTAUTH_SECRET**
    - crypto.randomBytes(32)
-   - Estado: Secret gerado
+   - State: Secret gerado
 
 7. **Save SecretsService.save()**
-   - Estado: .secrets.json atualizado
+   - State: .secrets.json atualizado
 
 8. **Prisma db push**
    - Schema aplicado ao banco
-   - Estado: Tabelas criadas
+   - State: Tabelas criadas
 
 9. **resetPrismaInstance()**
-   - Prisma reconecta com nova URL
-   - Estado: Conexao ativa
+   - Prisma reconecta with nova URL
+   - State: Connection ativa
 
-10. **Criacao de roles padrao**
-    - 5 roles com capabilities JSON
-    - Estado: Roles criadas
+10. **Creation de roles default**
+    - 5 roles with capabilities JSON
+    - State: Roles criadas
 
-11. **Criacao de PostTypes padrao**
+11. **Creation de PostTypes default**
     - post e page
-    - Estado: PostTypes criados
+    - State: PostTypes criados
 
-12. **Criacao de admin user**
+12. **Creation de admin user**
     - Email + bcrypt hash
-    - Estado: Admin criado
+    - State: Admin criado
 
 13. **Save settings (storage_driver, s3_config)**
-    - Estado: Settings salvas
+    - State: Settings salvas
 
 14. **markAsInstalled()**
     - Cria arquivo .installed
-    - Estado: Instalacao concluida
+    - State: Installation concluida
 
 15. **Redirect para /auth/login**

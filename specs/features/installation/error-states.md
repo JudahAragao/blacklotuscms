@@ -9,16 +9,16 @@ feature: "installation"
 # Installation Error States
 
 ## ERR-01: Database Connection Failed
-- **Condição:** Credenciais incorretas ou banco indisponivel
+- **Condition:** Credentials incorretas ou banco indisponivel
 - **Código HTTP:** 500
 - **Mensagem:** "Failed to connect to the database: [detail]"
 
 ## ERR-02: Schema Application Failed
-- **Condição:** prisma db push falhou
+- **Condition:** prisma db push falhou
 - **Código HTTP:** 500
-- **Mensagem:** "Falha ao criar tabelas no banco de dados. Verifique as credenciais e permissões."
+- **Mensagem:** "Falha ao criar tabelas no banco de data. Verifique as credenciais e permissões."
 
-## ERR-03: Validation Error
-- **Condição:** Formulario com campos invalidos
+## ERR-03: Validtion Error
+- **Condition:** Form with fields invalidos
 - **Código HTTP:** 400
 - **Mensagem:** Lista de erros de validacao
