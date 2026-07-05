@@ -150,6 +150,106 @@ flowchart TD
 | Prisma | `src/lib/prisma.ts` | Lazy database client |
 | Services | `src/core/services/` | Business logic with RBAC |
 | Sandbox | `src/core/sandbox/` | Plugin isolation (isolated-vm) |
+| Hooks | `src/core/services/HookService.ts` | Actions + Filters system |
+| Theme Renderer | `src/components/ThemeRenderer.tsx` | Dynamic theme loading |
+
+---
+
+## Core Systems
+
+### Plugin System
+
+Plugins execute in an isolated sandbox (`isolated-vm`) with a secure Bridge API:
+
+```mermaid
+flowchart LR
+    A[Plugin ZIP] --> B[PluginService]
+    B --> C[PluginSandbox]
+    C --> D[Bridge API]
+    D --> E[db.read/write]
+    D --> F[hooks.addAction/addFilter]
+    D --> G[storage.set/get]
+    D --> H[auth.getUser]
+    
+    style C fill:#fff3e0
+    style D fill:#e8f5e9
+```
+
+- **Sandbox:** Memory limit (512MB default), timeout (30s default)
+- **Rate Limit:** 50 DB queries/second per plugin
+- **Permissions:** Plugins must request access to data/hooks
+- **Docs:** [Plugin Development Guide](./docs/PLUGINS.md)
+
+### Hook System (Actions + Filters)
+
+WordPress-style extensibility ported to TypeScript:
+
+```typescript
+// Register an action (event handler)
+hookService.addAction('post.created', (post) => {
+  console.log('New post:', post.title);
+});
+
+// Register a filter (data transformation)
+hookService.addFilter('post.before_validate', (data) => {
+  data.title = data.title.trim();
+  return data;
+});
+```
+
+- **Actions:** Execute code at specific points (post.created, user.updated)
+- **Filters:** Transform data in pipeline (content.title, route_access)
+- **Audit Log:** All hook calls are logged with source and timestamp
+
+### Theme System
+
+Themes are React Server Components with CSS scoping:
+
+```mermaid
+flowchart TD
+    A[ThemeRenderer] --> B{Context}
+    B -->|single| C[layouts/post.tsx]
+    B -->|archive| D[layouts/archive.tsx]
+    B -->|search| E[layouts/search.tsx]
+    B -->|404| F[layouts/404.tsx]
+    
+    A --> G[ThemeDataService]
+    G --> H[CSS Variables]
+    
+    A --> I[Theme Context]
+    I --> J[AsyncLocalStorage]
+    
+    style A fill:#e1f5fe
+    style J fill:#f3e5f5
+```
+
+- **Dynamic Import:** Layouts loaded based on route context
+- **CSS Scoping:** All styles wrapped in `.blacklotuscms-theme`
+- **Permission Gate:** Themes request access to system data
+- **SDK:** `getPost()`, `getField()`, `getPostsByType()` helpers
+- **Docs:** [Theme Development Guide](./docs/THEMES.md)
+
+### RBAC (Role-Based Access Control)
+
+```typescript
+// Capability check
+if (!canPerformAction(user, 'post.create')) {
+  throw new BlackLotusCMSError('No permission', 403, 'AUTH_FORBIDDEN');
+}
+
+// Own resource check
+if (!canPerformAction(user, 'post.update', post.authorId)) {
+  // User can only edit their own posts
+}
+```
+
+| Role | Capabilities |
+|------|--------------|
+| Administrador | Full access (bypass all checks) |
+| Editor | CRUD all posts, media, comments |
+| Autor | CRUD own posts, upload media |
+| Colaborador | Create drafts only |
+| Assinante | Read content, edit profile |
 
 ---
 
