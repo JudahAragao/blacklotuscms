@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: blacklotuscms
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - blacklotuscms-network
+
+  # BlackLotusCMS Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/uploads
+      # Persiste o arquivo de instalação e configuração
+      - ./.secrets.json:/app/.secrets.json
+      - ./.installed:/app/.installed
+    networks:
+      - blacklotuscms-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  uploads:
+
+networks:
+  blacklotuscms-network:
+    driver: bridge

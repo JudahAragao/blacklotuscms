@@ -1,0 +1,338 @@
+@import "tailwindcss";
+
+@source "../../themes";
+@source "../components";
+@source "../app";
+
+@theme {
+  /* Colors - Aura Noir Palette (System Defaults) */
+  --color-background: #121317;
+  --color-on-background: #e3e2e7;
+
+  --color-surface: #121317;
+  --color-surface-dim: #121317;
+  --color-surface-bright: #38393d;
+  --color-surface-container-lowest: #0d0e12;
+  --color-surface-container-low: #1a1b1f;
+  --color-surface-container: #1e1f23;
+  --color-surface-container-high: #292a2e;
+  --color-surface-container-highest: #343539;
+  --color-on-surface: #e3e2e7;
+  --color-on-surface-variant: #d0c5af;
+
+  --color-primary: #f2ca50;
+  --color-on-primary: #3c2f00;
+  --color-primary-container: #d4af37;
+  --color-on-primary-container: #554300;
+
+  --color-secondary: #c8c6c5;
+  --color-on-secondary: #313030;
+  --color-secondary-container: #474746;
+  --color-on-secondary-container: #b7b5b4;
+
+  --color-outline: #99907c;
+  --color-outline-variant: #4d4635;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+
+  /* Admin Light Theme - Acoes e Superficies */
+  --color-action: #2271b1;
+  --color-action-hover: #135e96;
+  --color-action-light: #f0f6fc;
+
+  --color-surface-page: #f0f0f1;
+  --color-surface-card: #ffffff;
+  --color-surface-muted: #f9f9f9;
+
+  --color-border-default: #c3c4c7;
+  --color-border-input: #8c8f94;
+  --color-border-focus: #2271b1;
+
+  --color-text-heading: #1d2327;
+  --color-text-body: #50575e;
+  --color-text-muted: #787c82;
+
+  --color-status-published: #00a32a;
+  --color-status-draft: #dba617;
+  --color-status-trash: #b32d2e;
+  --color-status-inactive: #8c8f94;
+
+  /* Typography */
+  --font-sans: var(--font-roboto), system-ui, sans-serif;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+}
+
+@layer base {
+  /* Admin Shield - Garante que o Admin use os valores corretos independente do tema */
+  .bl-admin {
+    --color-background: #121317;
+    --color-primary: #f2ca50;
+    --color-on-background: #e3e2e7;
+    --color-surface: #121317;
+
+    /* Light theme tokens - garantidos no admin */
+    --color-action: #2271b1;
+    --color-action-hover: #135e96;
+    --color-action-light: #f0f6fc;
+    --color-surface-page: #f0f0f1;
+    --color-surface-card: #ffffff;
+    --color-surface-muted: #f9f9f9;
+    --color-border-default: #c3c4c7;
+    --color-border-input: #8c8f94;
+    --color-border-focus: #2271b1;
+    --color-text-heading: #1d2327;
+    --color-text-body: #50575e;
+    --color-text-muted: #787c82;
+    --color-status-published: #00a32a;
+    --color-status-draft: #dba617;
+    --color-status-trash: #b32d2e;
+    --color-status-inactive: #8c8f94;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-on-background font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans;
+  }
+
+  button, 
+  [role="button"],
+  select,
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"] {
+    @apply cursor-pointer;
+  }
+
+  a {
+    @apply cursor-pointer;
+  }
+}
+
+@utility headline-xl {
+  @apply font-sans text-[44px] font-bold leading-[1.1] tracking-[-0.01em];
+}
+
+@utility headline-lg {
+  @apply font-sans text-[30px] font-semibold leading-[1.2] tracking-normal;
+}
+
+@utility headline-md {
+  @apply font-sans text-[22px] font-semibold leading-[1.3] tracking-normal;
+}
+
+@utility body-lg {
+  @apply font-sans text-[18px] font-normal leading-[1.6] tracking-normal;
+}
+
+@utility body-md {
+  @apply font-sans text-[16px] font-normal leading-[1.5] tracking-normal;
+}
+
+@utility label-caps {
+  @apply font-sans text-[11px] font-bold leading-none tracking-[0.12em] uppercase;
+}
+
+@utility glass-card {
+  @apply bg-surface-container/60 backdrop-blur-md border border-white/10 shadow-xl rounded-md;
+  background-image: linear-gradient(to bottom right, rgba(255,255,255,0.05), transparent);
+}
+
+@utility gold-glow {
+  @apply border border-primary/20 shadow-[0_0_20px_rgba(242,202,80,0.08)] rounded-md;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-on-primary px-6 py-3 font-bold transition-all hover:brightness-110 active:scale-95 rounded-md cursor-pointer;
+    @apply border-t border-t-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)];
+  }
+
+  .btn-ghost {
+    @apply border border-primary/50 text-primary px-6 py-3 transition-all hover:bg-primary/10 rounded-md cursor-pointer;
+  }
+
+  .input-minimal {
+    @apply bg-transparent border-b border-outline-variant py-2 focus:border-primary outline-none transition-colors;
+    @apply font-sans text-[13px] font-medium leading-none tracking-wide text-on-background;
+  }
+
+  .select-minimal {
+    @apply bg-transparent border-b border-outline-variant py-2 focus:border-primary outline-none transition-colors;
+    @apply font-sans text-[13px] font-medium leading-none tracking-wide text-on-background;
+    @apply appearance-none cursor-pointer;
+  }
+
+  select option {
+    @apply bg-surface-container-high text-on-background py-2;
+  }
+}
+
+/* ============================================================
+   ADMIN LIGHT THEME - Novas Classes
+   Nao substituem as existentes - coexistem para migracao gradual
+   ============================================================ */
+
+/* Card de conteudo para area clara */
+@utility content-card {
+  @apply bg-surface-card border border-border-default rounded shadow-sm;
+}
+
+/* Botoes de acao */
+@utility btn-action {
+  @apply bg-action text-white px-5 py-2.5 font-semibold rounded cursor-pointer
+         hover:bg-action-hover active:scale-[0.98] transition-all text-sm;
+}
+
+@utility btn-action-secondary {
+  @apply bg-surface-card text-action border border-action px-5 py-2.5 rounded cursor-pointer
+         hover:bg-action-light transition-colors text-sm;
+}
+
+@utility btn-danger {
+  @apply bg-status-trash text-white px-5 py-2.5 font-semibold rounded cursor-pointer
+         hover:brightness-110 transition-all text-sm;
+}
+
+/* Campos de formulario para area clara */
+@utility field-input {
+  @apply bg-surface-card border border-border-input rounded px-3 py-2
+         text-sm focus:border-border-focus focus:shadow-[0_0_0_1px_var(--color-border-focus)]
+         outline-none transition-all text-text-heading placeholder:text-text-muted;
+}
+
+@utility field-select {
+  @apply bg-surface-card border border-border-input rounded px-3 py-2
+         text-sm focus:border-border-focus focus:shadow-[0_0_0_1px_var(--color-border-focus)]
+         outline-none transition-all appearance-none cursor-pointer text-text-heading;
+}
+
+@utility field-textarea {
+  @apply bg-surface-card border border-border-input rounded px-3 py-2
+         text-sm focus:border-border-focus focus:shadow-[0_0_0_1px_var(--color-border-focus)]
+         outline-none transition-all resize-none text-text-heading placeholder:text-text-muted;
+}
+
+/* Labels em formularios */
+@utility label-field {
+  @apply text-sm font-medium text-text-heading leading-none;
+}
+
+@utility label-field-muted {
+  @apply text-xs text-text-muted leading-none;
+}
+
+/* Badges de status */
+@utility status-badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold;
+}
+
+@utility status-published {
+  @apply status-badge bg-status-published text-white;
+}
+
+@utility status-draft {
+  @apply status-badge bg-status-draft text-white;
+}
+
+@utility status-trash {
+  @apply status-badge bg-status-trash text-white;
+}
+
+@utility status-inactive {
+  @apply status-badge bg-status-inactive text-white;
+}
+
+/* Meta box (secao colapsavel) */
+@utility meta-box {
+  @apply bg-surface-card border border-border-default rounded shadow-sm;
+}
+
+@utility meta-box-header {
+  @apply px-4 py-3 border-b border-border-default bg-surface-muted font-semibold text-sm text-text-heading;
+}
+
+/* Tabela de dados */
+@utility data-table {
+  @apply w-full border-collapse bg-surface-card border border-border-default text-sm;
+}
+
+@utility data-table th {
+  @apply px-4 py-3 text-left text-xs font-semibold text-text-muted border-b border-border-default bg-surface-muted;
+}
+
+@utility data-table td {
+  @apply px-4 py-3 border-b border-border-default text-text-heading;
+}
+
+@utility data-table tr:last-child td {
+  @apply border-b-0;
+}
+
+@utility data-table tr:hover td {
+  @apply bg-[#f6f7f7];
+}
+
+/* Barra de ferramentas de listagem */
+@utility list-toolbar {
+  @apply flex items-center justify-between px-4 py-3 bg-surface-card border-b border-border-default;
+}
+
+/* Area de conteudo clara */
+@utility admin-content {
+  @apply bg-surface-page min-h-screen;
+}
+
+/* Paginacao */
+@utility pagination {
+  @apply flex items-center justify-between px-4 py-3 bg-surface-card border-t border-border-default text-sm text-text-body;
+}
+
+/* Secao de filtros */
+@utility filter-bar {
+  @apply flex items-center gap-3 px-4 py-3 bg-surface-card border-b border-border-default;
+}
+
+/* Checkbox simples */
+@utility check-field {
+  @apply w-4 h-4 rounded border border-border-input text-action accent-action cursor-pointer;
+}
+
+@utility custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &:hover {
+    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  }
+}

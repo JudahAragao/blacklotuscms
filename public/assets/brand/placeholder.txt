@@ -1,0 +1,2 @@
+// Este arquivo será substituído pela imagem real enviada pelo usuário
+// Vou criar a estrutura de pastas e preparar o componente de Logo

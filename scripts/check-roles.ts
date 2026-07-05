@@ -1,0 +1,1 @@
+import { PrismaClient } from './prisma/generated/prisma'; const prisma = new PrismaClient(); async function check() { const roles = await prisma.role.findMany(); console.log(JSON.stringify(roles, null, 2)); } check().finally(() => prisma.$disconnect());

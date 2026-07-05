@@ -1,0 +1,273 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+generator pothos {
+  provider = "prisma-pothos-types"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  roleId        String
+  role          Role      @relation(fields: [roleId], references: [id])
+  posts         Post[]
+  apiKeys       ApiKey[]
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model ApiKey {
+  id          String    @id @default(uuid())
+  name        String    // Ex: "App Mobile", "Integração ERP"
+  key         String    @unique // Chave truncada ou hash para busca
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rateLimit   Int       @default(60) // Requisições por minuto
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Role {
+  id            String    @id @default(uuid())
+  name          String    @unique
+  capabilities  Json      // Ex: { "post.create": true, "plugin.install": false }
+  users         User[]
+}
+
+model PostType {
+  id              String        @id @default(uuid())
+  slug            String        @unique
+  label           String
+  hierarchical    Boolean       @default(false)
+  showInRest      Boolean       @default(true)
+  showInGraphql   Boolean       @default(true)
+  settings        Json?
+  
+  // Customizações de Interface (Supports)
+  supportsTitle      Boolean    @default(true)
+  supportsEditor     Boolean    @default(true)
+  supportsPermalink  Boolean    @default(true)
+  supportsTaxonomies Boolean    @default(true)
+
+  posts           Post[]
+  fieldGroups     FieldGroup[]
+  taxonomies      Taxonomy[]
+}
+
+model Post {
+  id            String      @id @default(uuid())
+  postTypeId    String
+  postType      PostType    @relation(fields: [postTypeId], references: [id])
+  title         String
+  slug          String      @unique
+  content       String?     @db.Text
+  status        String      @default("draft") // draft, published, private
+  authorId      String
+  author        User        @relation(fields: [authorId], references: [id])
+  metaValues    MetaValue[]
+  terms         PostTerm[]
+  comments      Comment[]
+  publishedAt   DateTime?
+  expiresAt     DateTime?
+  
+  // SEO Avançado
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+  noIndex        Boolean   @default(false)
+  
+  // Auditoria
+  createdBy     String?
+  updatedBy     String?
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([authorId])
+  @@index([postTypeId])
+}
+
+model FieldGroup {
+  id            String    @id @default(uuid())
+  postTypeId    String
+  postType      PostType  @relation(fields: [postTypeId], references: [id])
+  title         String
+  locationRules Json      // Regras de onde mostrar esse grupo
+  fields        Field[]
+}
+
+model Field {
+  id            String      @id @default(uuid())
+  fieldGroupId  String
+  fieldGroup    FieldGroup  @relation(fields: [fieldGroupId], references: [id])
+  name          String      // Chave interna (ex: "telefone_contato")
+  label         String      // Nome exibido (ex: "Telefone de Contato")
+  type          String      // text, image, repeater, etc
+  config        Json        // Configurações como min/max, required
+  metaValues    MetaValue[]
+}
+
+model MetaValue {
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  fieldId   String
+  field     Field    @relation(fields: [fieldId], references: [id])
+  value     Json     // O dado real (string, array, object, etc)
+
+  @@index([postId])
+  @@index([fieldId])
+}
+
+model Taxonomy {
+  id          String    @id @default(uuid())
+  slug        String    @unique
+  label       String
+  postTypeId  String
+  postType    PostType  @relation(fields: [postTypeId], references: [id])
+  terms       Term[]
+}
+
+model Term {
+  id          String     @id @default(uuid())
+  taxonomyId  String
+  taxonomy    Taxonomy   @relation(fields: [taxonomyId], references: [id])
+  name        String
+  slug        String     @unique
+  posts       PostTerm[]
+}
+
+model PostTerm {
+  postId  String
+  post    Post   @relation(fields: [postId], references: [id])
+  termId  String
+  term    Term   @relation(fields: [termId], references: [id])
+
+  @@id([postId, termId])
+}
+
+model Plugin {
+  id                    String   @id @default(uuid())
+  name                  String   @unique
+  version               String
+  isActive              Boolean  @default(false)
+  manifest              Json     // Conteúdo do plugin.json
+  authorizedPermissions Json?    // Permissões críticas confirmadas pelo usuário
+  sandboxId             String?  // ID do isolamento em execução
+  
+  // Relacionamentos para o novo sistema de dados
+  storageData           PluginData[]
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model PluginData {
+  id        String   @id @default(uuid())
+  pluginId  String
+  plugin    Plugin   @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+  key       String
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([pluginId, key])
+}
+
+model PluginPermission {
+  id              String   @id @default(uuid())
+  requesterPlugin String   // Nome/Slug do plugin que solicita
+  providerPlugin  String   // Nome/Slug do plugin dono do dado
+  capability      String   // "read", "write", "manage"
+  status          String   @default("pending") // pending, approved, denied
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([requesterPlugin, providerPlugin, capability])
+}
+
+model Media {
+  id          String   @id @default(uuid())
+  name        String
+  url         String
+  thumbnail   String?
+  mimeType    String
+  size        Int
+  metadata    Json?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+}
+
+model Setting {
+  key   String @id
+  value Json
+}
+
+model ThemeData {
+  id        String   @id @default(uuid())
+  themeName String   // Nome/Slug do tema (ex: "default")
+  key       String
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([themeName, key])
+}
+
+model ThemePermission {
+  id              String   @id @default(uuid())
+  requesterTheme  String   // Nome do tema que solicita
+  providerName    String   // 'system' ou nome de um plugin
+  capability      String   // ex: "db.read.post"
+  status          String   @default("pending")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([requesterTheme, providerName, capability])
+}
+
+model Menu {
+  id        String     @id @default(uuid())
+  name      String     @unique // ex: "Header Principal"
+  slug      String     @unique // ex: "header"
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+}
+
+model MenuItem {
+  id        String   @id @default(uuid())
+  menuId    String
+  menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  label     String
+  url       String
+  order     Int      @default(0)
+  parentId  String?
+  parent    MenuItem?  @relation("MenuHierarchy", fields: [parentId], references: [id])
+  children  MenuItem[] @relation("MenuHierarchy")
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    String    // Nome do autor
+  email     String
+  content   String    @db.Text
+  status    String    @default("pending") // approved, pending, spam
+  ip        String?
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  createdBy String?
+  createdAt DateTime  @default(now())
+}

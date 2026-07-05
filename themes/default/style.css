@@ -1,0 +1,79 @@
+/* 
+  Lotus Default - Theme Styles
+  Este arquivo é carregado dinamicamente pelo ThemeRenderer.
+  Aqui o desenvolvedor tem liberdade total para definir o visual do site.
+*/
+
+:root {
+  --theme-primary: #3b82f6; /* Azul moderno */
+  --theme-primary-dark: #2563eb;
+  --theme-text-main: #1e293b;
+  --theme-text-muted: #64748b;
+  --theme-bg-body: #ffffff;
+  --theme-bg-soft: #f8fafc;
+}
+
+/* Tipografia e Base */
+.blacklotuscms-theme {
+  font-family: var(--font-roboto), system-ui, sans-serif;
+  color: var(--theme-text-main);
+  background-color: var(--theme-bg-body);
+}
+
+.blacklotuscms-theme h1, 
+.blacklotuscms-theme h2, 
+.blacklotuscms-theme h3 {
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+
+
+/* Customização de Classes do Tailwind no contexto do Tema */
+.theme-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Estilo para o conteúdo (Prose) */
+.theme-prose {
+  line-height: 1.7;
+  font-size: 1.125rem;
+}
+
+.theme-prose p {
+  margin-bottom: 1.5rem;
+}
+
+.theme-prose h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+
+/* Botões do Tema */
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.theme-btn-primary {
+  background-color: var(--theme-primary);
+  color: white;
+}
+
+.theme-btn-primary:hover {
+  background-color: var(--theme-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
