@@ -4,28 +4,7 @@ import type { NextRequest } from "next/server";
 import { SecretsService } from "@/lib/secrets";
 import { ApiKeyService } from "@/core/services/ApiKeyService";
 import { logger } from "@/lib/logger";
-
-// In-memory cache for Rate Limiting (Local instance)
-const rateLimitCache = new Map<string, { count: number, resetAt: number }>();
-
-function checkRateLimit(keyId: string, limit: number): boolean {
-  const now = Date.now();
-  const bucket = rateLimitCache.get(keyId);
-
-  // If it doesn't exist or time has expired, restart the bucket (1 minute)
-  if (!bucket || now > bucket.resetAt) {
-    rateLimitCache.set(keyId, { count: 1, resetAt: now + 60000 });
-    return true;
-  }
-
-  // If the dynamically configured limit has been reached
-  if (bucket.count >= limit) {
-    return false;
-  }
-
-  bucket.count++;
-  return true;
-}
+import { rateLimiter } from "@/lib/rate-limiter";
 
 // Authentication logic from original proxy.ts
 const authProxy = withAuth(
@@ -70,8 +49,8 @@ export default async function proxy(req: NextRequest, event: any) {
         if (authResult) {
           const { user, rateLimit, id: keyId } = authResult as any;
 
-          // Apply Dynamic Rate Limit
-          if (!checkRateLimit(keyId, rateLimit)) {
+          // Apply Dynamic Rate Limit (Redis or Memory)
+          if (!await rateLimiter.check(keyId, rateLimit)) {
             logger.warn(`[Proxy] Rate limit exceeded for key: ${keyId}`, { path, ip: req.ip });
             return NextResponse.json(
               { error: 'Request limit exceeded (Rate Limit)', code: 'RATE_LIMIT_EXCEEDED' },
@@ -82,7 +61,7 @@ export default async function proxy(req: NextRequest, event: any) {
           const requestHeaders = new Headers(req.headers);
           requestHeaders.set('x-api-user-id', user.id);
           requestHeaders.set('x-api-user-role', JSON.stringify(user.role));
-          
+
           return NextResponse.next({
             request: {
               headers: requestHeaders,
