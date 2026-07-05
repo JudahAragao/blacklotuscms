@@ -119,24 +119,37 @@ blacklotuscms/
 
 ## Architecture
 
-```
-Request → Proxy (auth/rate-limit) → Route Handler → Service → Prisma → PostgreSQL
-                                    ↓
-                              HookService → Plugins
-                                    ↓
-                              ThemeRenderer → Public Page
+```mermaid
+flowchart TD
+    A[Client Request] --> B[Proxy]
+    B -->|auth/rate-limit| C[Route Handler]
+    C --> D[Service]
+    D --> E[Prisma]
+    E --> F[(PostgreSQL)]
+    
+    D --> G[HookService]
+    G --> H[Plugins]
+    
+    C --> I[ThemeRenderer]
+    I --> J[Public Page]
+    
+    style A fill:#e1f5fe
+    style F fill:#f3e5f5
+    style H fill:#fff3e0
+    style J fill:#e8f5e9
 ```
 
-### Key Files
+### Key Components
 
-| File | Purpose |
-|------|---------|
-| `src/proxy.ts` | Network boundary, auth, rate limiting |
-| `src/lib/secrets.ts` | Zero .env configuration |
-| `src/lib/auth.ts` | NextAuth JWT setup |
-| `src/lib/builder.ts` | Pothos GraphQL schema |
-| `src/lib/prisma.ts` | Lazy Prisma client |
-| `src/core/services/` | Business logic with RBAC |
+| Component | File | Purpose |
+|-----------|------|---------|
+| Proxy | `src/proxy.ts` | Auth, rate limiting, installation gate |
+| Secrets | `src/lib/secrets.ts` | Zero .env configuration |
+| Auth | `src/lib/auth.ts` | NextAuth JWT setup |
+| GraphQL | `src/lib/builder.ts` | Pothos schema builder |
+| Prisma | `src/lib/prisma.ts` | Lazy database client |
+| Services | `src/core/services/` | Business logic with RBAC |
+| Sandbox | `src/core/sandbox/` | Plugin isolation (isolated-vm) |
 
 ---
 
