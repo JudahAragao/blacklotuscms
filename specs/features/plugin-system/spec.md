@@ -16,7 +16,8 @@ Sistema de plugins com installation via ZIP, execution em sandbox isolado (isola
 - **REQ-02:** Execucao em isolate-vm com limite de memória e timeout
 - **REQ-03:** Bridge API: log, auth, db, storage, hooks, permissions
 - **REQ-04:** Sistema de permissions (requesterPlugin, providerPlugin, capability)
-- **REQ-05:** Rate limit de 50 queries/segundo por plugin
+- **REQ-05:** Rate limit de 50 queries/segundo por plugin (aplicado antes de hasPermission, como proteção contra abuso de recursos)
+- **REQ-05b:** Jitter aleatório de 1-5ms entre chamadas da Bridge API para mitigar thundering herd
 - **REQ-06:** Sanitization de data retornados ao plugin
 - **REQ-07:** Boot automatico de plugins ativos na inicializacao
 - **REQ-08:** Hooks (Actions + Filters) para extensibilidade
@@ -30,6 +31,7 @@ Sistema de plugins com installation via ZIP, execution em sandbox isolado (isola
 - **C02:** Timeout configuravel via SANDBOX_TIMEOUT (default 30s)
 - **C03:** Fields sensiveis (passwordHash, secret, etc.) sempre removidos
 - **C04:** Plugin Permission Gate verifica antes de cada acesso
+- **C05:** Cadeia de segurança: checkRateLimit() → applyJitter() → hasPermission() → query ao banco
 
 ## Dependencies
 - **Depends on:** Authentication, HookService
