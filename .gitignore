@@ -49,3 +49,4 @@ prisma/generated
 # Pothos generated types
 src/generated/
 *.swp
+tsconfig.tsbuildinfo

@@ -34,7 +34,7 @@ export type PluginNetworkConfigInput = z.infer<typeof PluginNetworkConfigSchema>
 export const HttpRequestBodySchema = z.object({
   url: z.string().url('Invalid URL'),
   method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']).default('GET'),
-  headers: z.record(z.string()).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
   body: z.any().optional(),
   timeout: z.number().min(1000).max(30000).optional(),
 });
