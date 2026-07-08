@@ -292,7 +292,7 @@
 
 /* Area de conteudo clara */
 @utility admin-content {
-  @apply bg-surface-page min-h-screen;
+  @apply bg-surface-page;
 }
 
 /* Paginacao */
