@@ -242,7 +242,7 @@ await bridge.permissions.request('db.write.user');
 | Timeout | 30s | Max execution time |
 | Rate Limit | 50 req/s | DB queries per second |
 
-### Security: Rate Limit como Firewall
+### Security: Rate Limit como Mecanismo de Proteção
 
 Todo acesso ao banco via Bridge API passa por uma cadeia de segurança:
 
@@ -254,7 +254,7 @@ Bridge API call → checkRateLimit() → applyJitter() → hasPermission() → q
 - **`applyJitter()`** adiciona um delay aleatório de 1-5ms entre chamadas para mitigar thundering herd.
 - **`hasPermission()`** só é consultado após passar pelo rate limit, evitando queries desnecessárias ao banco.
 
-Isso significa que um plugin malicioso gera no máximo 50 queries/s ao banco (incluindo permission checks e operações de dados), e o rate limit é o firewall real contra DoS.
+Isso significa que um plugin malicioso gera no máximo 50 queries/s ao banco (incluindo permission checks e operações de dados), e o rate limit é o principal mecanismo de proteção contra abuso de recursos.
 
 **Forbidden Fields:** `passwordHash`, `secret`, `token`, `apiKey` - always removed from data.
 

@@ -48,14 +48,25 @@ feature: "plugin-system"
 1. **Plugin chama bridge.db.read(model, query)**
    - State: Call received
 
-2. **checkPermission('read', model)**
+2. **checkRateLimit()**
+   - Verifica se o plugin excedeu 50 queries/s
+   - Se excedido: lança 429 RATE_LIMIT_EXCEEDED (sem chegar ao banco)
+   - State: Rate limit passed
+
+3. **applyJitter()**
+   - Delay aleatório de 1-5ms para mitigar thundering herd
+   - State: Jitter applied
+
+4. **hasPermission(pluginName, 'system', capability)**
    - Verifica PluginPermission no banco
    - State: Permission verified
 
-3. **Rate limit check** (50 req/s)
-   - State: Within limit
+5. **Query ao banco**
+   - Executa a operação de dados
+   - State: Data returned
 
-4. **Sanitization dos data** (remove forbidden fields)
+6. **sanitizeData()**
+   - Remove campos proibidos (passwordHash, secret, token, apiKey)
    - State: Secure data returned
 
 ## Boot na Inicializacao
