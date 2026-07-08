@@ -238,6 +238,46 @@ Themes must request permission to access sistema data:
 
 Permissions are managed via Admin > Themes > Permissions.
 
+## Custom Field Types
+
+The CMS supports the following custom field types via Admin > Settings > Post Types > Fields:
+
+| Type | Description | Validation |
+|------|-------------|------------|
+| `text` | Single-line text input | min/max characters, regex pattern |
+| `textarea` | Multi-line text area | min/max characters, regex pattern |
+| `number` | Numeric input | min/max value |
+| `email` | Email input with format validation | Email format (auto-validated) |
+| `select` | Dropdown with custom options | Options defined in config |
+| `image` | Image upload (returns URL) | - |
+| `gallery` | Multiple image upload | - |
+| `file` | File upload (returns URL) | - |
+| `boolean` | True/false checkbox | - |
+| `wysiwyg` | Rich text editor (HTML content) | - |
+| `json` | JSON data input | - |
+| `repeater` | Repeatable group of sub-fields | minItems/maxItems |
+
+### Accessing Custom Fields in Themes
+
+```tsx
+import { getField } from '@/lib/lotus-sdk';
+
+// Get a single field value
+const phone = await getField('phone');
+
+// Get field from specific post
+const subtitle = await getField('subtitle', postId);
+```
+
+### Field Config Options
+
+Each field supports these configuration options:
+- `required` - Field must have a value
+- `width` - Layout width (1-100%)
+- `instructions` - Helper text for editors
+- `validation` - Type-specific validation rules
+- `conditionalLogic` - Show/hide field based on other field values
+
 ## Instalacao
 1. Create theme folder in `themes/my-theme/`
 2. Add `theme.json` manifest

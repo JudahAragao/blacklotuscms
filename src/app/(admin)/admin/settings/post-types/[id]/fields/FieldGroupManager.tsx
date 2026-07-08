@@ -295,11 +295,14 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
                         <option value="text">Texto</option>
                         <option value="textarea">Area de Texto</option>
                         <option value="number">Numero</option>
+                        <option value="email">Email</option>
                         <option value="select">Selecao</option>
                         <option value="image">Imagem</option>
                         <option value="gallery">Galeria</option>
+                        <option value="file">Arquivo</option>
                         <option value="boolean">Booleano</option>
                         <option value="wysiwyg">Editor Rico</option>
+                        <option value="json">JSON</option>
                         <option value="repeater">Repetidor</option>
                       </select>
                     </div>

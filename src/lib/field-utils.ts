@@ -62,15 +62,30 @@ export function validateField(field: any, value: any): string | null {
     return 'This field is required.';
   }
 
-  if (field.type === 'number' || field.type === 'text') {
-    const val = field.type === 'number' ? Number(value) : String(value).length;
-    const label = field.type === 'number' ? 'value' : 'characters';
-
+  if (field.type === 'number') {
+    const val = Number(value);
     if (config.validation?.min !== undefined && val < config.validation.min) {
-      return `Minimum ${label} is ${config.validation.min}.`;
+      return `Minimum value is ${config.validation.min}.`;
     }
     if (config.validation?.max !== undefined && val > config.validation.max) {
-      return `Maximum ${label} is ${config.validation.max}.`;
+      return `Maximum value is ${config.validation.max}.`;
+    }
+  }
+
+  if (field.type === 'text' || field.type === 'textarea') {
+    const charCount = String(value).length;
+    if (config.validation?.min !== undefined && charCount < config.validation.min) {
+      return `Minimum ${config.validation.min} characters required.`;
+    }
+    if (config.validation?.max !== undefined && charCount > config.validation.max) {
+      return `Maximum ${config.validation.max} characters allowed.`;
+    }
+  }
+
+  if (field.type === 'email' && value) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(String(value))) {
+      return 'Invalid email format.';
     }
   }
 
