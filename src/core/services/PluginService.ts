@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { PluginSandbox } from '../sandbox/PluginSandbox';
 import { hookService } from './HookService';
 import { pluginDataService } from './PluginDataService';
+import { networkService } from './NetworkService';
 import { logger } from '@/lib/logger';
 import { BlackLotusCMSError } from '@/lib/errors';
 import { fileService } from './FileService';
@@ -123,6 +124,39 @@ export class PluginService {
           return this.sanitizeData(result);
         }
       },
+      http: {
+        request: async (config: { url: string; method?: string; headers?: Record<string, string>; body?: any; timeout?: number }) => {
+          const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', 'http.outbound.request');
+          if (!hasAccess) {
+            await pluginDataService.requestPermission(pluginName, 'system', 'http.outbound.request');
+            throw new BlackLotusCMSError(
+              `Plugin '${pluginName}' does not have http.outbound.request permission. Request approved by admin.`,
+              403, 'AUTH_FORBIDDEN'
+            );
+          }
+          return networkService.makeRequest(pluginId, config);
+        }
+      },
+      webhook: {
+        on: async (eventId: string, callback: any) => {
+          const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', 'webhook.inbound.register');
+          if (!hasAccess) {
+            await pluginDataService.requestPermission(pluginName, 'system', 'webhook.inbound.register');
+            throw new BlackLotusCMSError(
+              `Plugin '${pluginName}' does not have webhook.inbound.register permission. Request approved by admin.`,
+              403, 'AUTH_FORBIDDEN'
+            );
+          }
+          const ivmMod = await import('isolated-vm');
+          networkService.registerWebhookHandler(pluginId, eventId, async (data) => {
+            return await callback.apply(undefined, [new ivmMod.ExternalCopy(data).copyInto()], { result: { copy: true } });
+          });
+          await networkService.createWebhookEndpoint(pluginId, eventId);
+        },
+        off: async (eventId: string) => {
+          networkService.removeWebhookHandler(pluginId, eventId);
+        }
+      },
       hooks: {
         registerComponent: async (slot: string, component: any, priority: number = 10) => {
           if (slot.startsWith('public.route')) {
@@ -217,6 +251,9 @@ export class PluginService {
       this.activePlugins.delete(pluginId);
       this.sandboxPool.delete(pluginId);
     }
+
+    // Clean up webhook handlers for this plugin
+    networkService.removeAllWebhookHandlers(pluginId);
 
     await this.db.plugin.update({ where: { id: pluginId }, data: { isActive: false } });
     this.log.warn(`Plugin deactivated: ${pluginId}`);

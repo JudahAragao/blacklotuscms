@@ -21,6 +21,10 @@ Sistema de plugins com installation via ZIP, execution em sandbox isolado (isola
 - **REQ-06:** Sanitization de data retornados ao plugin
 - **REQ-07:** Boot automatico de plugins ativos na inicializacao
 - **REQ-08:** Hooks (Actions + Filters) para extensibilidade
+- **REQ-09:** HTTP outbound via bridge.http.request() com whitelist de domínios
+- **REQ-10:** Webhook inbound via bridge.webhook.on() com signature verification
+- **REQ-11:** Network audit log para todas as chamadas HTTP e webhooks
+- **REQ-12:** Rate limit separado para HTTP outbound (20 req/s, configurável por plugin)
 
 ## User Roles
 - **Administrador:** Install, activate, desactivate plugins, manage permissions

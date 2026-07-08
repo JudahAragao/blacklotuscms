@@ -117,24 +117,66 @@ bridge.hooks.addFilter('comment.before_save', (comment) => {
 });
 ```
 
-### Example 4: External API Integration
+### Example 4: External API Integration (HTTP Outbound)
 ```javascript
 // plugins/slack-notifier/index.js
 bridge.log('Slack Notifier loaded!');
 
-const WEBHOOK_URL = await bridge.storage.get('slack_webhook');
-
 // Notify Slack when new post is published
 bridge.hooks.addAction('post.created', async (post) => {
-  if (post.status === 'published' && WEBHOOK_URL) {
-    try {
-      // Note: Direct fetch not available in sandbox
-      // Would need Bridge API extension for HTTP requests
-      bridge.log(`Would notify Slack about: ${post.title}`);
-    } catch (error) {
-      bridge.log('Failed to notify Slack:', error);
+  if (post.status === 'published') {
+    const webhookUrl = await bridge.storage.get('slack_webhook');
+    if (!webhookUrl) return;
+
+    const response = await bridge.http.request({
+      url: webhookUrl,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: `New post published: ${post.title}`,
+        slug: post.slug,
+      }),
+      timeout: 10000,
+    });
+
+    if (response.status === 200) {
+      bridge.log('Slack notification sent successfully');
+    } else {
+      bridge.log('Slack notification failed:', response.status);
     }
   }
+});
+```
+
+### Example 5: Webhook Receiver (Inbound)
+```javascript
+// plugins/payment-processor/index.js
+bridge.log('Payment Processor loaded!');
+
+// Register webhook handler for payment events
+bridge.webhook.on('payment.completed', async (payload) => {
+  bridge.log('Payment received:', payload.data);
+  
+  // Process the payment data
+  const { orderId, amount, status } = payload.data;
+  
+  // Store payment record
+  await bridge.db.create('Setting', {
+    key: `payment_${orderId}`,
+    value: { amount, status, processedAt: new Date().toISOString() }
+  });
+  
+  // Notify admin via hook
+  await bridge.hooks.addAction('payment.processed', payload.data);
+  
+  return { success: true };
+});
+
+// Register another webhook for refunds
+bridge.webhook.on('payment.refunded', async (payload) => {
+  bridge.log('Refund processed:', payload.data);
+  // Handle refund logic...
+  return { success: true };
 });
 ```
 
@@ -205,6 +247,77 @@ const config = await bridge.storage.get('config');
 | `addAction(name, callback)` | Register event handler |
 | `addFilter(name, callback)` | Register data transformer |
 | `registerComponent(slot, component, priority?)` | Register UI component |
+
+### bridge.http (Outbound HTTP)
+
+Executa requisições HTTP externas em nome do plugin. Requer permissão `http.outbound.request`.
+
+| Method | Returns | Permission Required |
+|--------|---------|---------------------|
+| `request(config)` | `{ status, headers, body }` | `http.outbound.request` |
+
+```javascript
+// GET request
+const response = await bridge.http.request({
+  url: 'https://api.example.com/data',
+  method: 'GET',
+});
+
+// POST request with body
+const response = await bridge.http.request({
+  url: 'https://api.stripe.com/charges',
+  method: 'POST',
+  headers: { 'Authorization': 'Bearer sk_test_xxx' },
+  body: { amount: 2000, currency: 'usd' },
+  timeout: 15000,
+});
+
+bridge.log('Status:', response.status);
+bridge.log('Body:', response.body);
+```
+
+**Segurança:**
+- Domínios devem estar na whitelist configurada pelo admin
+- Bloqueio de IPs internos (127.0.0.1, 10.*, 192.168.*, etc.)
+- Rate limit separado: 20 req/s (configurável)
+- Timeout: 10s default, max 30s
+- Tamanho máximo de resposta: 1MB
+
+### bridge.webhook (Inbound Webhooks)
+
+Registra handlers para receber webhooks externos. Requer permissão `webhook.inbound.register`.
+
+| Method | Description | Permission Required |
+|--------|-------------|---------------------|
+| `on(eventId, callback)` | Register webhook handler | `webhook.inbound.register` |
+| `off(eventId)` | Remove webhook handler | - |
+
+```javascript
+// Register handler for payment events
+bridge.webhook.on('payment.completed', async (payload) => {
+  bridge.log('Payment received:', payload.data);
+  
+  const { orderId, amount } = payload.data;
+  await bridge.db.create('Setting', {
+    key: `payment_${orderId}`,
+    value: { amount, processedAt: new Date().toISOString() }
+  });
+  
+  return { success: true };
+});
+
+// Register handler for user registration
+bridge.webhook.on('user.registered', async (payload) => {
+  bridge.log('New user:', payload.data.email);
+  // Send welcome email, create profile, etc.
+});
+```
+
+**Endpoint gerado:** `POST /api/v1/webhooks/:pluginName/:eventId`
+**Segurança:**
+- Verificação HMAC-SHA256 (se webhookSecret configurado)
+- Tamanho máximo de payload: 512KB
+- Retry automático com exponential backoff (até 3 tentativas)
 
 ### bridge.permissions
 | Method | Description |

@@ -19,3 +19,34 @@ export const PluginPermissionSchema = z.object({
 });
 
 export type PluginPermissionInput = z.infer<typeof PluginPermissionSchema>;
+
+// === Network & Webhook Schemas ===
+
+export const PluginNetworkConfigSchema = z.object({
+  allowedDomains: z.array(z.string()).default([]),
+  httpRateLimit: z.number().min(1).max(100).default(20),
+  webhookSecret: z.string().optional(),
+  isActive: z.boolean().default(true),
+});
+
+export type PluginNetworkConfigInput = z.infer<typeof PluginNetworkConfigSchema>;
+
+export const HttpRequestBodySchema = z.object({
+  url: z.string().url('Invalid URL'),
+  method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']).default('GET'),
+  headers: z.record(z.string()).optional(),
+  body: z.any().optional(),
+  timeout: z.number().min(1000).max(30000).optional(),
+});
+
+export type HttpRequestInput = z.infer<typeof HttpRequestBodySchema>;
+
+export const WebhookPayloadSchema = z.object({
+  eventId: z.string(),
+  data: z.any(),
+  signature: z.string().optional(),
+  timestamp: z.string(),
+  source: z.string(),
+});
+
+export type WebhookPayloadInput = z.infer<typeof WebhookPayloadSchema>;
