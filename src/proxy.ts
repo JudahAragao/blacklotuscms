@@ -22,7 +22,7 @@ export default async function proxy(req: NextRequest, event: any) {
   await initCMS();
   const path = req.nextUrl.pathname;
 
-  if (path.includes('.') && !path.startsWith('/api') && !path.startsWith('/assets') && !path.startsWith('/uploads') && !path.includes('favicon')) {
+  if (path.includes('.') && !path.startsWith('/api') && !path.startsWith('/assets') && !path.startsWith('/uploads') && !path.includes('favicon') && !path.includes('sitemap.xml')) {
     return new NextResponse(null, { status: 404 });
   }
 
