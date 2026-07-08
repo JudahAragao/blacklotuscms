@@ -115,12 +115,12 @@ export class PostService {
   }
 
   async getLeanPostBySlug(slug: string): Promise<ThemePostDTO | null> {
+    await ThemeDataService.validate('db.read.post');
     return unstable_cache(
       async (s: string) => {
-        await ThemeDataService.validate('db.read.post');
         const now = new Date();
         const post = await this.db.post.findUnique({
-          where: { 
+          where: {
             slug: s,
             status: 'published',
             publishedAt: { lte: now },
@@ -143,9 +143,9 @@ export class PostService {
   }
 
   async getLeanPostById(id: string): Promise<ThemePostDTO | null> {
+    await ThemeDataService.validate('db.read.post');
     return unstable_cache(
       async (postId: string) => {
-        await ThemeDataService.validate('db.read.post');
         const post = await this.db.post.findUnique({
           where: { id: postId, status: 'published' },
           include: {
@@ -162,12 +162,12 @@ export class PostService {
   }
 
   async getLeanPostsByType(postTypeSlug: string, limit: number = 10) {
+    await ThemeDataService.validate('db.read.post');
     return unstable_cache(
       async (slug: string, l: number) => {
-        await ThemeDataService.validate('db.read.post');
         const now = new Date();
         const posts = await this.db.post.findMany({
-          where: { 
+          where: {
             postType: { slug },
             status: 'published',
             publishedAt: { lte: now },
@@ -191,12 +191,12 @@ export class PostService {
   }
 
   async getLeanPostsByTerm(termSlug: string, limit: number = 10) {
+    await ThemeDataService.validate('db.read.post');
     return unstable_cache(
       async (slug: string, l: number) => {
-        await ThemeDataService.validate('db.read.post');
         const now = new Date();
         const posts = await this.db.post.findMany({
-          where: { 
+          where: {
             terms: {
               some: {
                 term: { slug }
