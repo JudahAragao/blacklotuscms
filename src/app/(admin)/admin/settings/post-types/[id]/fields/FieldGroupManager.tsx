@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Settings, Layout, ShieldCheck, List, Code, GripVertical, Eye, Layers } from 'lucide-react';
 import { saveFieldsAction } from './actions';
+import { toast } from 'sonner';
 
 export default function FieldGroupManager({ postTypeId, postType, initialFieldGroups }: { postTypeId: string, postType: any, initialFieldGroups: any[] }) {
   const [fields, setFields] = useState<any[]>([]);
@@ -181,11 +182,11 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
     });
 
     setIsSaving(false);
-    if (result.success) {
+    if ('success' in result && result.success) {
       toast.success('Configuração salva com sucesso!');
       window.location.reload();
     } else {
-      toast.error('Erro ao salvar: ' + result.error);
+      toast.error('Erro ao salvar: ' + ('error' in result ? result.error : 'Desconhecido'));
     }
   };
 

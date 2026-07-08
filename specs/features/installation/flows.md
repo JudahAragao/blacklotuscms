@@ -1,14 +1,14 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "installation"
 ---
 
-# Installation Flows
+# Instalacao Flows
 
-## Flow de Installation
+## Flow de Instalacao
 
 1. **User acessa qualquer rota**
    - Proxy verifica: SecretsService.isInstalled()
@@ -21,9 +21,9 @@ feature: "installation"
    - Database config
    - Storage config
    - Admin credentials
-   - State: Form withpleto
+   - State: Form completo
 
-4. **Validcao do formulario**
+4. **Validacao do formulario**
    - InstallService.validateForm()
    - State: Validated data
 
@@ -43,18 +43,18 @@ feature: "installation"
    - State: Tabelas criadas
 
 9. **resetPrismaInstance()**
-   - Prisma reconecta with nova URL
+   - Prisma reconecta com nova URL
    - State: Connection ativa
 
-10. **Creation de roles default**
-    - 5 roles with capabilities JSON
+10. **Criacao de roles default**
+    - 5 roles com capabilities JSON
     - State: Roles criadas
 
-11. **Creation de PostTypes default**
+11. **Criacao de PostTypes default**
     - post e page
     - State: PostTypes criados
 
-12. **Creation de admin user**
+12. **Criacao de admin user**
     - Email + bcrypt hash
     - State: Admin criado
 
@@ -63,6 +63,6 @@ feature: "installation"
 
 14. **markAsInstalled()**
     - Cria arquivo .installed
-    - State: Installation concluida
+    - State: Instalacao concluida
 
 15. **Redirect para /auth/login**

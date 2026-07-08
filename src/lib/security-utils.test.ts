@@ -63,16 +63,16 @@ describe('maskSensitiveData', () => {
 });
 
 describe('sanitizeHtml', () => {
-  it('should sanitize dangerous tags', () => {
+  it('should sanitize dangerous tags', async () => {
     const html = '<script>alert("xss")</script><b>Safe</b>';
-    const result = sanitizeHtml(html);
+    const result = await sanitizeHtml(html);
     expect(result).not.toContain('<script>');
     expect(result).toContain('<b>');
   });
 
-  it('should allow safe tags', () => {
+  it('should allow safe tags', async () => {
     const html = '<p>Hello <b>World</b></p>';
-    const result = sanitizeHtml(html);
+    const result = await sanitizeHtml(html);
     expect(result).toContain('<p>');
     expect(result).toContain('<b>');
   });

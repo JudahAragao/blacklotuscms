@@ -27,7 +27,7 @@ export class TaxonomyService {
           },
           orderBy: { label: 'asc' }
         });
-        return taxonomies as TaxonomyDTO[];
+        return taxonomies as unknown as TaxonomyDTO[];
       },
       ['taxonomies-list'],
       { tags: ['taxonomies'], revalidate: 3600 }
@@ -46,8 +46,8 @@ export class TaxonomyService {
 
     const tax = await this.db.taxonomy.create({ data: validated });
     this.log.info(`Taxonomy created: ${tax.slug}`);
-    revalidateTag('taxonomies');
-    revalidateTag('posts'); // Taxonomy changes can affect listings
+    revalidateTag('taxonomies', 'max');
+    revalidateTag('posts', 'max'); // Taxonomy changes can affect listings
     return tax;
   }
 
@@ -61,7 +61,7 @@ export class TaxonomyService {
             terms: { orderBy: { name: 'asc' } }
           }
         });
-        return tax as TaxonomyDTO | null;
+        return tax as unknown as TaxonomyDTO | null;
       },
       [`taxonomy-${id}`],
       { tags: ['taxonomies', `taxonomy-${id}`], revalidate: 3600 }
@@ -75,9 +75,9 @@ export class TaxonomyService {
 
     const tax = await this.db.taxonomy.delete({ where: { id } });
     this.log.warn(`Taxonomy deleted: ${tax.slug}`);
-    revalidateTag('taxonomies');
-    revalidateTag(`taxonomy-${id}`);
-    revalidateTag('posts');
+    revalidateTag('taxonomies', 'max');
+    revalidateTag(`taxonomy-${id}`, 'max');
+    revalidateTag('posts', 'max');
     return tax;
   }
 
@@ -109,9 +109,9 @@ export class TaxonomyService {
 
     const term = await this.db.term.create({ data: validated });
     this.log.info(`Term created: ${term.slug} in taxonomy ${term.taxonomyId}`);
-    revalidateTag('taxonomies');
-    revalidateTag(`taxonomy-${term.taxonomyId}-terms`);
-    revalidateTag('posts');
+    revalidateTag('taxonomies', 'max');
+    revalidateTag(`taxonomy-${term.taxonomyId}-terms`, 'max');
+    revalidateTag('posts', 'max');
     return term;
   }
 
@@ -122,9 +122,9 @@ export class TaxonomyService {
 
     const term = await this.db.term.delete({ where: { id } });
     this.log.warn(`Term deleted: ${term.slug}`);
-    revalidateTag('taxonomies');
-    revalidateTag(`taxonomy-${term.taxonomyId}-terms`);
-    revalidateTag('posts');
+    revalidateTag('taxonomies', 'max');
+    revalidateTag(`taxonomy-${term.taxonomyId}-terms`, 'max');
+    revalidateTag('posts', 'max');
     return term;
   }
 

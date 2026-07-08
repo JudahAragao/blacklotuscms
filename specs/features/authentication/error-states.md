@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "authentication"
@@ -18,7 +18,7 @@ feature: "authentication"
 - **Condition:** User autenticado mas sem capability necessaria
 - **Código HTTP:** 403
 - **Mensagem:** "No permission to perform this action"
-- **Ação:** Log de tentativa with userId
+- **Ação:** Log de tentativa com userId
 
 ## ERR-03: Rate Limit Exceeded
 - **Condition:** API Key excedeu rate limit

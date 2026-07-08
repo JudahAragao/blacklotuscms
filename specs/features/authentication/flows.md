@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "authentication"
@@ -17,7 +17,7 @@ feature: "authentication"
    - State: Data received
 
 3. **NextAuth CredentialsProvider authorize()**
-   - Search User por email
+   - Busca User por email
    - Compara bcrypt hash
    - State: Credentials validadas
 
@@ -29,11 +29,11 @@ feature: "authentication"
 
 ## API Key Auth
 
-1. **Requisicao with header Authorization: Bearer bl_xxx**
+1. **Requisicao com header Authorization: Bearer bl_xxx**
    - State: Header detected in proxy
 
 2. **ApiKeyService.validateKey()**
-   - Search por SHA-256 hash
+   - Busca por SHA-256 hash
    - Verifica expiracao
    - State: Key validated
 
@@ -41,7 +41,7 @@ feature: "authentication"
    - State: Within limit ou erro 429
 
 4. **Headers injetados: x-api-user-id, x-api-user-role**
-   - State: Requisicao prossegue with identidade
+   - State: Requisicao prossegue com identidade
 
 ## RBAC Check
 

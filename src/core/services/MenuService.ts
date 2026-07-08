@@ -63,8 +63,8 @@ export class MenuService {
       throw new BlackLotusCMSError('No permission to manage menus', 403, 'AUTH_FORBIDDEN');
     }
 
-    revalidateTag(`menu-${slug}`);
-    revalidateTag('menus');
+    revalidateTag(`menu-${slug}`, 'max');
+    revalidateTag('menus', 'max');
     this.log.info(`Menu cache invalidated: ${slug}`);
   }
 

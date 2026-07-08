@@ -12,6 +12,7 @@ export default async function TermManagementPage({ params }: { params: Promise<{
   if (!taxonomy) {
     notFound();
   }
+  const terms = taxonomy.terms ?? [];
 
   async function handleCreate(formData: FormData) {
     'use server';
@@ -67,7 +68,7 @@ export default async function TermManagementPage({ params }: { params: Promise<{
                 </tr>
               </thead>
               <tbody>
-                {taxonomy.terms.map((term) => (
+                {terms.map((term) => (
                   <tr key={term.id}>
                     <td>
                       <div className="flex items-center gap-2.5">
@@ -85,7 +86,7 @@ export default async function TermManagementPage({ params }: { params: Promise<{
                     </td>
                   </tr>
                 ))}
-                {taxonomy.terms.length === 0 && (
+                {terms.length === 0 && (
                   <tr><td colSpan={2} className="px-4 py-10 text-center text-sm text-text-muted">Nenhum termo adicionado.</td></tr>
                 )}
               </tbody>

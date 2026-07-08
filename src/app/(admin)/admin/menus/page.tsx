@@ -24,6 +24,10 @@ export default async function MenuManagerPage() {
 
   async function createMenu(formData: FormData) {
     'use server';
+    const actionSession = await getServerSession(authOptions);
+    if (!actionSession || !hasCapability((actionSession.user as any).role, 'setting.manage')) {
+      throw new Error('Unauthorized');
+    }
     const name = formData.get('name') as string;
     const slug = name.toLowerCase().replace(/\s+/g, '-');
     await prisma.menu.create({ data: { name, slug } });
@@ -33,6 +37,10 @@ export default async function MenuManagerPage() {
   async function addItemToMenu(formData: FormData) {
     'use server';
     try {
+      const actionSession = await getServerSession(authOptions);
+      if (!actionSession || !hasCapability((actionSession.user as any).role, 'setting.manage')) {
+        throw new Error('Unauthorized');
+      }
       const menuId = formData.get('menuId') as string;
       const label = formData.get('label') as string;
       const url = formData.get('url') as string;
@@ -48,12 +56,20 @@ export default async function MenuManagerPage() {
 
   async function removeItemAction(id: string) {
     'use server';
+    const actionSession = await getServerSession(authOptions);
+    if (!actionSession || !hasCapability((actionSession.user as any).role, 'setting.manage')) {
+      throw new Error('Unauthorized');
+    }
     await prisma.menuItem.delete({ where: { id } });
     revalidatePath('/admin/menus');
   }
 
   async function deleteMenuAction(id: string) {
     'use server';
+    const actionSession = await getServerSession(authOptions);
+    if (!actionSession || !hasCapability((actionSession.user as any).role, 'setting.manage')) {
+      throw new Error('Unauthorized');
+    }
     await prisma.menu.delete({ where: { id } });
     revalidatePath('/admin/menus');
   }

@@ -142,7 +142,7 @@ export default function PostEditor({ post, onSave, readOnly, capabilities }: Pos
   const toggleTerm = (termId: string) => {
     setFormData(prev => {
       const terms = prev.terms.includes(termId)
-        ? prev.terms.filter(id => id !== termId)
+        ? prev.terms.filter((id: string) => id !== termId)
         : [...prev.terms, termId];
       return { ...prev, terms };
     });

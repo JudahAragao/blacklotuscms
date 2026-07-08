@@ -8,6 +8,8 @@ import { deleteFieldGroupAction } from './actions';
 
 import { PostTypeService } from '@/core/services/PostTypeService';
 import { revalidatePath } from 'next/cache';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export default async function EditFieldsPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -31,7 +33,8 @@ export default async function EditFieldsPage({ params }: { params: { id: string 
       supportsTaxonomies: formData.get('supportsTaxonomies') === 'on',
     };
 
-    await PostTypeService.update(postType!.slug, data);
+    const session = await getServerSession(authOptions);
+    await PostTypeService.update(postType!.slug, data, session?.user);
     revalidatePath(`/admin/settings/post-types/${id}/fields`);
   }
 
@@ -55,4 +58,3 @@ export default async function EditFieldsPage({ params }: { params: { id: string 
     </div>
   );
 }
-

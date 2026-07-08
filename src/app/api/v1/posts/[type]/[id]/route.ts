@@ -1,68 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PostService } from '@/core/services/PostService';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { hasCapability } from '@/lib/auth-utils';
 import { prisma } from '@/lib/prisma';
+import { withApiAuth } from '@/lib/api-auth';
+import { handleApiError } from '@/lib/errors';
 
 /**
- * GET /api/v1/posts/[type]/[id]
+ * GET /api/v1/posts/[type]/[id] — Público
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ type: string; id: string }> }
 ) {
   try {
-    const post = await PostService.getById(params.id);
+    const { id } = await params;
+    const post = await PostService.getById(id);
     if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     return NextResponse.json(post);
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching post' }, { status: 500 });
+    const { error: msg, status, code } = handleApiError(error);
+    return NextResponse.json({ error: msg, code }, { status });
   }
 }
 
 /**
- * PUT /api/v1/posts/[type]/[id]
+ * PUT /api/v1/posts/[type]/[id] — Aceita sessão + API Key
  */
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    if (!hasCapability((session.user as any).role, 'post.edit')) {
-      return NextResponse.json({ error: 'No permission to edit posts' }, { status: 403 });
+export const PUT = withApiAuth(
+  async (req, { params }, session) => {
+    try {
+      const { id } = await params;
+      const body = await req.json();
+      const post = await PostService.update(id, body, session.user);
+      return NextResponse.json(post);
+    } catch (error: any) {
+      const { error: msg, status, code } = handleApiError(error);
+      return NextResponse.json({ error: msg, code }, { status });
     }
-
-    const body = await req.json();
-    const post = await PostService.update(params.id, body);
-    
-    return NextResponse.json(post);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Error updating post' }, { status: 400 });
-  }
-}
+  },
+  'post.edit'
+);
 
 /**
- * DELETE /api/v1/posts/[type]/[id]
+ * DELETE /api/v1/posts/[type]/[id] — Aceita sessão + API Key
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    if (!hasCapability((session.user as any).role, 'post.delete')) {
-      return NextResponse.json({ error: 'No permission to delete posts' }, { status: 403 });
+export const DELETE = withApiAuth(
+  async (req, { params }, session) => {
+    try {
+      const { id } = await params;
+      await prisma.post.delete({ where: { id } });
+      return NextResponse.json({ message: 'Post deleted successfully' });
+    } catch (error) {
+      const { error: msg, status, code } = handleApiError(error);
+      return NextResponse.json({ error: msg, code }, { status });
     }
-
-    await prisma.post.delete({ where: { id: params.id } });
-    return NextResponse.json({ message: 'Post deleted successfully' });
-  } catch (error) {
-    return NextResponse.json({ error: 'Error deleting post' }, { status: 400 });
-  }
-}
+  },
+  'post.delete'
+);

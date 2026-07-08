@@ -48,9 +48,6 @@ export class SitemapService {
 
   // --- Static Proxy ---
   static async generateXML() { return sitemapService.generateXML(); }
-
-  // --- Instance Proxy (backward compatibility) ---
-  static instance = sitemapService;
 }
 
 export const sitemapService = new SitemapService();

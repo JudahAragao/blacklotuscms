@@ -26,6 +26,7 @@ export default function MediaUpload() {
         const response = await fetch('/api/v1/media', {
           method: 'POST',
           body: formData,
+          credentials: 'include',
         });
 
         if (!response.ok) throw new Error('Falha no upload');

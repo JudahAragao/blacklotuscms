@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "media-management"
@@ -17,7 +17,7 @@ feature: "media-management"
 - **Condition:** Sharp falha ao processar a imagem
 - **Código HTTP:** 500
 - **Mensagem:** "Error processing media file: [detail]"
-- **Ação do system:** BlackLotusCMSError with INTERNAL_SERVER_ERROR
+- **Ação do sistema:** BlackLotusCMSError com INTERNAL_SERVER_ERROR
 
 ## ERR-03: Media Nao Encontrada
 - **Condition:** ID de media nao existe
@@ -25,7 +25,7 @@ feature: "media-management"
 - **Mensagem:** "Media not found"
 
 ## ERR-04: Falha no Storage
-- **Condition:** S3/R2 ou filesyshas indisponivel
+- **Condition:** S3/R2 ou filesystem indisponivel
 - **Código HTTP:** 500
 - **Mensagem:** Erro de upload
-- **Ação do system:** Erro logado, upload falha
+- **Ação do sistema:** Erro logado, upload falha

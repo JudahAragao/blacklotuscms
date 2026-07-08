@@ -73,18 +73,18 @@ describe('RBAC Integration', () => {
   });
 
   describe('Media permissions', () => {
-    it('editor can upload and delete', () => {
-      expect(hasCapability(roles.editor, 'media.upload')).toBe(true);
+    it('editor can create and delete media', () => {
+      expect(hasCapability(roles.editor, 'media.create')).toBe(true);
       expect(hasCapability(roles.editor, 'media.delete')).toBe(true);
     });
 
-    it('author can upload but not delete all', () => {
-      expect(hasCapability(roles.author, 'media.upload')).toBe(true);
+    it('author can create media but not delete all', () => {
+      expect(hasCapability(roles.author, 'media.create')).toBe(true);
       expect(hasCapability(roles.author, 'media.delete')).toBe(false);
     });
 
-    it('contributor cannot upload', () => {
-      expect(hasCapability(roles.contributor, 'media.upload')).toBe(false);
+    it('contributor cannot create media', () => {
+      expect(hasCapability(roles.contributor, 'media.create')).toBe(false);
     });
   });
 

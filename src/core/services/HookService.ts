@@ -1,4 +1,3 @@
-import DOMPurify from 'isomorphic-dompurify';
 import { logger } from '@/lib/logger';
 
 export interface HookMetadata {
@@ -93,6 +92,7 @@ export class HookService {
         result = await entry.callback(inputCopy);
 
         if (typeof result === 'string' && this.shouldSanitize(hook)) {
+          const { default: DOMPurify } = await import('isomorphic-dompurify');
           result = DOMPurify.sanitize(result);
         }
       } catch (err) {

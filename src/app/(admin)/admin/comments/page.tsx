@@ -2,8 +2,19 @@ import React from 'react';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { MessageSquare, Check, ShieldAlert, Trash2 } from 'lucide-react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { hasCapability } from '@/lib/auth-utils';
+import { redirect } from 'next/navigation';
 
 export default async function AdminCommentsPage() {
+  const session = await getServerSession(authOptions);
+  if (!session) redirect('/auth/login');
+
+  if (!hasCapability((session.user as any).role, 'comment.manage')) {
+    return <div className="p-10 text-center text-sm text-status-trash">Acesso negado</div>;
+  }
+
   const comments = await prisma.comment.findMany({
     include: { post: true },
     orderBy: { createdAt: 'desc' }
@@ -11,6 +22,10 @@ export default async function AdminCommentsPage() {
 
   async function updateStatus(formData: FormData) {
     'use server';
+    const actionSession = await getServerSession(authOptions);
+    if (!actionSession || !hasCapability((actionSession.user as any).role, 'comment.manage')) {
+      throw new Error('Unauthorized');
+    }
     const id = formData.get('id') as string;
     const status = formData.get('status') as string;
     await prisma.comment.update({ where: { id }, data: { status } });

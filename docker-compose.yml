@@ -25,7 +25,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - uploads:/app/uploads
+      - /home/deploy/portfolio/uploads:/app/uploads
       # Persiste o arquivo de instalação e configuração
       - ./.secrets.json:/app/.secrets.json
       - ./.installed:/app/.installed
@@ -35,7 +35,6 @@ services:
 
 volumes:
   postgres_data:
-  uploads:
 
 networks:
   blacklotuscms-network:

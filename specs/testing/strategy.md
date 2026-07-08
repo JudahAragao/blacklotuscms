@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: draft
 ---
@@ -15,7 +15,7 @@ status: draft
 
 ## 2. Integration Testing
 - **Framework:** Vitest
-- **Scope:** API routes, Proxy middleware, Hook syshas
+- **Scope:** API routes, Proxy middleware, Hook sistema
 - **Setup:** Database real (test) ou mock
 - **Status:** Pending (TASK-030)
 

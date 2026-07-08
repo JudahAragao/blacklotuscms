@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "post-management"
@@ -14,7 +14,7 @@ feature: "post-management"
    - Entrada: title, slug, content, status, metaFields, terms
    - State: Valid form
 
-2. **System valida with Zod**
+2. **Sistema valida com Zod**
    - Valid: CreatePostSchema
    - State: Validated data
 
@@ -40,14 +40,14 @@ feature: "post-management"
 
 ## Editar Post
 
-1. **System busca post existente**
+1. **Sistema busca post existente**
    - State: Post found
 
-2. **RBAC check with own verification**
+2. **RBAC check com own verification**
    - Verifica: canPerformAction(user, 'post.update', existingPost.authorId)
    - State: Authorized
 
-3. **Validcao Zod + MetaFields validation**
+3. **Validacao Zod + MetaFields validation**
    - State: Validated data
 
 4. **Transaction: update post + upsert metaValues + replace terms**
@@ -58,10 +58,10 @@ feature: "post-management"
 
 ## Deletar Post
 
-1. **RBAC check with own verification**
+1. **RBAC check com own verification**
    - Verifica: canPerformAction(user, 'post.delete', existingPost.authorId)
 
-2. **Transaction: delete metaValues + postTerms + withments + post**
+2. **Transaction: delete metaValues + postTerms + comments + post**
    - State: Post removed
 
 3. **Hook post.deleted + revalidateTag**
@@ -69,10 +69,10 @@ feature: "post-management"
 ## Listar Posts Publicos
 
 1. **Theme chama PostService.getLeanPostsByType(slug)**
-   - State: Query executada with filtro status=published, publishedAt <= now, expiresAt >= now ou null
+   - State: Query executada com filtro status=published, publishedAt <= now, expiresAt >= now ou null
 
 2. **ThemeDataService.validate('db.read.post')**
    - State: Permission validated
 
-3. **Cache via unstable_cache with tag 'posts'**
+3. **Cache via unstable_cache com tag 'posts'**
    - State: Data returned from cache or database

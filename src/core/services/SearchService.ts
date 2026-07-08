@@ -42,9 +42,6 @@ export class SearchService {
 
   // --- Static Proxy ---
   static async globalSearch(q: string, l?: number) { return searchService.globalSearch(q, l); }
-
-  // --- Instance Proxy (backward compatibility) ---
-  static instance = searchService;
 }
 
 export const searchService = new SearchService();

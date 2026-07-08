@@ -5,7 +5,7 @@ import { sanitizePath } from '@/lib/security-utils';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { name: string } }
+  { params }: { params: Promise<{ name: string }> }
 ) {
   const { name } = await params;
   const themeName = sanitizePath(name);

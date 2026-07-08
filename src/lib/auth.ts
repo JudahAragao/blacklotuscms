@@ -2,20 +2,12 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
-import { SecretsService } from "@/lib/secrets";
 import { logger } from "@/lib/logger";
 import bcrypt from "bcryptjs";
 
-// Load secrets for NextAuth
-const secrets = SecretsService.loadSync();
-
-// Ensure NextAuth has the secrets in environment for internal logic
-if (secrets.NEXTAUTH_URL) process.env.NEXTAUTH_URL = secrets.NEXTAUTH_URL;
-if (secrets.NEXTAUTH_SECRET) process.env.NEXTAUTH_SECRET = secrets.NEXTAUTH_SECRET;
-
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
-  secret: secrets.NEXTAUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
@@ -44,7 +36,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash);
-          
+
           if (!isPasswordValid) {
             logger.warn(`[NextAuth] Invalid password for user: ${credentials.email}`);
             return null;
@@ -54,7 +46,10 @@ export const authOptions: NextAuthOptions = {
           return {
             id: user.id,
             email: user.email,
-            role: user.role,
+            role: {
+              ...user.role,
+              capabilities: (user.role.capabilities ?? {}) as Record<string, any>,
+            },
           };
         } catch (error) {
           logger.error("[NextAuth] Error in authorize callback:", error);

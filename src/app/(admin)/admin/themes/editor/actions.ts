@@ -9,7 +9,8 @@ import { handleApiError } from "@/lib/errors";
 export async function saveThemeSettingAction(themeName: string, key: string, value: any) {
   try {
     const session = await getServerSession(authOptions);
-    await themeDataService.setForTheme(themeName, key, value, session?.user);
+    if (!session?.user) throw new Error('Unauthorized');
+    await themeDataService.setForTheme(themeName, key, value, session.user);
     revalidatePath("/admin/themes/editor");
     return { success: true };
   } catch (error) {

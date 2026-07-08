@@ -1,12 +1,12 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "installation"
 ---
 
-# Installation Error States
+# Instalacao Error States
 
 ## ERR-01: Database Connection Failed
 - **Condition:** Credentials incorretas ou banco indisponivel
@@ -18,7 +18,7 @@ feature: "installation"
 - **Código HTTP:** 500
 - **Mensagem:** "Falha ao criar tabelas no banco de data. Verifique as credenciais e permissões."
 
-## ERR-03: Validtion Error
-- **Condition:** Form with fields invalidos
+## ERR-03: Validation Error
+- **Condition:** Form com fields invalidos
 - **Código HTTP:** 400
 - **Mensagem:** Lista de erros de validacao

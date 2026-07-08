@@ -32,7 +32,7 @@ export default async function AdminMediaPage() {
     }
 
     try {
-      await MediaService.delete(id);
+      await MediaService.delete(id, session?.user);
       revalidatePath('/admin/media');
     } catch (error) {
       logger.error('Error deleting media:', error);

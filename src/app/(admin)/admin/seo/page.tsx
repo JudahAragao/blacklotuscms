@@ -34,7 +34,7 @@ export default async function SEOSettingsPage() {
       throw new Error("Nao autorizado");
     }
 
-    await SettingService.set('site_url', formData.get('site_url'));
+    await SettingService.set('site_url', formData.get('site_url'), session?.user);
     const seoData = {
       site_name: formData.get('site_name'),
       title_separator: formData.get('title_separator'),
@@ -42,9 +42,9 @@ export default async function SEOSettingsPage() {
       og_image: formData.get('og_image'),
       google_site_verification: formData.get('google_site_verification'),
     };
-    await SettingService.set('seo', seoData);
+    await SettingService.set('seo', seoData, session?.user);
     const selectedPostTypes = postTypes.filter(pt => formData.get(`sitemap_${pt.slug}`) === 'on').map(pt => pt.slug);
-    await SettingService.set('sitemap_post_types', selectedPostTypes);
+    await SettingService.set('sitemap_post_types', selectedPostTypes, session?.user);
     revalidatePath('/admin/seo');
   }
 

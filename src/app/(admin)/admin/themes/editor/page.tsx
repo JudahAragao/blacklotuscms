@@ -12,6 +12,7 @@ import 'prismjs/components/prism-jsx';
 import 'prismjs/components/prism-tsx';
 import 'prismjs/themes/prism-tomorrow.css';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { saveThemeSettingAction, getThemeSettingsAction } from './actions';
 
 function EditorContent() {
@@ -48,7 +49,9 @@ function EditorContent() {
 
   const loadSettings = async () => {
     const data = await getThemeSettingsAction(theme);
-    setSettings(data);
+    if (Array.isArray(data)) {
+      setSettings(data);
+    }
   };
 
   const saveFile = async () => {

@@ -84,8 +84,8 @@ export default async function TaxonomyTypesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="text-sm text-action font-medium">{tx.postType.label}</td>
-                    <td className="text-sm text-text-muted">{tx._count.terms}</td>
+                    <td className="text-sm text-action font-medium">{tx.postType?.label ?? '-'}</td>
+                    <td className="text-sm text-text-muted">{tx._count?.terms ?? 0}</td>
                     <td className="text-right">
                       <div className="flex justify-end items-center gap-1.5">
                         <Link href={`/admin/settings/taxonomy-types/${tx.id}/terms`} className="p-1.5 text-text-muted hover:text-action transition-colors" title="Gerenciar Termos">

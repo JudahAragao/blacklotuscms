@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: draft
 ---
@@ -8,10 +8,10 @@ status: draft
 # E2E Testing Plan
 
 ## Tools
-- A definir (Playwright rewithendado)
+- A definir (Playwright recomendado)
 
 ## Scenarios
-1. **Installation Completa:** Setup wizard with banco real
+1. **Instalacao Completa:** Setup wizard com banco real
    - Feature vinculada: installation
    - Acceptance tests: AT-01 a AT-04
 
@@ -23,10 +23,10 @@ status: draft
    - Feature vinculada: media-management
    - Acceptance tests: AT-01 a AT-03
 
-4. **Plugin Lifecycle:** Installation + ativacao + desativacao
-   - Feature vinculada: plugin-syshas
+4. **Plugin Lifecycle:** Instalacao + ativacao + desativacao
+   - Feature vinculada: plugin-system
    - Acceptance tests: AT-01 a AT-05
 
-5. **Theme Rendering:** Visualizacao publica withpleta
+5. **Theme Rendering:** Visualizacao publica completa
    - Feature vinculada: theme-engine
    - Acceptance tests: AT-01 a AT-03

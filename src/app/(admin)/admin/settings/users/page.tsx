@@ -20,6 +20,16 @@ export default async function UsersPage() {
 
   const roles = await prisma.role.findMany();
 
+  async function createUserForm(formData: FormData) {
+    'use server';
+    await createUserAction(formData);
+  }
+
+  async function deleteUserForm(id: string) {
+    'use server';
+    await deleteUserAction(id);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -38,7 +48,7 @@ export default async function UsersPage() {
             <Plus size={16} className="text-action" />
             <h3 className="font-semibold text-sm text-text-heading">Novo Usuario</h3>
           </div>
-          <form action={createUserAction} className="space-y-4">
+          <form action={createUserForm} className="space-y-4">
             <div className="flex flex-col gap-1">
               <label className="label-field-muted">Email</label>
               <input type="email" name="email" required className="field-input" placeholder="email@exemplo.com" />
@@ -104,7 +114,7 @@ export default async function UsersPage() {
                         <Link href={`/admin/settings/users/${u.id}`} className="p-1.5 text-text-muted hover:text-action transition-colors" title="Editar">
                           <Edit3 size={16} />
                         </Link>
-                        <form action={deleteUserAction.bind(null, u.id)}>
+                        <form action={deleteUserForm.bind(null, u.id)}>
                           <button disabled={(session.user as any).id === u.id} className="p-1.5 text-text-muted hover:text-status-trash transition-colors disabled:opacity-20">
                             <Trash2 size={16} />
                           </button>

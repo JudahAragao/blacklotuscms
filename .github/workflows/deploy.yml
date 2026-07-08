@@ -1,0 +1,250 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set lowercased repository owner
+        id: set_repo_owner
+        run: echo "REPO_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/blacklotuscms:latest
+            ghcr.io/${{ env.REPO_OWNER }}/blacklotuscms:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set lowercased repository owner
+        id: set_repo_owner
+        run: echo "GITHUB_USER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: GITHUB_USER
+          script: |
+            set -e
+
+            export GITHUB_USER=$(echo '${{ github.actor }}' | tr '[:upper:]' '[:lower:]')
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # === 1. Determine target ===
+            ACTIVE=$(cat /opt/apps/current 2>/dev/null || echo "none")
+            if [ "$ACTIVE" = "blue" ]; then
+              TARGET="green"
+              PORT=3002
+              PREV="blue"
+              PREV_PORT=3001
+            else
+              TARGET="blue"
+              PORT=3001
+              PREV="green"
+              PREV_PORT=3002
+            fi
+            echo "Deploying to $TARGET (port $PORT)..."
+
+            # === 2. Read DB password from .env ===
+            mkdir -p /opt/apps/$TARGET
+            if [ -f /opt/apps/$TARGET/.env ]; then
+              APP_DB_PASSWORD=$(grep '^DATABASE_URL=' /opt/apps/$TARGET/.env | sed 's|.*:\([^@]*\)@.*|\1|')
+            elif [ -f /opt/apps/$PREV/.env ]; then
+              APP_DB_PASSWORD=$(grep '^DATABASE_URL=' /opt/apps/$PREV/.env | sed 's|.*:\([^@]*\)@.*|\1|')
+            else
+              echo "ERROR: No .env found to read database password from."
+              exit 1
+            fi
+            echo "DB password extracted from .env."
+
+            # === 3. Shared Postgres (password from .env) ===
+            docker network create blacklotus-network 2>/dev/null || true
+
+            cat > /opt/apps/shared/docker-compose.yml << PGEOF
+            services:
+              postgres:
+                image: postgres:15-alpine
+                container_name: blacklotus-postgres
+                environment:
+                  POSTGRES_USER: postgres
+                  POSTGRES_DB: blacklotuscms
+                  POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
+                volumes:
+                  - postgres_data:/var/lib/postgresql/data
+                ports:
+                  - "127.0.0.1:5432:5432"
+                networks:
+                  - blacklotus-network
+                restart: unless-stopped
+                healthcheck:
+                  test: ["CMD-SHELL", "pg_isready -U postgres"]
+                  interval: 10s
+                  timeout: 5s
+                  retries: 5
+
+            volumes:
+              postgres_data:
+
+            networks:
+              blacklotus-network:
+                external: true
+            PGEOF
+
+            cd /opt/apps/shared
+            docker compose up -d
+            echo "Waiting for postgres..."
+            sleep 3
+
+            # === 4. Create app docker-compose ===
+            mkdir -p /opt/apps/$TARGET
+            mkdir -p /home/deploy/portfolio/uploads
+
+            # Ensure nginx can traverse parent directories
+            chmod o+x /home/deploy /home/deploy/portfolio
+            # Ensure nextjs (UID 1001) owns the uploads dir
+            chown -R 1001:1001 /home/deploy/portfolio/uploads 2>/dev/null || true
+            cat > /opt/apps/$TARGET/docker-compose.yml << APPEOF
+            services:
+              app:
+                image: ghcr.io/\${GITHUB_USER}/blacklotuscms:latest
+                container_name: blacklotus-${TARGET}-app
+                ports:
+                  - "${PORT}:3000"
+                volumes:
+                  - /home/deploy/portfolio/uploads:/app/uploads
+                  - ./.env:/app/.env
+                env_file:
+                  - .env
+                networks:
+                  - blacklotus-network
+                restart: unless-stopped
+
+            networks:
+              blacklotus-network:
+                external: true
+            APPEOF
+
+            # === 5. Check .env exists ===
+            cd /opt/apps/$TARGET
+            export GITHUB_USER=$GITHUB_USER
+
+            if [ ! -f .env ]; then
+              echo "ERROR: .env not found in /opt/apps/$TARGET/. Create it before deploying."
+              exit 1
+            fi
+
+            # === 6. Pull and start ===
+            docker pull ghcr.io/$GITHUB_USER/blacklotuscms:latest
+
+            # Clean up any orphaned named volumes from old deploys
+            docker volume rm ${TARGET}_uploads 2>/dev/null || true
+            docker volume rm ${PREV}_uploads 2>/dev/null || true
+
+            # === 6b. Push schema (first deploy or schema changes) ===
+            cd /opt/apps/$TARGET
+            APP_DATABASE_URL=$(grep '^DATABASE_URL=' .env | cut -d'=' -f2-)
+            if [ -n "$APP_DATABASE_URL" ] && [ ! -f /opt/apps/shared/.schema-applied ]; then
+              docker run --rm --network blacklotus-network \
+                -e DATABASE_URL="$APP_DATABASE_URL" \
+                ghcr.io/$GITHUB_USER/blacklotuscms:latest \
+                sh -c 'echo "import { defineConfig } from \"prisma/config\"; export default defineConfig({ datasource: { url: process.env.DATABASE_URL } });" > /tmp/prisma.config.ts && bunx prisma db push --accept-data-loss --schema=/app/prisma/schema.prisma --config=/tmp/prisma.config.ts' && touch /opt/apps/shared/.schema-applied && echo 'Schema applied.' || echo 'Schema push failed (may already be applied)'
+            fi
+
+            docker compose up -d app
+
+            # === 7. Ensure previous app is also running (rollback fallback) ===
+            if [ -d /opt/apps/$PREV ]; then
+              cd /opt/apps/$PREV
+              export GITHUB_USER=$GITHUB_USER
+              docker compose up -d app 2>/dev/null || true
+              cd /opt/apps/$TARGET
+            fi
+
+            # === 8. Health check ===
+            echo "Waiting for $TARGET to be healthy..."
+            for i in $(seq 1 12); do
+              if curl -s http://localhost:$PORT > /dev/null 2>&1; then
+                echo "$TARGET is healthy!"
+                break
+              fi
+              sleep 5
+              if [ $i -eq 12 ]; then
+                echo "Health check failed"
+                docker compose logs app --tail=20
+                exit 1
+              fi
+            done
+
+            # === 9. Update Nginx ===
+            sudo rm -f /etc/nginx/sites-enabled/default
+            cat > /tmp/nginx-app.conf << NGXEOF
+            upstream backend {
+                server 127.0.0.1:${PORT};
+            }
+
+            server {
+                listen 80;
+                server_name judahdearagao.pro www.judahdearagao.pro;
+                client_max_body_size 64M;
+
+                location / {
+                    proxy_pass http://backend;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection "upgrade";
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                    proxy_cache_bypass \$http_upgrade;
+                    proxy_read_timeout 300s;
+                }
+
+                location /uploads/ {
+                    alias /home/deploy/portfolio/uploads/;
+                    expires 30d;
+                    add_header Cache-Control "public, immutable";
+                }
+            }
+            NGXEOF
+            sudo cp /tmp/nginx-app.conf /etc/nginx/conf.d/app.conf
+            sudo nginx -t && sudo systemctl reload nginx
+
+            # === 10. Update current ===
+            echo "$TARGET" | sudo tee /opt/apps/current
+            echo "Deploy to $TARGET completed!"

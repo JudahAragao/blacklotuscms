@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -12,7 +12,7 @@ status: approved
 ### ErrorCode (src/lib/errors.ts)
 // source: manual
 ```typescript
-type ErrorCode = 'AUTH_UNAUTHORIZED' | 'AUTH_FORBIDDEN' | 'RESOURCE_NOT_FOUND' | 'VALIDATION_ERROR' | 'DATABASE_ERROR' | 'INTERNAL_SERVER_ERROR' | 'RATE_LIMIT_EXCEEDED';
+type ErrorCode = 'AUTH_UNAUTHORIZED' | 'AUTH_FORBIDDEN' | 'RESOURCE_NOT_FOUND' | 'VALIDATION_ERROR' | 'DATABASE_ERROR' | 'INTERNAL_SERVER_ERROR' | 'RATE_LIMIT_EXCEEDED' | 'CONFLICT' | 'INSTALL_REQUIRED' | 'SANDBOX_TIMEOUT' | 'PLUGIN_ERROR' | 'THEME_PERMISSION_DENIED';
 ```
 
 ### BlackLotusCMSError (src/lib/errors.ts)
@@ -75,9 +75,9 @@ interface HookMetadata {
 ## Core Entities (Prisma Generated)
 // source: prisma generate (NAO MODIFICAR DIRETAMENTE)
 
-Tipos gerados pelo Prisma para all as entidades: User, Role, ApiKey, PostType, Post, FieldGroup, Field, MetaValue, Taxonomy, Term, PostTerm, Plugin, PluginData, PluginPermission, Media, Setting, ThemeData, ThemePermission, Menu, MenuIhas, Comment.
+Tipos gerados pelo Prisma para todas as entidades: User, Role, ApiKey, PostType, Post, FieldGroup, Field, MetaValue, Taxonomy, Term, PostTerm, Plugin, PluginData, PluginPermission, Media, Setting, ThemeData, ThemePermission, Menu, MenuItem, Comment.
 
-Access via: `import { User, Post, ... } from '../../prisma/generated/prisma'`
+Acesso via: `import { User, Post, ... } from '../../prisma/generated/prisma'`
 
 ## Shared Types (src/types/dto.ts)
 // source: manual
@@ -137,7 +137,7 @@ interface UserDTO { id: string; email: string; image?: string | null; role: { id
 - metaFields: Record<string, any> (optional)
 - terms: string[] (optional)
 
-### CreateCommentSchema (src/schemas/withment.schema.ts)
+### CreateCommentSchema (src/schemas/comment.schema.ts)
 - postId: UUID
 - author: string (2-100)
 - email: string (valid email)

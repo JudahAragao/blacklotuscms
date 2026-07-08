@@ -1,22 +1,22 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "search"
 ---
 
-# Search Flows
+# Busca Flows
 
-## Search Global
+## Busca Global
 
 1. **Theme/usuario envia query**
    - State: Query received
 
-2. **Validcao: query.length >= 3**
+2. **Validacao: query.length >= 3**
    - State: Valid query
 
-3. **Prisma query with OR**
+3. **Prisma query com OR**
    - title contains (insensitive)
    - content contains (insensitive)
    - metaValues value array_contains

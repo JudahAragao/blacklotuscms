@@ -17,7 +17,7 @@ const MIME_TYPES: Record<string, string> = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { name: string; path: string[] } }
+  { params }: { params: Promise<{ name: string; path: string[] }> }
 ) {
   const { name, path: assetPathArray } = await params;
   const themeName = sanitizePath(name);

@@ -46,7 +46,7 @@ export default async function PostsAdminPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-text-heading">{label}</h1>
           <p className="text-sm text-text-muted mt-1">Gerenciar {label.toLowerCase()}</p>
@@ -54,7 +54,7 @@ export default async function PostsAdminPage({
         {canCreate && (
           <Link
             href={`/admin/posts/new?type=${postTypeSlug}`}
-            className="btn-action flex items-center gap-2"
+            className="btn-action flex items-center gap-2 justify-center"
           >
             <Plus size={16} /> Adicionar Novo
           </Link>
@@ -62,7 +62,8 @@ export default async function PostsAdminPage({
       </div>
 
       <div className="content-card overflow-hidden">
-        <table className="data-table">
+        <div className="overflow-x-auto">
+          <table className="data-table min-w-[600px]">
           <thead>
             <tr>
               <th className="w-10"><input type="checkbox" className="check-field" /></th>
@@ -119,6 +120,7 @@ export default async function PostsAdminPage({
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

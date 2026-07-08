@@ -39,7 +39,7 @@ export interface MediaDTO {
     width?: number;
     height?: number;
     format?: string;
-  };
+  } | null;
   createdBy?: string | null;
   createdAt: Date;
 }
@@ -65,8 +65,12 @@ export interface TaxonomyDTO {
   label: string;
   hierarchical: boolean;
   postType?: {
+    id?: string;
     slug: string;
     label: string;
+  };
+  _count?: {
+    terms: number;
   };
   terms?: TermDTO[];
 }

@@ -21,7 +21,7 @@ const memoryStore = new Map<string, RateLimitBucket>();
 // Redis client (lazy loaded)
 let redisClient: any = null;
 
-async function getRedisClient(config: RateLimiterConfig.redis) {
+async function getRedisClient(config: RateLimiterConfig["redis"]) {
   if (redisClient) return redisClient;
 
   try {
@@ -30,8 +30,8 @@ async function getRedisClient(config: RateLimiterConfig.redis) {
       socket: {
         host: config?.host || 'localhost',
         port: config?.port || 6379,
-        password: config?.password,
       },
+      password: config?.password,
     });
 
     redisClient.on('error', (err: any) => {

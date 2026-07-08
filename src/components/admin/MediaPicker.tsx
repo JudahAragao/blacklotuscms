@@ -26,7 +26,7 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
   const fetchMedia = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/media');
+      const res = await fetch('/api/v1/media', { credentials: 'include' });
       const data = await res.json();
       setMediaList(data);
     } catch (error) {
@@ -78,6 +78,7 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
         const response = await fetch('/api/v1/media', {
           method: 'POST',
           body: formData,
+          credentials: 'include',
         });
 
         if (response.ok) {

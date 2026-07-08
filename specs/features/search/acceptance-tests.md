@@ -1,15 +1,15 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "search"
 ---
 
-# Search Acceptance Tests
+# Busca Acceptance Tests
 
-## AT-01: Search with Results
-- **GIVEN** posts publicados with titulo "Tecnologia"
+## AT-01: Busca com Results
+- **GIVEN** posts publicados com titulo "Tecnologia"
 - **WHEN** busca por "tecnologia"
 - **THEN** posts correspondentes retornados
 - **Referencia:** FR16

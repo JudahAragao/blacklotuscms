@@ -1,7 +1,8 @@
 import SchemaBuilder from '@pothos/core';
 import PrismaPlugin from '@pothos/plugin-prisma';
 import ScopeAuthPlugin from '@pothos/plugin-scope-auth';
-import type PrismaTypes from '@pothos/plugin-prisma/generated';
+import type PrismaTypes from '../generated/pothos-types';
+import { getDatamodel } from '../generated/pothos-types';
 import { prisma } from './prisma';
 
 /**
@@ -31,30 +32,31 @@ export const builder = new SchemaBuilder<{
   plugins: [PrismaPlugin, ScopeAuthPlugin],
   prisma: {
     client: prisma,
+    dmmf: getDatamodel(),
   },
-  authScopes: async (context) => ({
-    public: true,
-    authenticated: !!context.session?.user,
-    hasCapability: (cap) => {
-      const user = context.session?.user;
-      if (!user || !user.role) return false;
-      
-      const capabilities = user.role.capabilities as Record<string, any>;
-      // Support for nested paths or simple strings
-      const keys = cap.split('.');
-      let current = capabilities;
-      for (const key of keys) {
-        if (current[key] === undefined) return false;
-        current = current[key];
-      }
-      return !!current;
-    },
-  }),
+  scopeAuth: {
+    authScopes: async (context: { session?: any }) => ({
+      public: true,
+      authenticated: !!context.session?.user,
+      hasCapability: (cap: string) => {
+        const user = context.session?.user;
+        if (!user || !user.role) return false;
+
+        const capabilities = user.role.capabilities as Record<string, any>;
+        const keys = cap.split('.');
+        let current: any = capabilities;
+        for (const key of keys) {
+          if (current[key] === undefined) return false;
+          current = current[key];
+        }
+        return !!current;
+      },
+    }),
+  },
 });
 
 // Add basic scalars
 builder.queryType({});
-builder.mutationType({});
 
 builder.scalarType('DateTime', {
   serialize: (date) => date.toISOString(),

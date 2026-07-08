@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { importPluginAction } from '@/app/(admin)/admin/plugins/actions';
 
 export default function PluginImportButton() {
@@ -18,8 +19,10 @@ export default function PluginImportButton() {
 
     try {
       const result = await importPluginAction(formData);
-      if (result.success) {
+      if ('success' in result && result.success) {
         toast.success('Plugin importado com sucesso!');
+      } else if ('error' in result) {
+        toast.error(`Erro ao importar plugin: ${result.error}`);
       }
     } catch (err: any) {
       toast.error(`Erro ao importar plugin: ${err.message}`);
@@ -55,10 +58,6 @@ export default function PluginImportButton() {
           </>
         )}
       </button>
-    </div>
-  );
-}
-button>
     </div>
   );
 }

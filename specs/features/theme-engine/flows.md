@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "theme-engine"
@@ -29,7 +29,7 @@ feature: "theme-engine"
    - import(`../../themes/${themeName}/layouts/${layoutFile}`)
    - State: Componente carregado
 
-6. **Search de ThemeData para CSS Variables**
+6. **Busca de ThemeData para CSS Variables**
    - ThemeDataService.listAll(themeName)
    - State: Variaveis CSS prontas
 
@@ -44,11 +44,11 @@ feature: "theme-engine"
    - State: Call received
 
 2. **ThemeDataService.validate(capability)**
-   - Search ThemePermission no banco
+   - Busca ThemePermission no banco
    - State: Permission verified
 
 3. **Se nao aprovada: requestPermission()**
-   - Cria/solicita ThemePermission with status "pending"
+   - Cria/solicita ThemePermission com status "pending"
    - State: Request registrada
 
 4. **Admin aprova/denega via painel**

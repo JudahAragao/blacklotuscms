@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "media-management"
@@ -32,13 +32,13 @@ feature: "media-management"
    - State: Files salvos
 
 6. **Registro no banco**
-   - Cria Media with url, thumbnail, mimeType, size, metadata
+   - Cria Media com url, thumbnail, mimeType, size, metadata
    - State: Registro criado
 
-## Deletion de Media
+## Exclusao de Media
 
 1. **RBAC check** (media.manage)
-2. **Search Media no banco**
+2. **Busca Media no banco**
 3. **Exclui arquivo principal do storage**
 4. **Exclui thumbnail do storage**
 5. **Exclui registro do banco**

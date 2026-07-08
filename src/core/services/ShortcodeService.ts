@@ -36,7 +36,7 @@ export class ShortcodeService {
 
         try {
           const replacement = await handler(attributes, innerContent);
-          result = result.replace(fullMatch, sanitizeHTML(replacement));
+          result = result.replace(fullMatch, await sanitizeHTML(replacement));
         } catch (err) {
           this.log.error(`Failed to process shortcode: [${tag}]`, { err });
         }

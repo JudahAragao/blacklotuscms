@@ -73,7 +73,7 @@ export async function updateUserAction(id: string, formData: FormData) {
       data.passwordHash = await bcrypt.hash(password, 12);
     }
 
-    const isAdmin = hasCapability(session.user.role, 'user.manage');
+    const isAdmin = hasCapability((session.user as any).role, 'user.manage');
     if (isAdmin && roleId) {
       const adminRole = await prisma.role.findFirst({ where: { name: 'Administrador' } });
       if (adminRole && currentUser.role.name === 'Administrador' && roleId !== adminRole.id) {

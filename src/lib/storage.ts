@@ -1,8 +1,9 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import fs from "fs/promises";
 import path from "path";
 import { prisma } from "./prisma";
+import { logger } from "./logger";
 
 export interface StorageDriver {
   upload(file: Buffer, filename: string, mimeType: string): Promise<string>;
@@ -10,18 +11,25 @@ export interface StorageDriver {
 }
 
 class LocalDriver implements StorageDriver {
-  private uploadDir: string = process.env.UPLOAD_DIR || "./public/uploads";
+  private resolvedDir: string;
+
+  constructor() {
+    const raw = process.env.UPLOAD_DIR || './public/uploads';
+    this.resolvedDir = path.isAbsolute(raw)
+      ? raw
+      : path.resolve(process.cwd(), raw);
+    logger.info(`[Storage] LocalDriver resolved uploadDir: ${this.resolvedDir}`);
+  }
 
   async upload(file: Buffer, filename: string): Promise<string> {
-    const fullPath = path.join(process.cwd(), this.uploadDir, filename);
+    const fullPath = path.join(this.resolvedDir, filename);
     await fs.mkdir(path.dirname(fullPath), { recursive: true });
     await fs.writeFile(fullPath, file);
-    const publicPath = this.uploadDir.replace(/^\.\/public\/?/, '').replace(/^public\/?/, '');
-    return `/${path.join(publicPath, filename)}`;
+    return `/uploads/${filename}`;
   }
 
   async delete(filename: string): Promise<void> {
-    const fullPath = path.join(process.cwd(), this.uploadDir, filename);
+    const fullPath = path.join(this.resolvedDir, filename);
     await fs.unlink(fullPath);
   }
 }
@@ -58,7 +66,12 @@ class S3Driver implements StorageDriver {
     return `${this.publicUrl}/${filename}`;
   }
 
-  async delete(filename: string): Promise<void> { /* Implement real delete */ }
+  async delete(filename: string): Promise<void> {
+    await this.client.send(new DeleteObjectCommand({
+      Bucket: this.bucket,
+      Key: filename,
+    }));
+  }
 }
 
 export const getStorageDriver = async (): Promise<StorageDriver> => {

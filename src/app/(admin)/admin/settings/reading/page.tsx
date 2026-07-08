@@ -44,7 +44,7 @@ export default async function ReadingSettingsPage() {
       page_for_posts: formData.get('page_for_posts'),
     };
 
-    await SettingService.set('reading', data);
+    await SettingService.set('reading', data, session?.user);
     revalidatePath('/admin/settings/reading');
     revalidatePath('/');
   }

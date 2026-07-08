@@ -35,7 +35,7 @@ export class PostTypeService {
     });
 
     this.log.info(`New Post Type created: ${pt.label} (${pt.slug})`);
-    revalidateTag('post-types');
+    revalidateTag('post-types', 'max');
     return pt;
   }
 
@@ -96,8 +96,8 @@ export class PostTypeService {
       data,
     });
     this.log.info(`Post Type updated: ${pt.slug}`);
-    revalidateTag(`post-type-${slug}`);
-    revalidateTag('post-types');
+    revalidateTag(`post-type-${slug}`, 'max');
+    revalidateTag('post-types', 'max');
     return pt;
   }
 
@@ -122,8 +122,8 @@ export class PostTypeService {
     });
 
     this.log.warn(`Post Type deleted: ${slug}`);
-    revalidateTag(`post-type-${slug}`);
-    revalidateTag('post-types');
+    revalidateTag(`post-type-${slug}`, 'max');
+    revalidateTag('post-types', 'max');
     return deleted;
   }
 

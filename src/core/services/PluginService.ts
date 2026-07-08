@@ -8,7 +8,6 @@ import { fileService } from './FileService';
 import path from 'path';
 import fs from 'fs/promises';
 import bcrypt from 'bcryptjs';
-import ivm from 'isolated-vm';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { canPerformAction } from '@/lib/auth-utils';
@@ -135,29 +134,31 @@ export class PluginService {
           }
           hookService.registerComponent(slot, component, pluginId, priority);
         },
-        addAction: (hookName: string, callback: ivm.Reference<any>) => {
+        addAction: async (hookName: string, callback: any) => {
+          const ivmMod = await import('isolated-vm');
           hookService.addAction(hookName, async (data) => {
             try {
-              await callback.apply(undefined, [new ivm.ExternalCopy(data).copyInto()]);
+              await callback.apply(undefined, [new ivmMod.ExternalCopy(data).copyInto()]);
             } catch (err) {
               this.log.error(`Error in hook ${hookName} of plugin ${pluginId}`, { err });
             }
           });
         },
-        addFilter: (hookName: string, callback: ivm.Reference<any>) => {
+        addFilter: async (hookName: string, callback: any) => {
+          const ivmMod = await import('isolated-vm');
           hookService.addFilter(hookName, async (data) => {
             try {
               if (hookName === 'route_access') {
                 const capability = `system.hook.filter.${hookName}`;
                 const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', capability);
-                
+
                 if (!hasAccess) {
                   await pluginDataService.requestPermission(pluginName, 'system', capability);
                   this.log.warn(`Plugin '${pluginName}' attempted to use sensitive hook '${hookName}' without permission.`);
                   return data;
                 }
               }
-              return await callback.apply(undefined, [new ivm.ExternalCopy(data).copyInto()], { result: { copy: true } });
+              return await callback.apply(undefined, [new ivmMod.ExternalCopy(data).copyInto()], { result: { copy: true } });
             } catch (err) {
               this.log.error(`Error in filter ${hookName} of plugin ${pluginId}`, { err });
               return data;
@@ -188,7 +189,7 @@ export class PluginService {
       // Sandbox Pooling Implementation
       let sandbox = this.sandboxPool.get(pluginId);
       if (!sandbox) {
-        sandbox = new PluginSandbox();
+        sandbox = await PluginSandbox.create();
         this.sandboxPool.set(pluginId, sandbox);
       }
 
@@ -231,7 +232,7 @@ export class PluginService {
         const realFs = fs;
         const content = await realFs.readFile(entryPath, 'utf-8');
 
-        let sandbox = new PluginSandbox();
+        let sandbox = await PluginSandbox.create();
         const bridge = this.createBridgeApi(plugin.id, manifest);
         await sandbox.execute(content, bridge);
         

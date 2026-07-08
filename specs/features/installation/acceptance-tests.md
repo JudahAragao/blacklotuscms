@@ -1,16 +1,16 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "installation"
 ---
 
-# Installation Acceptance Tests
+# Instalacao Acceptance Tests
 
-## AT-01: Installation Completa
-- **GIVEN** system nao instalado
-- **WHEN** formulario preenchido with data validos
+## AT-01: Instalacao Completa
+- **GIVEN** sistema nao instalado
+- **WHEN** formulario preenchido com data validos
 - **THEN** schema aplicado, roles criadas, admin criado, .installed criado
 - **Referencia:** FR20
 
@@ -23,11 +23,11 @@ feature: "installation"
 ## AT-03: Database Connection Fail
 - **GIVEN** credenciais de banco incorretas
 - **WHEN** tenta conectar
-- **THEN** erro 500 with mensagem de falha de conexao
+- **THEN** erro 500 com mensagem de falha de conexao
 - **Referencia:** FR20
 
 ## AT-04: Re-installation Blocked
-- **GIVEN** system ja instalado (.installed existe)
+- **GIVEN** sistema ja instalado (.installed existe)
 - **WHEN** acessa /install
 - **THEN** redireciona para /auth/login
 - **Referencia:** FR20, BR10

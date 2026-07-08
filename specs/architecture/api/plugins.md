@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 module: "plugins"
@@ -15,7 +15,7 @@ module: "plugins"
 - **Auth:** Required
 - **RBAC:** `plugin.manage`
 
-**Request:** multipart/form-data with campo "file" (ZIP)
+**Request:** multipart/form-data com campo "file" (ZIP)
 
 **Response 200:**
 ```json
@@ -41,4 +41,4 @@ module: "plugins"
 - **Auth:** Required
 - **RBAC:** `plugin.manage`
 
-**Gerencia permissions pendentes/aprovadas/denegadas entre plugins e o system.**
+**Gerencia permissions pendentes/aprovadas/denegadas entre plugins e o sistema.**

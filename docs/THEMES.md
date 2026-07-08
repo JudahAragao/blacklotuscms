@@ -1,7 +1,7 @@
 # Theme Development Guide
 
 ## Overview
-BlackLotusCMS themes are React Server Components with CSS scoping, dynamic imports, and permission-gated data access.
+BlackLotusCMS themes are React Server Components com CSS scoping, dynamic imports, and permission-gated data access.
 
 ## Theme Structure
 ```
@@ -16,7 +16,7 @@ themes/
     │   ├── post.tsx        # Single post
     │   ├── archive.tsx     # Post listings
     │   ├── category.tsx    # Category/taxonomy listings
-    │   ├── search.tsx      # Search results
+    │   ├── search.tsx      # Busca results
     │   └── 404.tsx         # Not found
     └── components/
         ├── Header.tsx
@@ -231,14 +231,14 @@ Theme settings are injected as CSS variables:
 ```
 
 ## Permissions
-Themes must request permission to access system data:
+Themes must request permission to access sistema data:
 - `db.read.post` - Read posts
 - `db.read.media` - Read media library
-- `system.auth.read` - Access user auth
+- `sistema.auth.read` - Acesso user auth
 
 Permissions are managed via Admin > Themes > Permissions.
 
-## Installation
+## Instalacao
 1. Create theme folder in `themes/my-theme/`
 2. Add `theme.json` manifest
 3. Create layouts (at least `post.tsx`)
@@ -246,8 +246,8 @@ Permissions are managed via Admin > Themes > Permissions.
 5. Activate via Admin > Themes
 
 ## Security
-- Theme names sanitized with `sanitizePath()`
+- Theme names sanitized com `sanitizePath()`
 - Data masked (no passwords, tokens exposed)
 - CSS scoped via `.blacklotuscms-theme` class
-- HTML sanitized with DOMPurify
+- HTML sanitized com DOMPurify
 - Dynamic imports use try/catch fallback

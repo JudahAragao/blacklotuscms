@@ -1,9 +1,9 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
-feature: "withments"
+feature: "comments"
 ---
 
 # Comments Flows
@@ -14,7 +14,7 @@ feature: "withments"
    - postId, author, email, content, parentId?
    - State: Data received
 
-2. **Validcao Zod** (CreateCommentSchema)
+2. **Validacao Zod** (CreateCommentSchema)
    - State: Validated data
 
 3. **Verificacao de captcha** (se habilitado)
@@ -31,12 +31,12 @@ feature: "withments"
    - Otherwise: status = "pending"
    - State: Status defined
 
-6. **Creation no banco**
+6. **Criacao no banco**
    - State: Comment created
 
 ## Moderar Comment
 
-1. **Admin visualiza withentarios pendentes**
+1. **Admin visualiza comentarios pendentes**
    - State: List displayed
 
 2. **Admin aprova/denega/exclui**

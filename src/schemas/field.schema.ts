@@ -57,7 +57,7 @@ export const CreateFieldSchema: z.ZodType<any> = z.object({
   name: z.string().min(2).regex(/^[a-z0-9_]+$/, "Nome do campo deve ser snake_case."),
   label: z.string().min(2),
   type: FieldTypeEnum,
-  config: FieldConfigSchema.optional().default({}),
+  config: FieldConfigSchema.optional().default({ required: false, width: 100 }),
 });
 
 export const CreateFieldGroupSchema = z.object({

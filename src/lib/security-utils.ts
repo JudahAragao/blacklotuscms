@@ -1,10 +1,7 @@
-import DOMPurify from 'isomorphic-dompurify';
-
 /**
  * Sanitizes slugs and directory names to prevent Path Traversal.
  */
 export function sanitizePath(path: string): string {
-  // Remove .. , / and \
   return path.replace(/\.\./g, '').replace(/[/\\]/g, '').trim();
 }
 
@@ -14,7 +11,7 @@ export function sanitizePath(path: string): string {
 export function maskSensitiveData(data: any): any {
   if (!data) return data;
   if (Array.isArray(data)) return data.map(maskSensitiveData);
-  
+
   if (typeof data === 'object') {
     const forbiddenFields = [
       'passwordHash', 'password', 'password_hash', 'hashedPassword',
@@ -23,7 +20,7 @@ export function maskSensitiveData(data: any): any {
       'access_token', 'refresh_token', 'providerAccountId'
     ];
     const sanitized = { ...data };
-    
+
     for (const key in sanitized) {
       if (forbiddenFields.includes(key)) {
         delete sanitized[key];
@@ -37,8 +34,9 @@ export function maskSensitiveData(data: any): any {
 }
 
 /**
- * Sanitizes HTML to prevent XSS.
+ * Sanitizes HTML to prevent XSS. Lazy-loaded to avoid jsdom at import time.
  */
-export function sanitizeHtml(html: string): string {
+export async function sanitizeHtml(html: string): Promise<string> {
+  const { default: DOMPurify } = await import('isomorphic-dompurify');
   return DOMPurify.sanitize(html);
 }

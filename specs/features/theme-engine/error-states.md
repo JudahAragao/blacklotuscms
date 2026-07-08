@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "theme-engine"
@@ -11,7 +11,7 @@ feature: "theme-engine"
 ## ERR-01: Theme Nao Found
 - **Condition:** Diretorio do theme nao existe
 - **Código HTTP:** N/A (fallback para layout "post")
-- **Ação do system:** import fallthrough para fallback
+- **Ação do sistema:** import fallthrough para fallback
 
 ## ERR-02: Theme Permission Denied
 - **Condition:** Theme sem permissao aprovada
@@ -22,4 +22,4 @@ feature: "theme-engine"
 ## ERR-03: Layout Nao Found
 - **Condition:** File de layout nao existe no theme
 - **Código HTTP:** N/A (fallback automatico)
-- **Ação do system:** import catch para layouts/post
+- **Ação do sistema:** import catch para layouts/post

@@ -65,7 +65,7 @@ export class MediaService {
       });
 
       this.log.info(`Media uploaded: ${safeFilename}`, { id: media.id });
-      return media;
+      return media as MediaDTO;
     } catch (error: any) {
       if (error instanceof BlackLotusCMSError) throw error;
       this.log.error('Media upload failed', { 

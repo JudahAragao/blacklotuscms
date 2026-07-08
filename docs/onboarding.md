@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -23,7 +23,7 @@ Bem-vindo ao BlackLotusCMS. Um CMS moderno e extensivel construido com Next.js 1
 - **Prisma Proxy:** Lazy initialization permite instalacao web-based
 - **Hook System:** Actions + Filters para extensibilidade (WordPress-style)
 - **Plugin Sandbox:** isolated-vm com Bridge API
-- **Theme System:** React Server Components com CSS scoping
+- **Theme Sistema:** React Server Components com CSS scoping
 - **RBAC:** Capability-based permissions em JSON
 
 ## Development Workflow

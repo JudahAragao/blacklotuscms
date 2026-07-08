@@ -69,17 +69,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Top Admin Bar */}
       <header className="h-10 bg-[#1d2327] border-b border-[#2c3338] flex items-center justify-between px-4 flex-shrink-0 z-50">
         <div className="flex items-center gap-4">
+          <label htmlFor="sidebar-toggle" className="md:hidden text-[#a7aaad] hover:text-white cursor-pointer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </label>
           <Link href="/admin" className="flex items-center gap-2">
             <img src="/assets/brand/logo.png" alt="BlackLotusCMS" className="w-5 h-5 object-contain" />
             <span className="text-white text-sm font-semibold tracking-tight">BlackLotusCMS</span>
           </Link>
-          <span className="text-[#a7aaad] text-xs">|</span>
-          <Link href="/" target="_blank" className="text-[#a7aaad] hover:text-white text-xs flex items-center gap-1 transition-colors">
+          <span className="text-[#a7aaad] text-xs hidden sm:inline">|</span>
+          <Link href="/" target="_blank" className="text-[#a7aaad] hover:text-white text-xs items-center gap-1 transition-colors hidden sm:flex">
             Ver Site <ExternalLink size={10} />
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[#a7aaad] text-xs">{user.email}</span>
+          <span className="text-[#a7aaad] text-xs hidden sm:inline">{user.email}</span>
           <div className="w-6 h-6 rounded-full bg-[#2c3338] flex items-center justify-center overflow-hidden border border-[#3c434a]">
             {user.image ? (
               <img src={user.image} alt="" className="w-full h-full object-cover" />
@@ -92,7 +95,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-60 bg-[#1d2327] border-r border-[#2c3338] flex flex-col h-full flex-shrink-0">
+        <input type="checkbox" id="sidebar-toggle" className="hidden peer" />
+        <aside className="w-60 bg-[#1d2327] border-r border-[#2c3338] flex flex-col h-full flex-shrink-0
+          max-md:fixed max-md:top-10 max-md:left-0 max-md:bottom-0 max-md:z-40 max-md:-translate-x-full max-md:peer-checked:translate-x-0 max-md:transition-transform max-md:duration-200">
           <nav className="flex-1 overflow-y-auto custom-scrollbar py-3 px-3 space-y-0.5">
             <BlackLotusCMSSlot name="admin.sidebar.top" />
 
@@ -144,10 +149,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <BlackLotusCMSSlot name="admin.sidebar.bottom" />
           <UserControl user={user} />
         </aside>
+        {/* Overlay for mobile sidebar */}
+        <label htmlFor="sidebar-toggle" className="max-md:fixed max-md:inset-0 max-md:bg-black/50 max-md:z-30 max-md:peer-checked:block max-md:hidden" />
 
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto admin-content custom-scrollbar h-full">
-          <div className="w-full p-6">
+          <div className="w-full p-4 md:p-6">
             {children}
           </div>
         </main>

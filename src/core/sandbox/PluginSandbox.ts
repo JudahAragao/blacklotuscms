@@ -1,4 +1,3 @@
-import ivm from 'isolated-vm';
 import { logger } from '@/lib/logger';
 import { BlackLotusCMSError } from '@/lib/errors';
 import { SANDBOX_MEMORY_LIMIT, SANDBOX_TIMEOUT } from '@/lib/config';
@@ -9,41 +8,49 @@ export interface PluginManifest {
   permissions: string[];
 }
 
-export class PluginSandbox {
-  private isolate: ivm.Isolate;
-  private context: ivm.Context;
+let ivm: typeof import('isolated-vm') | null = null;
 
-  constructor() {
-    this.isolate = new ivm.Isolate({ memoryLimit: SANDBOX_MEMORY_LIMIT });
-    this.context = this.isolate.createContextSync();
+async function getIvm() {
+  if (!ivm) {
+    ivm = await import('isolated-vm');
+  }
+  return ivm;
+}
+
+export class PluginSandbox {
+  private isolate: any;
+  private context: any;
+
+  static async create(): Promise<PluginSandbox> {
+    const ivmMod = await getIvm();
+    const sandbox = new PluginSandbox();
+    sandbox.isolate = new ivmMod.Isolate({ memoryLimit: SANDBOX_MEMORY_LIMIT });
+    sandbox.context = sandbox.isolate.createContextSync();
+    return sandbox;
   }
 
-  /**
-   * Executa um script de plugin dentro do sandbox com Bridge API e controle de erros.
-   */
+  private constructor() {}
+
   async execute(code: string, bridgeApi: Record<string, any>) {
+    const ivmMod = await getIvm();
     try {
       const jail = this.context.global;
 
-      // Criar a Bridge API segura
-      await jail.set('bridge', new ivm.ExternalCopy(bridgeApi).copyInto());
-      
-      // Injetar logger seguro
-      await jail.set('log', new ivm.Reference((...args: any[]) => {
+      await jail.set('bridge', new ivmMod.ExternalCopy(bridgeApi).copyInto());
+
+      await jail.set('log', new ivmMod.Reference((...args: any[]) => {
         logger.info('[PLUGIN LOG]', { data: args });
       }));
 
       const script = await this.isolate.compileScript(code);
-      
-      // Execução com Timeout para evitar loops infinitos
+
       return await script.run(this.context, { timeout: SANDBOX_TIMEOUT * 1000 });
     } catch (err: any) {
-      logger.error('Erro na execução do Sandbox de Plugin', { 
+      logger.error('Erro na execução do Sandbox de Plugin', {
         error: err.message,
-        stack: err.stack 
+        stack: err.stack
       });
 
-      // Erros de memória ou tempo excedido
       if (err.message.includes('Script execution timed out') || err.message.includes('Isolate was disposed')) {
         throw new BlackLotusCMSError('Plugin excedeu limites de recurso (Tempo/Memória)', 408, 'RATE_LIMIT_EXCEEDED');
       }
@@ -53,7 +60,7 @@ export class PluginSandbox {
   }
 
   dispose() {
-    if (!this.isolate.isDisposed) {
+    if (this.isolate && !this.isolate.isDisposed) {
       this.context.release();
       this.isolate.dispose();
     }

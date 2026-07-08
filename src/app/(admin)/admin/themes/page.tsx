@@ -2,7 +2,7 @@ import React from 'react';
 import { ThemeService } from '@/core/services/ThemeService';
 import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { approveThemePermissionAction, denyThemePermissionAction, setActiveThemeAction } from './actions';
-import { Palette, Shield, Check, X, Layout, Code, Plus, Trash2, History } from 'lucide-react';
+import { Palette, Shield, Check, X, Layout, Code, Plus, History } from 'lucide-react';
 import Link from 'next/link';
 import ThemeUpload from './ThemeUpload';
 
@@ -11,6 +11,21 @@ export default async function ThemesPage() {
   const activeThemeName = await ThemeService.getActiveTheme();
   const pendingPermissions = await ThemeDataService.getPendingPermissions();
   const processedPermissions = await ThemeDataService.getProcessedPermissions();
+
+  async function approveThemePermissionForm(permissionId: string) {
+    'use server';
+    await approveThemePermissionAction(permissionId);
+  }
+
+  async function denyThemePermissionForm(permissionId: string) {
+    'use server';
+    await denyThemePermissionAction(permissionId);
+  }
+
+  async function setActiveThemeForm(themeName: string) {
+    'use server';
+    await setActiveThemeAction(themeName);
+  }
 
   return (
     <div className="space-y-6">
@@ -42,10 +57,10 @@ export default async function ThemesPage() {
                   O tema <span className="font-semibold text-text-heading">"{perm.requesterTheme}"</span> solicita acesso a <span className="font-mono text-text-heading bg-surface-muted px-1.5 py-0.5 rounded">{perm.capability}</span>
                 </p>
                 <div className="flex gap-2">
-                  <form action={approveThemePermissionAction.bind(null, perm.id)}>
+                  <form action={approveThemePermissionForm.bind(null, perm.id)}>
                     <button className="w-8 h-8 rounded bg-status-published/10 text-status-published hover:bg-status-published hover:text-white transition-all flex items-center justify-center" title="Aprovar"><Check size={16} /></button>
                   </form>
-                  <form action={denyThemePermissionAction.bind(null, perm.id)}>
+                  <form action={denyThemePermissionForm.bind(null, perm.id)}>
                     <button className="w-8 h-8 rounded bg-status-trash/10 text-status-trash hover:bg-status-trash hover:text-white transition-all flex items-center justify-center" title="Negar"><X size={16} /></button>
                   </form>
                 </div>
@@ -75,11 +90,11 @@ export default async function ThemesPage() {
                   </p>
                 </div>
                 {perm.status === 'approved' ? (
-                  <form action={denyThemePermissionAction.bind(null, perm.id)}>
+                  <form action={denyThemePermissionForm.bind(null, perm.id)}>
                     <button className="p-1.5 text-text-muted hover:text-status-trash transition-colors" title="Revogar"><X size={16} /></button>
                   </form>
                 ) : (
-                  <form action={approveThemePermissionAction.bind(null, perm.id)}>
+                  <form action={approveThemePermissionForm.bind(null, perm.id)}>
                     <button className="p-1.5 text-text-muted hover:text-action transition-colors" title="Aprovar"><Check size={16} /></button>
                   </form>
                 )}
@@ -121,7 +136,7 @@ export default async function ThemesPage() {
 
                 <div className="flex gap-2 mt-auto">
                   {!isActive && (
-                    <form action={setActiveThemeAction.bind(null, theme.name)} className="flex-1">
+                    <form action={setActiveThemeForm.bind(null, theme.name)} className="flex-1">
                       <button className="w-full btn-action flex items-center justify-center gap-2">
                         <Layout size={16} /> Ativar
                       </button>

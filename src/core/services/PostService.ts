@@ -107,7 +107,7 @@ export class PostService {
       }
 
       this.log.info(`Post created: ${post.slug}`, { id: post.id, authorId: post.authorId });
-      revalidateTag('posts');
+      revalidateTag('posts', 'max');
       await HookService.doAction('post.created', post);
 
       return post;
@@ -305,8 +305,8 @@ export class PostService {
       }
 
       this.log.info(`Post atualizado: ${post.slug}`, { id: post.id });
-      revalidateTag('posts');
-      revalidateTag(`post-${post.slug}`);
+      revalidateTag('posts', 'max');
+      revalidateTag(`post-${post.slug}`, 'max');
       await HookService.doAction('post.updated', post);
       return post;
     });
@@ -326,8 +326,8 @@ export class PostService {
       const post = await tx.post.delete({ where: { id } });
 
       this.log.warn(`Post deleted: ${post.slug}`, { id: post.id });
-      revalidateTag('posts');
-      revalidateTag(`post-${post.slug}`);
+      revalidateTag('posts', 'max');
+      revalidateTag(`post-${post.slug}`, 'max');
       await HookService.doAction('post.deleted', post);
       return post;
     });
@@ -337,6 +337,7 @@ export class PostService {
   static mapToThemeDTO(post: any) { return postService.mapToThemeDTO(post); }
   static async create(data: any, user: any) { return postService.create(data, user); }
   static async getLeanPostBySlug(slug: string) { return postService.getLeanPostBySlug(slug); }
+  static async getLeanPostById(id: string) { return postService.getLeanPostById(id); }
   static async getLeanPostsByType(type: string, limit?: number) { return postService.getLeanPostsByType(type, limit); }
   static async getLeanPostsByTerm(term: string, limit?: number) { return postService.getLeanPostsByTerm(term, limit); }
   static async getPostMeta(postId: string) { return postService.getPostMeta(postId); }

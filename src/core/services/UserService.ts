@@ -77,11 +77,92 @@ export class UserService {
     return role;
   }
 
+  async exportData(id: string, user: any) {
+    const isSelf = user.id === id;
+    const isAdmin = hasCapability(user.role, 'user.manage');
+
+    if (!isAdmin && !isSelf) {
+      throw new BlackLotusCMSError('No permission to export this user data', 403, 'AUTH_FORBIDDEN');
+    }
+
+    const userData = await this.db.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        role: { select: { name: true } },
+        posts: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            content: true,
+            status: true,
+            createdAt: true,
+          },
+        },
+        apiKeys: {
+          select: {
+            id: true,
+            name: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    if (!userData) {
+      throw new BlackLotusCMSError('User not found', 404, 'RESOURCE_NOT_FOUND');
+    }
+
+    this.log.info(`User data exported: ${id}`);
+    return {
+      exportDate: new Date().toISOString(),
+      user: userData,
+    };
+  }
+
+  async deleteAccount(id: string, user: any) {
+    const isSelf = user.id === id;
+    const isAdmin = hasCapability(user.role, 'user.manage');
+
+    if (!isAdmin && !isSelf) {
+      throw new BlackLotusCMSError('No permission to delete this account', 403, 'AUTH_FORBIDDEN');
+    }
+
+    if (isSelf && isAdmin) {
+      const userCount = await this.db.user.count();
+      if (userCount <= 1) {
+        throw new BlackLotusCMSError('Cannot delete the last admin user', 400, 'VALIDATION_ERROR');
+      }
+    }
+
+    return await this.db.$transaction(async (tx) => {
+      // Delete associated data
+      await tx.postTerm.deleteMany({ where: { post: { authorId: id } } });
+      await tx.metaValue.deleteMany({ where: { post: { authorId: id } } });
+      await tx.comment.deleteMany({ where: { post: { authorId: id } } });
+      await tx.post.deleteMany({ where: { authorId: id } });
+      await tx.apiKey.deleteMany({ where: { userId: id } });
+
+      // Delete user
+      const deleted = await tx.user.delete({ where: { id } });
+
+      this.log.warn(`User account deleted (LGPD): ${id}`, { email: deleted.email });
+      return deleted;
+    });
+  }
+
   // --- Static Proxy ---
   static async create(d: any, u: any) { return userService.create(d, u); }
   static async update(id: string, d: any, u: any) { return userService.update(id, d, u); }
   static async delete(id: string, u: any) { return userService.delete(id, u); }
   static async updateRoleCapabilities(r: string, c: any, u: any) { return userService.updateRoleCapabilities(r, c, u); }
+  static async exportData(id: string, u: any) { return userService.exportData(id, u); }
+  static async deleteAccount(id: string, u: any) { return userService.deleteAccount(id, u); }
 }
 
 export const userService = new UserService();

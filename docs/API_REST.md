@@ -13,7 +13,7 @@ All protected endpoints require authentication via:
 ## Rate Limiting
 - Default: 60 requests per minute per API Key
 - Configurable per key via `rateLimit` field
-- Returns `429` with `RATE_LIMIT_EXCEEDED` code when exceeded
+- Returns `429` com `RATE_LIMIT_EXCEEDED` code when exceeded
 
 ---
 
@@ -93,11 +93,36 @@ POST /api/v1/media
 **Auth:** Required | **RBAC:** `media.upload`
 **Content-Type:** multipart/form-data
 
-### Delete Media
+**Note:** Media deletion is managed via Admin panel server actions, not via REST API.
+
+---
+
+## Health Check
+
+### Health
 ```
-DELETE /api/v1/media/:id
+GET /api/health
 ```
-**Auth:** Required | **RBAC:** `media.manage`
+**Auth:** Public
+
+**Response 200:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-07-06T00:00:00Z",
+  "database": "connected"
+}
+```
+
+**Response 503:**
+```json
+{
+  "status": "unhealthy",
+  "timestamp": "2026-07-06T00:00:00Z",
+  "database": "disconnected",
+  "error": "Connection refused"
+}
+```
 
 ---
 
@@ -128,7 +153,7 @@ GET /api/v1/public/comments?postId=uuid
 
 ---
 
-## Search (Public)
+## Busca (Public)
 
 ### Global Search
 ```
@@ -193,4 +218,8 @@ query {
 | `DATABASE_ERROR` | 500 | Database operation failed |
 | `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
 | `CONFLICT` | 409 | Resource already exists |
+| `INSTALL_REQUIRED` | 403 | System not installed, redirect to /install |
+| `SANDBOX_TIMEOUT` | 500 | Plugin execution exceeded time limit |
+| `PLUGIN_ERROR` | 500 | Plugin runtime error |
+| `THEME_PERMISSION_DENIED` | 403 | Theme lacks required permission |
 | `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |

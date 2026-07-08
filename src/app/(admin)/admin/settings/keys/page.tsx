@@ -10,7 +10,7 @@ export default async function ApiKeysPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return null;
 
-  const keys = await ApiKeyService.listKeys((session.user as any).id);
+  const keys = await ApiKeyService.listKeys((session.user as any).id, session.user);
 
   return (
     <div className="space-y-6">

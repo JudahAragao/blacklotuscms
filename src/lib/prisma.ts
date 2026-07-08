@@ -16,7 +16,9 @@ function createPrismaInstance(): PrismaClient {
 
   const pool = new pg.Pool({ connectionString: url });
   const adapter = new PrismaPg(pool);
-  return new PrismaClient({ adapter });
+  const client = new PrismaClient({ adapter });
+
+  return client;
 }
 
 /**

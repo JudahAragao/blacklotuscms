@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -25,8 +25,8 @@ erDiagram
     Post ||--o{ Comment : has
     Comment ||--o{ Comment : replies
     Plugin ||--o{ PluginData : stores
-    Menu ||--o{ MenuIhas : contains
-    MenuIhas ||--o{ MenuIhas : hierarchy
+    Menu ||--o{ MenuItem : contains
+    MenuItem ||--o{ MenuItem : hierarchy
 ```
 
 ## Entidades
@@ -178,13 +178,13 @@ erDiagram
 - `slug`: String (unique)
 - `createdAt`: DateTime
 
-### MenuIhas
+### MenuItem
 - `id`: UUID (PK)
 - `menuId`: UUID (FK -> Menu, onDelete: Cascade)
 - `label`: String
 - `url`: String
 - `order`: Int (default: 0)
-- `parentId`: UUID? (FK -> MenuIhas, auto-relacionamento)
+- `parentId`: UUID? (FK -> MenuItem, auto-relacionamento)
 
 ### Comment
 - `id`: UUID (PK)

@@ -16,7 +16,7 @@ export function hasCapability(role: Role, capability: string, checkOwn: boolean 
     if (capabilities[cap] === true) return true;
     if (cap.includes('.')) {
       const parts = cap.split('.');
-      let current = capabilities;
+      let current: any = capabilities;
       for (const part of parts) {
         if (current && typeof current === 'object' && part in current) {
           current = current[part];

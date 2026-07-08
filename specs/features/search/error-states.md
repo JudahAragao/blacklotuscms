@@ -1,14 +1,14 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "search"
 ---
 
-# Search Error States
+# Busca Error States
 
 ## ERR-01: Query Vazia ou Curta
 - **Condition:** query.length < 3
 - **Código HTTP:** N/A (retorna [])
-- **Ação do system:** Retorna array vazio silenciosamente
+- **Ação do sistema:** Retorna array vazio silenciosamente

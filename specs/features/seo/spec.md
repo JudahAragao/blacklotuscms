@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "seo"
@@ -9,14 +9,14 @@ feature: "seo"
 # SEO Specification
 
 ## Description
-Metadata de SEO por post with suporte a title, description, OG image e noIndex.
+Metadata de SEO por post com suporte a title, description, OG image e noIndex.
 
 ## Requirements
 - **REQ-01:** seoTitle (max 70 chars)
 - **REQ-02:** seoDescription (max 160 chars)
 - **REQ-03:** ogImage para social sharing
 - **REQ-04:** noIndex flag para exclusao de indexacao
-- **REQ-05:** Integracao with sithemep (noIndex = excluded)
+- **REQ-05:** Integracao com sitemap (noIndex = excluded)
 
 ## Constraints
 - **C01:** seoTitle max 70, seoDescription max 160
@@ -24,4 +24,4 @@ Metadata de SEO por post with suporte a title, description, OG image e noIndex.
 ## Dependencies
 - **Depends on:** Post Management
 - **Blocks:** NONE
-- **Related to:** Sithemep, Themes
+- **Related to:** Sitemap, Themes

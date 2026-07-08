@@ -56,8 +56,6 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
         heading: {
           levels: [1, 2, 3],
         },
-        // Desabilita para evitar duplicata com as extensões que importamos manualmente
-        history: true,
         code: false,
         codeBlock: false,
       }),

@@ -45,3 +45,7 @@ prisma/generated
 # Media
 /public/uploads/*
 !/public/uploads/placeholder.txt
+
+# Pothos generated types
+src/generated/
+*.swp

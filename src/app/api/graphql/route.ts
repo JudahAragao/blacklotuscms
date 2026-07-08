@@ -7,7 +7,6 @@ import { authOptions } from '@/lib/auth';
 
 const server = new ApolloServer({
   schema,
-  // Desativar em produção para evitar ataques de introspecção
   introspection: process.env.NODE_ENV !== 'production',
 });
 
@@ -15,7 +14,6 @@ const handler = startServerAndCreateNextHandler<NextRequest>(server, {
   context: async (req) => {
     let session = await getServerSession(authOptions);
 
-    // Suporte para API Key via headers injetados pelo proxy
     if (!session?.user) {
       const apiUserId = req.headers.get('x-api-user-id');
       const apiUserRole = req.headers.get('x-api-user-role');
@@ -34,4 +32,5 @@ const handler = startServerAndCreateNextHandler<NextRequest>(server, {
   },
 });
 
-export { handler as GET, handler as POST };
+export const GET = (handler as any) as (req: NextRequest, ctx?: any) => Promise<Response>;
+export const POST = (handler as any) as (req: NextRequest, ctx?: any) => Promise<Response>;

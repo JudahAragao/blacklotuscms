@@ -1,12 +1,11 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SecretsService } from "@/lib/secrets";
 import { ApiKeyService } from "@/core/services/ApiKeyService";
 import { logger } from "@/lib/logger";
 import { rateLimiter } from "@/lib/rate-limiter";
+import { initCMS } from "@/lib/init";
 
-// Authentication logic from original proxy.ts
 const authProxy = withAuth(
   function proxy(req) {
     // @ts-ignore
@@ -19,21 +18,9 @@ const authProxy = withAuth(
   }
 );
 
-// Unified proxy for Next.js 16
 export default async function proxy(req: NextRequest, event: any) {
+  await initCMS();
   const path = req.nextUrl.pathname;
-  const isInstalled = await SecretsService.isInstalled();
-
-  if (!isInstalled) {
-    if (path.startsWith('/install') || path.startsWith('/api/install') || path.startsWith('/assets')) {
-      return NextResponse.next();
-    }
-    return NextResponse.redirect(new URL('/install', req.url));
-  }
-
-  if (path.startsWith('/install')) {
-    return NextResponse.redirect(new URL('/auth/login', req.url));
-  }
 
   if (path.includes('.') && !path.startsWith('/api') && !path.startsWith('/assets') && !path.startsWith('/uploads') && !path.includes('favicon')) {
     return new NextResponse(null, { status: 404 });
@@ -49,9 +36,8 @@ export default async function proxy(req: NextRequest, event: any) {
         if (authResult) {
           const { user, rateLimit, id: keyId } = authResult as any;
 
-          // Apply Dynamic Rate Limit (Redis or Memory)
           if (!await rateLimiter.check(keyId, rateLimit)) {
-            logger.warn(`[Proxy] Rate limit exceeded for key: ${keyId}`, { path, ip: req.ip });
+            logger.warn(`[Proxy] Rate limit exceeded for key: ${keyId}`, { path });
             return NextResponse.json(
               { error: 'Request limit exceeded (Rate Limit)', code: 'RATE_LIMIT_EXCEEDED' },
               { status: 429 }

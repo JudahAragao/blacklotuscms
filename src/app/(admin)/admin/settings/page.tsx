@@ -26,7 +26,7 @@ export default async function SettingsPage() {
     }
 
     const driver = formData.get('storage_driver') as string;
-    await SettingService.set('storage_driver', driver);
+    await SettingService.set('storage_driver', driver, session?.user);
 
     if (driver !== 'local') {
       const s3Config = {
@@ -36,7 +36,7 @@ export default async function SettingsPage() {
         bucket: formData.get('s3_bucket'),
         publicUrl: formData.get('s3_public_url'),
       };
-      await SettingService.set('s3_config', s3Config);
+      await SettingService.set('s3_config', s3Config, session?.user);
     }
 
     revalidatePath('/admin/settings');

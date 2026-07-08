@@ -2,7 +2,7 @@ import React from 'react';
 import { prisma } from '@/lib/prisma';
 import { PluginDataService } from '@/core/services/PluginDataService';
 import { approvePermissionAction, denyPermissionAction, activatePluginAction, deactivatePluginAction } from './actions';
-import { Shield, Database, Check, X, Play, Square, Download } from 'lucide-react';
+import { Shield, Database, Check, X } from 'lucide-react';
 import PluginImportButton from '@/components/admin/PluginImportButton';
 
 export default async function PluginsPage() {
@@ -10,6 +10,26 @@ export default async function PluginsPage() {
     orderBy: { name: 'asc' }
   }).catch(() => []);
   const pendingPermissions = await PluginDataService.getPendingPermissions().catch(() => []);
+
+  async function approvePermissionForm(permissionId: string) {
+    'use server';
+    await approvePermissionAction(permissionId);
+  }
+
+  async function denyPermissionForm(permissionId: string) {
+    'use server';
+    await denyPermissionAction(permissionId);
+  }
+
+  async function activatePluginForm(pluginId: string) {
+    'use server';
+    await activatePluginAction(pluginId);
+  }
+
+  async function deactivatePluginForm(pluginId: string) {
+    'use server';
+    await deactivatePluginAction(pluginId);
+  }
 
   return (
     <div className="space-y-6">
@@ -34,10 +54,10 @@ export default async function PluginsPage() {
                   Plugin <span className="font-semibold text-text-heading">"{perm.requesterPlugin}"</span> solicita <span className="italic">"{perm.capability}"</span> em <span className="font-semibold">"{perm.providerPlugin}"</span>
                 </p>
                 <div className="flex gap-2">
-                  <form action={approvePermissionAction.bind(null, perm.id)}>
+                  <form action={approvePermissionForm.bind(null, perm.id)}>
                     <button className="text-status-published hover:text-status-published/80 transition-colors p-1" title="Aprovar"><Check size={18} /></button>
                   </form>
-                  <form action={denyPermissionAction.bind(null, perm.id)}>
+                  <form action={denyPermissionForm.bind(null, perm.id)}>
                     <button className="text-status-trash hover:text-status-trash/80 transition-colors p-1" title="Negar"><X size={18} /></button>
                   </form>
                 </div>
@@ -77,11 +97,11 @@ export default async function PluginsPage() {
                 </span>
 
                 {plugin.isActive ? (
-                  <form action={deactivatePluginAction.bind(null, plugin.id)}>
+                  <form action={deactivatePluginForm.bind(null, plugin.id)}>
                     <button className="text-xs text-status-trash font-medium hover:underline transition-all">Desativar</button>
                   </form>
                 ) : (
-                  <form action={activatePluginAction.bind(null, plugin.id)}>
+                  <form action={activatePluginForm.bind(null, plugin.id)}>
                     <button className="text-xs text-action font-medium hover:underline transition-all">Ativar</button>
                   </form>
                 )}

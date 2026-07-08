@@ -10,7 +10,8 @@ import { authOptions } from "@/lib/auth";
 export async function approveThemePermissionAction(permissionId: string) {
   try {
     const session = await getServerSession(authOptions);
-    await themeDataService.updatePermissionStatus(permissionId, "approved", session?.user);
+    if (!session?.user) throw new Error('Unauthorized');
+    await themeDataService.updatePermissionStatus(permissionId, "approved", session.user);
     revalidatePath("/admin/themes");
     return { success: true };
   } catch (error) {
@@ -21,7 +22,8 @@ export async function approveThemePermissionAction(permissionId: string) {
 export async function denyThemePermissionAction(permissionId: string) {
   try {
     const session = await getServerSession(authOptions);
-    await themeDataService.updatePermissionStatus(permissionId, "denied", session?.user);
+    if (!session?.user) throw new Error('Unauthorized');
+    await themeDataService.updatePermissionStatus(permissionId, "denied", session.user);
     revalidatePath("/admin/themes");
     return { success: true };
   } catch (error) {
@@ -32,7 +34,8 @@ export async function denyThemePermissionAction(permissionId: string) {
 export async function setActiveThemeAction(themeName: string) {
   try {
     const session = await getServerSession(authOptions);
-    await themeService.setActiveTheme(themeName, session?.user);
+    if (!session?.user) throw new Error('Unauthorized');
+    await themeService.setActiveTheme(themeName, session.user);
     revalidatePath("/admin/themes");
     return { success: true };
   } catch (error) {
@@ -43,11 +46,12 @@ export async function setActiveThemeAction(themeName: string) {
 export async function installThemeAction(formData: FormData) {
   try {
     const session = await getServerSession(authOptions);
+    if (!session?.user) throw new Error('Unauthorized');
     const file = formData.get('file') as File;
     if (!file) throw new Error("Arquivo não encontrado");
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    await themeService.installTheme(buffer, file.name, session?.user);
+    await themeService.installTheme(buffer, file.name, session.user);
     revalidatePath("/admin/themes");
     return { success: true };
   } catch (error) {

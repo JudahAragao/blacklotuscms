@@ -1,12 +1,12 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
-feature: "plugin-syshas"
+feature: "plugin-system"
 ---
 
-# Plugin Syshas Error States
+# Plugin System Error States
 
 ## ERR-01: Plugin Nao Found
 - **Condition:** ID de plugin nao existe
@@ -28,7 +28,7 @@ feature: "plugin-syshas"
 ## ERR-04: Plugin Permission Denied
 - **Condition:** Plugin sem permissao aprovada
 - **Código HTTP:** 403
-- **Mensagem:** "Access denied for '[capability]'"
+- **Mensagem:** "Acesso denied for '[capability]'"
 - **Código:** AUTH_FORBIDDEN
 
 ## ERR-05: DB Rate Limit

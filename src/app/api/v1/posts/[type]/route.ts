@@ -7,10 +7,11 @@ import { handleApiError } from '@/lib/errors';
 // Listar posts (Público ou logado)
 export async function GET(
   req: NextRequest,
-  { params }: { params: { type: string } }
+  { params }: { params: Promise<{ type: string }> }
 ) {
   try {
-    const posts = await PostService.getLeanPostsByType(params.type);
+    const { type } = await params;
+    const posts = await PostService.getLeanPostsByType(type);
     return NextResponse.json(posts);
   } catch (error) {
     const { error: msg, status, code } = handleApiError(error);

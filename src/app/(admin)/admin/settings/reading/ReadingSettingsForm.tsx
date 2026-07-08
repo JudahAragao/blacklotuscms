@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Save, Layout } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface ReadingSettingsFormProps {
   initialSettings: any;

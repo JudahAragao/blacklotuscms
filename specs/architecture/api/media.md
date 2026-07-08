@@ -1,6 +1,6 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
 module: "media"
@@ -30,7 +30,7 @@ module: "media"
 - **Auth:** Required
 - **RBAC:** `media.upload`
 
-**Request:** multipart/form-data with campo "file"
+**Request:** multipart/form-data com campo "file"
 
 **Response 201:**
 ```json
@@ -44,10 +44,11 @@ module: "media"
 - `500` — Erro no processamento da imagem
 
 ### EP-03: Delete Media
-- **Method:** `DELETE`
-- **Path:** `/api/v1/media/:id`
+- **Method:** Server Action (Admin Panel)
 - **Auth:** Required
 - **RBAC:** `media.manage`
+
+**Note:** Media deletion is handled via admin panel server actions, not via REST API endpoint. The `MediaService.delete()` method removes both the physical file and database record.
 
 **Erros possíveis:**
 - `401` — AUTH_UNAUTHORIZED

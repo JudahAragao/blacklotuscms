@@ -1,7 +1,7 @@
 # Plugin Development Guide
 
 ## Overview
-Plugins extend BlackLotusCMS via isolated sandbox execution (isolated-vm) with a secure Bridge API.
+Plugins extend BlackLotusCMS via isolated sandbox execution (isolated-vm) com a secure Bridge API.
 
 ## Plugin Structure
 ```
@@ -150,8 +150,8 @@ bridge.log('Error:', error);
 ### bridge.auth
 | Method | Returns | Permission Required |
 |--------|---------|---------------------|
-| `getUser()` | User object or null | `system.auth.read` |
-| `isAuthenticated()` | boolean | `system.auth.read` |
+| `getUser()` | User object or null | `sistema.auth.read` |
+| `isAuthenticated()` | boolean | `sistema.auth.read` |
 
 ```javascript
 const user = await bridge.auth.getUser();
@@ -232,7 +232,7 @@ await bridge.permissions.request('db.write.user');
 | `post.before_validate` | Before post validation | Post data |
 | `comment.before_save` | Before comment save | Comment data |
 | `content.title` | Title rendering | Title string |
-| `route_access` | Route access check | Access boolean |
+| `route_access` | Route access check | Acesso boolean |
 
 ## Sandboxing
 
@@ -248,20 +248,20 @@ await bridge.permissions.request('db.write.user');
 
 Plugins must request permission for:
 - Database access (`db.read.*`, `db.write.*`)
-- Auth access (`system.auth.read`)
+- Auth access (`sistema.auth.read`)
 - Sensitive hooks (`route_access`)
 
 Permissions are managed via Admin > Plugins > Permissions.
 
-## Installation
+## Instalacao
 
 ### Via Admin Panel
-1. Create ZIP with `plugin.json` and `index.js`
+1. Create ZIP com `plugin.json` and `index.js`
 2. Admin > Plugins > Upload ZIP
 3. Click Activate
 4. Approve requested permissions in Permissions tab
 
-### Manual Installation
+### Manual Instalacao
 1. Create folder in `plugins/my-plugin/`
 2. Add `plugin.json` and `index.js`
 3. Restart the application

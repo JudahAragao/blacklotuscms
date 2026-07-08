@@ -10,7 +10,7 @@ POST /api/graphql
 - **Authenticated queries:** Session cookie or API Key Bearer token
 
 ## Schema Builder
-Built with **Pothos** + **Prisma Plugin** for type-safe schema generation.
+Built com **Pothos** + **Prisma Plugin** for type-safe schema generation.
 
 ---
 
@@ -161,7 +161,7 @@ curl -X POST http://localhost:3000/api/graphql \
   -d '{"query": "{ posts(type: \"post\") { id title slug } }"}'
 ```
 
-### Get single post with meta fields
+### Get single post com meta fields
 ```bash
 curl -X POST http://localhost:3000/api/graphql \
   -H "Content-Type: application/json" \

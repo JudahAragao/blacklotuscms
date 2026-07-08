@@ -18,7 +18,7 @@ export const UpdateUserSchema = z.object({
 export type UpdateUserInput = z.infer<typeof UpdateUserSchema>;
 
 export const UpdateRoleCapabilitiesSchema = z.object({
-  capabilities: z.record(z.any()),
+  capabilities: z.record(z.string(), z.any()),
 });
 
 export type UpdateRoleCapabilitiesInput = z.infer<typeof UpdateRoleCapabilitiesSchema>;

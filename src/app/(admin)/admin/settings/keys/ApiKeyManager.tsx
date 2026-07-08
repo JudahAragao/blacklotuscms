@@ -17,9 +17,13 @@ export default function ApiKeyManager({ initialKeys }: { initialKeys: any[] }) {
     const formData = new FormData(e.currentTarget);
     try {
       const result = await createApiKeyAction(formData);
-      setNewKey(result.plainKey);
-      toast.success("Chave de API criada com sucesso!");
-      window.location.reload(); 
+      if ('plainKey' in result) {
+        setNewKey(result.plainKey);
+        toast.success("Chave de API criada com sucesso!");
+        window.location.reload();
+      } else if ('error' in result) {
+        toast.error(`Erro ao criar chave: ${result.error}`);
+      }
     } catch (error) {
       toast.error("Erro ao criar chave");
     } finally {

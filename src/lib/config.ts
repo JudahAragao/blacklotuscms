@@ -1,53 +1,40 @@
 import { z } from 'zod';
-import { SecretsService } from './secrets';
 import { logger } from './logger';
 
-const rawSecrets = SecretsService.loadSync();
-
-const secretsSchema = z.object({
-  DATABASE_URL: z.string().url('Invalid or missing DATABASE_URL'),
+const envSchema = z.object({
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   NEXTAUTH_SECRET: z.string().min(1, 'NEXTAUTH_SECRET is required'),
-  NEXTAUTH_URL: z.string().url('Invalid NEXTAUTH_URL'),
+  NEXTAUTH_URL: z.string().url('Invalid NEXTAUTH_URL').default('http://localhost:3000'),
   STORAGE_DRIVER: z.enum(['local', 's3', 'r2']).default('local'),
   UPLOAD_DIR: z.string().min(1, 'UPLOAD_DIR is required'),
   SANDBOX_MEMORY_LIMIT: z.preprocess((val) => Number(val), z.number().min(128).max(4096)).default(512),
   SANDBOX_TIMEOUT: z.preprocess((val) => Number(val), z.number().min(1).max(300)).default(30),
 });
 
-const parsed = secretsSchema.safeParse(rawSecrets);
+const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
   const errors = parsed.error.flatten().fieldErrors;
   const errorMsg = Object.entries(errors)
     .map(([key, val]) => ` - ${key}: ${val}`)
     .join('\n');
-  
-  logger.error('Critical error in system Secrets:\n' + errorMsg);
+
+  logger.error('Critical error in environment config:\n' + errorMsg);
 }
 
-// Helper to get fresh secrets
 const getFreshConfig = () => {
-  const rawSecrets = SecretsService.loadSync();
-  const parsed = secretsSchema.safeParse(rawSecrets);
-  return parsed.success ? parsed.data : (rawSecrets as any);
+  const parsed = envSchema.safeParse(process.env);
+  return parsed.success ? parsed.data : (process.env as any);
 };
 
-// Database
 export const getDatabaseUrl = () => getFreshConfig().DATABASE_URL;
-
-// NextAuth
 export const getNextAuthSecret = () => getFreshConfig().NEXTAUTH_SECRET;
 export const getNextAuthUrl = () => getFreshConfig().NEXTAUTH_URL;
-
-// Storage
 export const getStorageDriver = () => getFreshConfig().STORAGE_DRIVER;
 export const getUploadDir = () => getFreshConfig().UPLOAD_DIR;
-
-// Sandbox
 export const getSandboxMemoryLimit = () => getFreshConfig().SANDBOX_MEMORY_LIMIT;
 export const getSandboxTimeout = () => getFreshConfig().SANDBOX_TIMEOUT;
 
-// Legacy constant exports for compatibility (will be updated on first load)
 const initialConfig = getFreshConfig();
 export const DATABASE_URL = initialConfig.DATABASE_URL;
 export const NEXTAUTH_SECRET = initialConfig.NEXTAUTH_SECRET;

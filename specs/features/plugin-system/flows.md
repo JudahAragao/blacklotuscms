@@ -1,14 +1,14 @@
 ---
-spec_version: "1.0"
-last_updated: "2026-07-05"
+spec_version: "1.2"
+last_updated: "2026-07-06"
 author: "BlackLotusCMS Team"
 status: approved
-feature: "plugin-syshas"
+feature: "plugin-system"
 ---
 
-# Plugin Syshas Flows
+# Plugin System Flows
 
-## Installation de Plugin
+## Instalacao de Plugin
 
 1. **Admin faz upload de ZIP**
    - State: File received
@@ -34,7 +34,7 @@ feature: "plugin-syshas"
 3. **Leitura do entry file (index.js)**
    - State: Code loaded
 
-4. **Creation/uso do PluginSandbox**
+4. **Criacao/uso do PluginSandbox**
    - State: Sandbox ready
 
 5. **Execucao via sandbox.execute(code, bridgeApi)**
@@ -43,7 +43,7 @@ feature: "plugin-syshas"
 6. **Update isActive = true**
    - State: Active plugin
 
-## Access a Dados pelo Plugin
+## Acesso a Dados pelo Plugin
 
 1. **Plugin chama bridge.db.read(model, query)**
    - State: Call received
