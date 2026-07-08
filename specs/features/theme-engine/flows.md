@@ -44,12 +44,18 @@ feature: "theme-engine"
    - State: Call received
 
 2. **ThemeDataService.validate(capability)**
-   - Busca ThemePermission no banco
-   - State: Permission verified
+   - Verifica cache em memória (Map<string, CacheEntry> com TTL de 10s)
+   - Se cache hit e status = "approved": retorna true imediatamente
+   - Se cache hit e status != "approved": lanca erro + requestPermission()
+   - Se cache miss: busca ThemePermission no banco
+   - Armazena resultado no cache com TTL (expiresAt = now + 10s)
+   - State: Permission verified (via cache ou banco)
 
 3. **Se nao aprovada: requestPermission()**
    - Cria/solicita ThemePermission com status "pending"
+   - Limpa cache de permissões para o theme afetado
    - State: Request registrada
 
 4. **Admin aprova/denega via painel**
+   - Limpa cache de permissões para o theme afetado
    - State: Permission processada

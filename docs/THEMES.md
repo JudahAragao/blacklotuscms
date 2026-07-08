@@ -285,9 +285,25 @@ Each field supports these configuration options:
 4. Add components (Header, Footer)
 5. Activate via Admin > Themes
 
+## ThemeContent Component
+
+O componente `ThemeContent` (`src/components/ThemeContent.tsx`) é responsável por renderizar o conteúdo HTML de um post com sanitização automática via DOMPurify. Deve ser usado em todos os layouts que exibem `data.content`:
+
+```tsx
+import ThemeContent from '@/components/ThemeContent';
+
+<div className="prose prose-lg max-w-none">
+  <ThemeContent content={data.content} />
+</div>
+```
+
+- Sanitiza HTML contra XSS (DOMPurify)
+- Suporta shortcodes via `ShortcodeService`
+- Usado no `post.tsx` e em qualquer layout que renderize conteúdo rich text
+
 ## Security
 - Theme names sanitized com `sanitizePath()`
 - Data masked (no passwords, tokens exposed)
 - CSS scoped via `.blacklotuscms-theme` class
-- HTML sanitized com DOMPurify
+- HTML sanitized com DOMPurify via `ThemeContent`
 - Dynamic imports use try/catch fallback

@@ -47,10 +47,32 @@ throw new BlackLotusCMSError('Post not found', 404, 'RESOURCE_NOT_FOUND');
 ```
 
 ## 5. Caching
-Usar unstable_cache com tags para revalidation:
+Dois padrões de cache são utilizados no projeto:
+
+### 5.1 unstable_cache (Next.js Data Cache)
+Usar unstable_cache com tags para revalidation de queries:
 
 ```typescript
 return unstable_cache(async () => { /* query */ }, ['key'], { tags: ['tag'], revalidate: 3600 })();
+```
+
+### 5.2 Cache em memória com TTL
+Usado para permissões de themes (ThemeDataService). Evita queries ao banco a cada chamada de `validate()`:
+
+```typescript
+const PERMISSION_CACHE_TTL = 10_000; // 10 seconds
+
+interface CacheEntry {
+  status: string;
+  expiresAt: number;
+}
+
+private permissionCache = new Map<string, CacheEntry>();
+
+// Uso: ThemeDataService.validate('db.read.post')
+// 1. Verifica cache -> se hit e approved, retorna true
+// 2. Se miss, busca no banco, armazena no cache com TTL
+// 3. Cache é limpo quando permission é aprovada/denegada/deletada
 ```
 
 ## 6. Hooks
