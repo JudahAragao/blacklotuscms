@@ -94,7 +94,7 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
     const newFields = [...fields];
     const updatedField = { ...newFields[index], [key]: value };
 
-    if (key === 'label' && !updatedField.isSystem && !updatedField.name) {
+    if (key === 'label' && !updatedField.isSystem) {
       updatedField.name = value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
     }
     newFields[index] = updatedField;
