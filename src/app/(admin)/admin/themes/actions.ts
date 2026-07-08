@@ -2,7 +2,7 @@
 
 import { themeDataService } from "@/core/services/ThemeDataService";
 import { themeService } from "@/core/services/ThemeService";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { handleApiError } from "@/lib/errors";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -13,6 +13,7 @@ export async function approveThemePermissionAction(permissionId: string) {
     if (!session?.user) throw new Error('Unauthorized');
     await themeDataService.updatePermissionStatus(permissionId, "approved", session.user);
     revalidatePath("/admin/themes");
+    revalidateTag("posts");
     return { success: true };
   } catch (error) {
     return handleApiError(error);
@@ -25,6 +26,7 @@ export async function denyThemePermissionAction(permissionId: string) {
     if (!session?.user) throw new Error('Unauthorized');
     await themeDataService.updatePermissionStatus(permissionId, "denied", session.user);
     revalidatePath("/admin/themes");
+    revalidateTag("posts");
     return { success: true };
   } catch (error) {
     return handleApiError(error);
