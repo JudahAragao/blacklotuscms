@@ -23,7 +23,7 @@ BlackLotusCMS is a modern, high-performance, and extensible Content Management S
 | Requirement | Version |
 |-------------|---------|
 | Node.js | >= 20 |
-| pnpm | >= 8 |
+| bun | >= 1.0 |
 | PostgreSQL | >= 15 |
 
 ---
@@ -34,7 +34,7 @@ BlackLotusCMS is a modern, high-performance, and extensible Content Management S
 ```bash
 git clone https://github.com/your-org/blacklotuscms.git
 cd blacklotuscms
-pnpm install
+bun install
 ```
 
 ### 2. Start PostgreSQL
@@ -52,12 +52,12 @@ touch .secrets.json .installed
 
 ### 4. Generate Prisma client
 ```bash
-pnpm prisma generate
+bunx prisma generate
 ```
 
 ### 5. Start development server
 ```bash
-pnpm dev
+bun run dev
 ```
 
 ### 6. Complete installation
@@ -69,14 +69,14 @@ Open `http://localhost:3000/install` and follow the setup wizard.
 
 | Command | Description |
 |---------|-------------|
-| `pnpm dev` | Start development server |
-| `pnpm build` | Build for production |
-| `pnpm start` | Start production server |
-| `pnpm lint` | Run ESLint |
-| `pnpm test` | Run unit tests (Vitest) |
-| `pnpm prisma generate` | Generate Prisma client |
-| `pnpm prisma db push` | Push schema to database |
-| `pnpm prisma studio` | Open Prisma Studio |
+| `bun run dev` | Start development server |
+| `bun run build` | Build for production |
+| `bun run start` | Start production server |
+| `bun run lint` | Run ESLint |
+| `bun run test` | Run unit tests (Vitest) |
+| `bunx prisma generate` | Generate Prisma client |
+| `bunx prisma db push` | Push schema to database |
+| `bunx prisma studio` | Open Prisma Studio |
 
 ---
 
@@ -269,10 +269,10 @@ if (!canPerformAction(user, 'post.update', post.authorId)) {
 
 ```bash
 # Unit tests
-pnpm test
+bun run test
 
 # E2E tests (requires Playwright)
-pnpm exec playwright test
+bunx playwright test
 ```
 
 ---
@@ -281,7 +281,7 @@ pnpm exec playwright test
 
 **Prisma Client not generated**
 ```bash
-pnpm prisma generate
+bunx prisma generate
 ```
 
 **Database connection failed**
@@ -371,7 +371,7 @@ UPLOAD_DIR=uploads
 **Opção rápida** — Execute o script automatizado na VPS:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/JudahAragao/porftolio/main/scripts/setup_vps.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/JudahAragao/blacklotuscms/main/scripts/setup_vps.sh | sudo bash
 ```
 
 O script vai:
