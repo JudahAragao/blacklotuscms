@@ -13,7 +13,7 @@ export async function approveThemePermissionAction(permissionId: string) {
     if (!session?.user) throw new Error('Unauthorized');
     await themeDataService.updatePermissionStatus(permissionId, "approved", session.user);
     revalidatePath("/admin/themes");
-    revalidateTag("posts");
+    revalidateTag("posts", "max");
     return { success: true };
   } catch (error) {
     return handleApiError(error);
@@ -26,7 +26,7 @@ export async function denyThemePermissionAction(permissionId: string) {
     if (!session?.user) throw new Error('Unauthorized');
     await themeDataService.updatePermissionStatus(permissionId, "denied", session.user);
     revalidatePath("/admin/themes");
-    revalidateTag("posts");
+    revalidateTag("posts", "max");
     return { success: true };
   } catch (error) {
     return handleApiError(error);
