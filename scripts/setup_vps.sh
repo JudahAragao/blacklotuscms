@@ -4,7 +4,7 @@
 # Automatiza toda a infraestrutura para deploy Blue/Green via GitHub Actions.
 #
 # Uso:
-#   curl -fsSL https://raw.githubusercontent.com/JudahAragao/porftolio/main/scripts/setup_vps.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/JudahAragao/blacklotuscms/main/scripts/setup_vps.sh | bash
 #   ou
 #   chmod +x scripts/setup_vps.sh && sudo ./scripts/setup_vps.sh
 #
