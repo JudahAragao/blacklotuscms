@@ -57,6 +57,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/themes ./themes
 
+# esbuild binary for runtime theme compilation (alias resolution + bundling)
+COPY --from=deps /app/node_modules/.bin/esbuild ./node_modules/.bin/esbuild
+COPY --from=deps /app/node_modules/@esbuild ./node_modules/@esbuild
+
 USER nextjs
 
 EXPOSE 3000
