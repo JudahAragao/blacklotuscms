@@ -6,7 +6,7 @@ services:
       - "3001:3000"
     volumes:
       - /opt/apps/shared/uploads:/app/uploads
-      - /opt/apps/shared/themes:/app/themes
+      - blacklotus_blue_themes:/app/themes
       - /opt/apps/shared/plugins:/app/plugins
       - ./.env:/app/.env
     env_file:
@@ -14,6 +14,9 @@ services:
     networks:
       - blacklotus-network
     restart: unless-stopped
+
+volumes:
+  blacklotus_blue_themes:
 
 networks:
   blacklotus-network:

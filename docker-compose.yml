@@ -26,7 +26,7 @@ services:
       - "3000:3000"
     volumes:
       - /opt/apps/shared/uploads:/app/uploads
-      - /opt/apps/shared/themes:/app/themes
+      - themes_data:/app/themes
       - /opt/apps/shared/plugins:/app/plugins
     networks:
       - blacklotuscms-network
@@ -34,6 +34,7 @@ services:
 
 volumes:
   postgres_data:
+  themes_data:
 
 networks:
   blacklotuscms-network:

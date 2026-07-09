@@ -75,7 +75,7 @@ systemctl restart cloudflared
 
 # Create persistent directories for the app
 echo "📁 Creating persistent app directories..."
-mkdir -p /opt/apps/shared/uploads /opt/apps/shared/themes /opt/apps/shared/plugins
+mkdir -p /opt/apps/shared/uploads /opt/apps/shared/plugins
 chown -R ${APP_USER}:${APP_USER} /opt/apps/shared
 
 # Set permissions
@@ -98,6 +98,7 @@ echo "1. Clone your repository to /home/deploy/portfolio"
 echo "2. Run: cd /opt/apps/scripts && bash switch.sh blue"
 echo "3. Access your site at https://judahdearagao.pro"
 echo ""
-echo "Note: /opt/apps/shared/uploads, /opt/apps/shared/themes and /opt/apps/shared/plugins"
+echo "Note: /opt/apps/shared/uploads and /opt/apps/shared/plugins"
 echo "are already created and ready for persistent data."
+echo "Themes are stored in Docker named volumes (persists across redeployments)."
 echo ""
