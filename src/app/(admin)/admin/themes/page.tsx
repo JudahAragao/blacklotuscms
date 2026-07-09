@@ -2,9 +2,8 @@ import React from 'react';
 import { ThemeService } from '@/core/services/ThemeService';
 import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { approveThemePermissionAction, denyThemePermissionAction, setActiveThemeAction, deleteThemeAction } from './actions';
-import { Palette, Shield, Check, X, Layout, Code, Plus, History, Trash2 } from 'lucide-react';
+import { Palette, Shield, Check, X, Layout, Code, History, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import ThemeUpload from './ThemeUpload';
 
 export default async function ThemesPage() {
   const themes = await ThemeService.listThemes();
@@ -43,9 +42,6 @@ export default async function ThemesPage() {
           <Link href="/admin/themes/editor" className="btn-action-secondary flex items-center gap-2">
             <Code size={16} /> Lotus Studio
           </Link>
-          <button className="btn-action flex items-center gap-2">
-            <Plus size={16} /> Instalar Tema
-          </button>
         </div>
       </div>
 
@@ -178,8 +174,6 @@ export default async function ThemesPage() {
             </div>
           );
         })}
-
-        <ThemeUpload />
       </div>
     </div>
   );

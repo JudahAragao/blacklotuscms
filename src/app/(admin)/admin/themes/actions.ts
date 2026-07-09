@@ -45,18 +45,6 @@ export async function setActiveThemeAction(themeName: string) {
   }
 }
 
-export async function installThemeAction(formData: FormData) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) throw new Error('Unauthorized');
-  const file = formData.get('file') as File;
-  if (!file) throw new Error("Arquivo não encontrado");
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await themeService.installTheme(buffer, file.name, session.user);
-  revalidatePath("/admin/themes");
-  return { success: true };
-}
-
 export async function deleteThemeAction(themeName: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user) throw new Error('Unauthorized');

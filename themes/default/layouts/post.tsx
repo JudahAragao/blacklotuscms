@@ -1,8 +1,10 @@
 import React from 'react';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Comments from '../components/Comments';
-import { renderContent, ThemeSlot } from '@/lib/lotus-sdk';
+import ThemeContent from '@/components/ThemeContent';
+import BlackLotusCMSSlot from '@/components/admin/BlackLotusCMSSlot';
 
 export default async function DefaultPostLayout({ data, context }: { data: any, context: string }) {
   return (
@@ -12,7 +14,7 @@ export default async function DefaultPostLayout({ data, context }: { data: any, 
       <main className="flex-1 theme-container py-20">
         <article className="max-w-3xl mx-auto">
           {/* Slot for Plugins (especially useful for public route Overrides) */}
-          <ThemeSlot name={`public.route.${context}`} data={data} />
+          <BlackLotusCMSSlot name={`public.route.${context}`} data={data} />
 
           {context === 'single' && (
             <>
@@ -48,20 +50,20 @@ export default async function DefaultPostLayout({ data, context }: { data: any, 
 
               {/* Content with Shortcode support */}
               <div className="theme-prose prose prose-slate lg:prose-xl max-w-none prose-headings:font-black prose-a:text-primary">
-                 {await renderContent(data.content)}
+                 <ThemeContent content={data.content} />
               </div>
 
               {/* Tags / Terms */}
               {data.terms?.length > 0 && (
                 <div className="mt-16 flex flex-wrap gap-2">
                   {data.terms.map((pt: any) => (
-                    <a 
+                    <Link 
                       key={pt.term.id} 
                       href={`/archive/${pt.term.slug}`}
                       className="bg-slate-50 text-slate-500 hover:bg-primary hover:text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider  border border-slate-100"
                     >
                       #{pt.term.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               )}

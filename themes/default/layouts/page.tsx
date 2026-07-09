@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { renderContent } from '@/lib/lotus-sdk';
+import ThemeContent from '@/components/ThemeContent';
 
 export default async function DefaultPageLayout({ data }: { data: any }) {
   return (
@@ -23,7 +23,7 @@ export default async function DefaultPageLayout({ data }: { data: any }) {
           {/* Conteúdo */}
           <div className="theme-container py-24">
             <article className="max-w-4xl theme-prose prose prose-slate lg:prose-xl max-w-none">
-            {await renderContent(data.content)}
+            <ThemeContent content={data.content} />
           </article>
 
           {/* MetaFields (Exibidos como seções extras se existirem) */}

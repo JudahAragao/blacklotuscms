@@ -36,24 +36,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_SKIP_LOCKFILE_PATCHING=1
 RUN bun run build
 
-# Pre-compile default theme with esbuild (alias resolution + bundling)
-RUN mkdir -p themes/default/compiled/layouts themes/default/compiled/components && \
-    for f in themes/default/layouts/*.tsx; do \
-      node_modules/.bin/esbuild "$f" \
-        --outfile="themes/default/compiled/layouts/$(basename "$f" .tsx).js" \
-        --format=cjs --loader:.tsx=tsx --jsx=automatic --target=es2020 \
-        --bundle --alias:@=/app/src --packages=external; \
-    done && \
-    for f in themes/default/components/*.tsx; do \
-      node_modules/.bin/esbuild "$f" \
-        --outfile="themes/default/compiled/components/$(basename "$f" .tsx).js" \
-        --format=cjs --loader:.tsx=tsx --jsx=automatic --target=es2020 \
-        --bundle --alias:@=/app/src --packages=external; \
-    done
-
-# Copiar custom-server.js (JavaScript puro, sem necessidade de compilação)
-RUN cp custom-server.js .next/standalone/custom-server.js
-
 # Estágio de Runner (Produção)
 FROM oven/bun:1 AS runner
 WORKDIR /app
@@ -64,18 +46,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs
 
-RUN mkdir -p uploads themes plugins && chown nextjs:nodejs uploads themes plugins
+RUN mkdir -p uploads plugins && chown nextjs:nodejs uploads plugins
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/themes ./themes
-COPY --from=builder --chown=nextjs:nodejs /app/themes ./bundled-themes
-
-# esbuild binary for runtime theme compilation (alias resolution + bundling)
-COPY --from=deps /app/node_modules/.bin/esbuild ./node_modules/.bin/esbuild
-COPY --from=deps /app/node_modules/@esbuild ./node_modules/@esbuild
 
 # Prisma + pg packages for database connectivity (not bundled by standalone)
 COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
@@ -91,4 +67,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "custom-server.js"]
+CMD ["node", "server.js"]

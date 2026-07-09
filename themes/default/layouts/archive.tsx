@@ -1,11 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { renderContent } from '@/lib/lotus-sdk';
-
-async function Excerpt({ content }: { content?: string }) {
-  return <>{await renderContent(content ? content.substring(0, 120) + '...' : '')}</>;
-}
+import ThemeContent from '@/components/ThemeContent';
 
 export default async function DefaultArchiveLayout({ data }: { data: any }) {
   return (
@@ -35,12 +32,11 @@ export default async function DefaultArchiveLayout({ data }: { data: any }) {
                 </div>
                 
                 <h2 className="text-2xl font-black text-slate-900 mb-4 leading-tight group-hover:text-primary transition-colors">
-                  <a href={`/${post.slug}`}>{post.title}</a>
+                  <Link href={`/${post.slug}`}>{post.title}</Link>
                 </h2>
 
                 <div className="text-slate-500 text-sm line-clamp-3 mb-8 flex-1 leading-relaxed">
-                   {/* Strip HTML tags for excerpt or use ThemeContent with custom parser */}
-                   <Excerpt content={post.content} />
+                   <ThemeContent content={post.content?.substring(0, 120) + '...'} />
                 </div>
 
                 <div className="flex items-center gap-3 pt-6 border-t border-slate-50">
@@ -56,7 +52,7 @@ export default async function DefaultArchiveLayout({ data }: { data: any }) {
           ) : (
             <div className="col-span-full py-32 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-100">
               <p className="text-slate-400 italic text-xl">Nenhum conteúdo encontrado para esta categoria.</p>
-              <a href="/" className="theme-btn theme-btn-primary mt-8">Voltar ao Início</a>
+              <Link href="/" className="theme-btn theme-btn-primary mt-8">Voltar ao Início</Link>
             </div>
           )}
         </div>

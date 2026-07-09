@@ -1,5 +1,5 @@
 import React from 'react';
-import { applyThemeFilter } from '@/lib/lotus-sdk';
+import { HookService } from '@/core/services/HookService';
 
 export default async function Footer() {
   return (
@@ -19,7 +19,7 @@ export default async function Footer() {
               </p>
             </div>
 
-            {/* Quick Links (Placeholder ou Menu Dinâmico) */}
+            {/* Quick Links */}
             <div>
               <h4 className="label-caps text-xs text-white mb-6">Explore</h4>
               <ul className="space-y-4 text-sm text-slate-400">
@@ -45,14 +45,14 @@ export default async function Footer() {
             </p>
             <div className="flex items-center gap-6 text-slate-500">
                {/* Hook para redes sociais de plugins */}
-               {await applyThemeFilter('theme_footer_social', null)}
+               {await HookService.applyFilters('theme_footer_social', null)}
             </div>
           </div>
         </div>
       </footer>
       
       {/* Hook: Injeção final (Scripts de tracking, etc) */}
-      {await applyThemeFilter('theme_after_footer', null)}
+      {await HookService.applyFilters('theme_after_footer', null)}
     </>
   );
 }

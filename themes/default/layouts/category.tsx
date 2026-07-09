@@ -1,9 +1,9 @@
 import React from 'react';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 export default async function DefaultCategoryLayout({ data }: { data: any }) {
-  // data = { taxonomy, terms: Term[] }
   return (
     <div className="blacklotuscms-theme min-h-screen flex flex-col">
       <Header />
@@ -24,7 +24,7 @@ export default async function DefaultCategoryLayout({ data }: { data: any }) {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
           {data.terms && data.terms.length > 0 ? (
             data.terms.map((term: any) => (
-              <a
+              <Link
                 key={term.id}
                 href={`/archive/${term.slug}`}
                 className="group bg-white border border-slate-100 p-6 rounded-2xl text-center hover:border-primary/30 hover:shadow-lg transition-all"
@@ -35,14 +35,14 @@ export default async function DefaultCategoryLayout({ data }: { data: any }) {
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   #{term.slug}
                 </p>
-              </a>
+              </Link>
             ))
           ) : (
             <div className="col-span-full py-20 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-100">
               <p className="text-slate-400 italic text-lg">No terms found for this taxonomy.</p>
-              <a href="/" className="inline-block mt-6 px-6 py-2 bg-primary text-on-primary rounded-lg text-sm font-bold">
+              <Link href="/" className="inline-block mt-6 px-6 py-2 bg-primary text-on-primary rounded-lg text-sm font-bold">
                 Go Home
-              </a>
+              </Link>
             </div>
           )}
         </div>

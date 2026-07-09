@@ -1,14 +1,10 @@
 import React from 'react';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { renderContent } from '@/lib/lotus-sdk';
-
-async function Excerpt({ content }: { content?: string }) {
-  return <>{await renderContent(content ? content.substring(0, 200) + '...' : '')}</>;
-}
+import ThemeContent from '@/components/ThemeContent';
 
 export default async function DefaultSearchLayout({ data }: { data: any }) {
-  // data = { query, results: Post[] }
   return (
     <div className="blacklotuscms-theme min-h-screen flex flex-col">
       <Header />
@@ -36,16 +32,16 @@ export default async function DefaultSearchLayout({ data }: { data: any }) {
                   </div>
                   
                   <h2 className="text-2xl font-black text-slate-900 mb-4 group-hover:text-primary transition-colors">
-                    <a href={`/${post.slug}`}>{post.title}</a>
+                    <Link href={`/${post.slug}`}>{post.title}</Link>
                   </h2>
 
                   <div className="text-slate-500 text-sm line-clamp-2 leading-relaxed mb-6">
-                    <Excerpt content={post.content} />
+                    <ThemeContent content={post.content?.substring(0, 200) + '...'} />
                   </div>
 
-                  <a href={`/${post.slug}`} className="text-xs font-bold text-slate-900 flex items-center gap-2 group-hover:gap-4 ">
+                  <Link href={`/${post.slug}`} className="text-xs font-bold text-slate-900 flex items-center gap-2 group-hover:gap-4 ">
                     LER CONTEÚDO COMPLETO <span className="text-primary">→</span>
-                  </a>
+                  </Link>
                 </div>
               </article>
             ))
