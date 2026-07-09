@@ -1,7 +1,6 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import ThemeContent from '@/components/ThemeContent';
 
 export default async function DefaultCategoryLayout({ data }: { data: any }) {
   // data = { taxonomy, terms: Term[] }

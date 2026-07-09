@@ -1,9 +1,9 @@
 import React from 'react';
-import { CommentService } from '@/core/services/CommentService';
 import CommentForm from './CommentForm';
+import { getCommentsForPost } from '@/lib/lotus-sdk';
 
 export default async function Comments({ postId }: { postId: string }) {
-  const comments = await CommentService.getForPost(postId);
+  const comments = await getCommentsForPost(postId);
 
   return (
     <section className="mt-24 pt-16 border-t border-slate-100">

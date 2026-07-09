@@ -1,7 +1,11 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import ThemeContent from '@/components/ThemeContent';
+import { renderContent } from '@/lib/lotus-sdk';
+
+async function Excerpt({ content }: { content?: string }) {
+  return <>{await renderContent(content ? content.substring(0, 200) + '...' : '')}</>;
+}
 
 export default async function DefaultSearchLayout({ data }: { data: any }) {
   // data = { query, results: Post[] }
@@ -36,7 +40,7 @@ export default async function DefaultSearchLayout({ data }: { data: any }) {
                   </h2>
 
                   <div className="text-slate-500 text-sm line-clamp-2 leading-relaxed mb-6">
-                    <ThemeContent content={post.content?.substring(0, 200) + '...'} />
+                    <Excerpt content={post.content} />
                   </div>
 
                   <a href={`/${post.slug}`} className="text-xs font-bold text-slate-900 flex items-center gap-2 group-hover:gap-4 ">

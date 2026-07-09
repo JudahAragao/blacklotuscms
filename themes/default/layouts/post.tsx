@@ -2,8 +2,7 @@ import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Comments from '../components/Comments';
-import ThemeContent from '@/components/ThemeContent';
-import BlackLotusCMSSlot from '@/components/admin/BlackLotusCMSSlot';
+import { renderContent, ThemeSlot } from '@/lib/lotus-sdk';
 
 export default async function DefaultPostLayout({ data, context }: { data: any, context: string }) {
   return (
@@ -13,7 +12,7 @@ export default async function DefaultPostLayout({ data, context }: { data: any, 
       <main className="flex-1 theme-container py-20">
         <article className="max-w-3xl mx-auto">
           {/* Slot for Plugins (especially useful for public route Overrides) */}
-          <BlackLotusCMSSlot name={`public.route.${context}`} data={data} />
+          <ThemeSlot name={`public.route.${context}`} data={data} />
 
           {context === 'single' && (
             <>
@@ -49,7 +48,7 @@ export default async function DefaultPostLayout({ data, context }: { data: any, 
 
               {/* Content with Shortcode support */}
               <div className="theme-prose prose prose-slate lg:prose-xl max-w-none prose-headings:font-black prose-a:text-primary">
-                 <ThemeContent content={data.content} />
+                 {await renderContent(data.content)}
               </div>
 
               {/* Tags / Terms */}

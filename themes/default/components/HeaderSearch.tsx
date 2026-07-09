@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function HeaderSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
   // Foca no input automaticamente ao abrir
   useEffect(() => {
@@ -16,10 +14,10 @@ export default function HeaderSearch() {
     }
   }, [isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      window.location.href = `/search?q=${encodeURIComponent(query.trim())}`;
       setIsOpen(false);
       setQuery('');
     }

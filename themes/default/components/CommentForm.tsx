@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { submitCommentAction } from '@/app/actions/comments';
 
 export default function CommentForm({ postId, parentId }: { postId: string, parentId?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -13,7 +12,10 @@ export default function CommentForm({ postId, parentId }: { postId: string, pare
     setMessage(null);
 
     const formData = new FormData(e.currentTarget);
-    const result = await submitCommentAction(formData);
+    const result = await fetch('/api/themes/comments', {
+      method: 'POST',
+      body: formData,
+    }).then((res) => res.json());
 
     setIsSubmitting(false);
 

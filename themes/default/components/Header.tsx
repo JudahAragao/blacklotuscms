@@ -1,20 +1,16 @@
 import React from 'react';
-import { MenuService } from '@/core/services/MenuService';
-import { HookService } from '@/core/services/HookService';
 import HeaderSearch from './HeaderSearch';
-
-import { SettingService } from '@/core/services/SettingService';
+import { applyThemeFilter, getMenuBySlug, getSiteSetting } from '@/lib/lotus-sdk';
 
 export default async function Header() {
   // Busca o menu 'header' dinamicamente
-  const menuItems = await MenuService.getMenuBySlug('header');
-  const settings = await SettingService.getAll();
-  const siteName = settings.seo?.site_name || 'BlackLotusCMS';
+  const menuItems = await getMenuBySlug('header');
+  const siteName = await getSiteSetting('seo.site_name') || 'BlackLotusCMS';
 
   return (
     <>
       {/* Hook: Injeção antes do header (útil para banners de plugins) */}
-      {await HookService.applyFilters('theme_before_header', null)}
+      {await applyThemeFilter('theme_before_header', null)}
 
       <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100">
         <div className="theme-container h-20 flex items-center justify-between">
@@ -40,7 +36,7 @@ export default async function Header() {
                   {/* Dropdown se houver filhos */}
                   {item.children.length > 0 && (
                     <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-100 shadow-2xl rounded-lg py-2 opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible ">
-                      {item.children.map(child => (
+                      {item.children.map((child: any) => (
                         <a 
                           key={child.id} 
                           href={child.url}
@@ -71,7 +67,7 @@ export default async function Header() {
       </header>
 
       {/* Hook: Injeção após o header */}
-      {await HookService.applyFilters('theme_after_header', null)}
+      {await applyThemeFilter('theme_after_header', null)}
     </>
   );
 }

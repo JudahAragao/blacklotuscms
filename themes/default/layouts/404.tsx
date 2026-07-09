@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 
 export default function ThemeNotFound({ data }: { data: any }) {
   return (
@@ -17,12 +16,12 @@ export default function ThemeNotFound({ data }: { data: any }) {
         </div>
 
         <div className="pt-12">
-          <Link 
+          <a
             href="/" 
             className="inline-block border-b border-slate-900 pb-1 text-sm tracking-widest font-bold uppercase hover:text-slate-500 hover:border-slate-300 transition-all"
           >
             RETURN TO HOME
-          </Link>
+          </a>
         </div>
       </div>
     </div>

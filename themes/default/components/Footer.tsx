@@ -1,5 +1,5 @@
 import React from 'react';
-import { HookService } from '@/core/services/HookService';
+import { applyThemeFilter } from '@/lib/lotus-sdk';
 
 export default async function Footer() {
   return (
@@ -45,14 +45,14 @@ export default async function Footer() {
             </p>
             <div className="flex items-center gap-6 text-slate-500">
                {/* Hook para redes sociais de plugins */}
-               {await HookService.applyFilters('theme_footer_social', null)}
+               {await applyThemeFilter('theme_footer_social', null)}
             </div>
           </div>
         </div>
       </footer>
       
       {/* Hook: Injeção final (Scripts de tracking, etc) */}
-      {await HookService.applyFilters('theme_after_footer', null)}
+      {await applyThemeFilter('theme_after_footer', null)}
     </>
   );
 }

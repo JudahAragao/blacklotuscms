@@ -1,7 +1,11 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import ThemeContent from '@/components/ThemeContent';
+import { renderContent } from '@/lib/lotus-sdk';
+
+async function Excerpt({ content }: { content?: string }) {
+  return <>{await renderContent(content ? content.substring(0, 120) + '...' : '')}</>;
+}
 
 export default async function DefaultArchiveLayout({ data }: { data: any }) {
   return (
@@ -36,7 +40,7 @@ export default async function DefaultArchiveLayout({ data }: { data: any }) {
 
                 <div className="text-slate-500 text-sm line-clamp-3 mb-8 flex-1 leading-relaxed">
                    {/* Strip HTML tags for excerpt or use ThemeContent with custom parser */}
-                   <ThemeContent content={post.content?.substring(0, 120) + '...'} />
+                   <Excerpt content={post.content} />
                 </div>
 
                 <div className="flex items-center gap-3 pt-6 border-t border-slate-50">

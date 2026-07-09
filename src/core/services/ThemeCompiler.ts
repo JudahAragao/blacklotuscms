@@ -5,6 +5,12 @@ import fs from 'fs/promises';
 import { logger } from '@/lib/logger';
 
 const execFileAsync = promisify(execFile);
+const FORBIDDEN_IMPORTS = [
+  'next/',
+  '@/core/services',
+  '@/app/',
+  '@/components/',
+];
 
 function getEsbuildBin(): string {
   return path.join(process.cwd(), 'node_modules', '.bin', 'esbuild');
@@ -53,6 +59,7 @@ export class ThemeCompiler {
       const outputFile = path.join(outputDir, file.replace(/\.tsx?$/, '.js'));
 
       try {
+        await this.validateSourceFile(sourceFile);
         const loader = file.endsWith('.tsx') ? 'tsx' : 'ts';
 
         await execFileAsync(esbuild, [
@@ -70,7 +77,23 @@ export class ThemeCompiler {
         ]);
       } catch (err) {
         logger.error(`Failed to compile ${file}:`, err);
-        await fs.copyFile(sourceFile, outputFile);
+        throw err;
+      }
+    }
+  }
+
+  private async validateSourceFile(sourceFile: string): Promise<void> {
+    const source = await fs.readFile(sourceFile, 'utf-8');
+
+    for (const forbiddenImport of FORBIDDEN_IMPORTS) {
+      const importPattern = new RegExp(
+        `(?:from\\s+['"]|import\\s*\\(\\s*['"]|require\\s*\\(\\s*['"])${forbiddenImport.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
+      );
+
+      if (importPattern.test(source)) {
+        throw new Error(
+          `Theme file '${path.basename(sourceFile)}' imports '${forbiddenImport}', which is not allowed in runtime themes. Use '@/lib/lotus-sdk' instead.`
+        );
       }
     }
   }
