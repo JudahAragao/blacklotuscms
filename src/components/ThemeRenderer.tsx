@@ -42,16 +42,24 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
     layoutFile = '404';
   }
 
-  // 3. Load layout using require with absolute paths (works in standalone builds)
+  // 3. Load compiled layout using require with absolute paths
   const themesPath = path.join(process.cwd(), 'themes');
   let Layout;
 
   try {
-    const layoutPath = path.join(themesPath, themeName, 'layouts', layoutFile);
-    Layout = require(layoutPath).default;
+    // First try compiled directory (themes compiled at upload time)
+    const compiledPath = path.join(themesPath, themeName, 'compiled', 'layouts', layoutFile);
+    Layout = require(compiledPath).default;
   } catch {
-    const fallbackPath = path.join(themesPath, themeName, 'layouts', 'post');
-    Layout = require(fallbackPath).default;
+    try {
+      // Fallback to compiled post layout
+      const fallbackPath = path.join(themesPath, themeName, 'compiled', 'layouts', 'post');
+      Layout = require(fallbackPath).default;
+    } catch {
+      // Last resort: try raw layouts directory (for development/default theme)
+      const rawPath = path.join(themesPath, themeName, 'layouts', layoutFile);
+      Layout = require(rawPath).default;
+    }
   }
 
   // 4. Fetch custom variables to inject as CSS Variables

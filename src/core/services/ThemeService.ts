@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { canPerformAction } from '@/lib/auth-utils';
 import { BlackLotusCMSError } from '@/lib/errors';
+import { themeCompiler } from './ThemeCompiler';
 
 export class ThemeService {
   /**
@@ -96,6 +97,9 @@ export class ThemeService {
       await fs.rm(extractPath, { recursive: true, force: true });
       throw new Error("The theme does not have a valid theme.json file.");
     }
+
+    // Compile theme .tsx files to .js for runtime loading
+    await themeCompiler.compile(extractPath);
 
     return { success: true, themeName: themeFolder };
   }
