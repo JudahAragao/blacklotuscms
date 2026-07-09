@@ -159,11 +159,6 @@ export default async function ThemesPage() {
                         type="submit"
                         className="flex items-center justify-center gap-2 py-2 px-3 border border-border-default rounded text-sm text-text-muted hover:border-status-trash hover:text-status-trash hover:bg-status-trash/5 transition-all"
                         title="Excluir tema"
-                        onClick={(e) => {
-                          if (!confirm(`Tem certeza que deseja excluir o tema "${theme.displayName}"? Esta ação não pode ser desfeita.`)) {
-                            e.preventDefault();
-                          }
-                        }}
                       >
                         <Trash2 size={16} />
                       </button>
