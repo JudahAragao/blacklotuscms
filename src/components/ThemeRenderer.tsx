@@ -4,15 +4,25 @@ import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { ShortcodeService } from '@/core/services/ShortcodeService';
 import { sanitizePath, maskSensitiveData, sanitizeHtml } from '@/lib/security-utils';
 import { themeStorage } from '@/lib/theme-context';
-import { createRequire } from 'module';
+import fs from 'fs';
 import path from 'path';
-
-const require = createRequire(import.meta.url);
+import Module from 'module';
 
 interface ThemeRendererProps {
   context: 'single' | 'search' | 'archive' | '404' | string;
   data: any;
   previewTheme?: string;
+}
+
+/**
+ * Loads a compiled theme module at runtime using eval + Module._compile.
+ * This bypasses Turbopack's static analysis completely.
+ */
+function loadThemeModule(filePath: string): any {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const m = new Module(filePath);
+  m._compile(content, filePath);
+  return m.exports;
 }
 
 export default async function ThemeRenderer({ context, data, previewTheme }: ThemeRendererProps) {
@@ -42,23 +52,23 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
     layoutFile = '404';
   }
 
-  // 3. Load compiled layout using require with absolute paths
+  // 3. Load compiled layout using Module._compile (bypasses Turbopack)
   const themesPath = path.join(process.cwd(), 'themes');
   let Layout;
 
   try {
     // First try compiled directory (themes compiled at upload time)
-    const compiledPath = path.join(themesPath, themeName, 'compiled', 'layouts', layoutFile);
-    Layout = /* turbopackIgnore: true */ require(compiledPath).default;
+    const compiledPath = path.join(themesPath, themeName, 'compiled', 'layouts', layoutFile + '.js');
+    Layout = loadThemeModule(compiledPath).default;
   } catch {
     try {
       // Fallback to compiled post layout
-      const fallbackPath = path.join(themesPath, themeName, 'compiled', 'layouts', 'post');
-      Layout = /* turbopackIgnore: true */ require(fallbackPath).default;
+      const fallbackPath = path.join(themesPath, themeName, 'compiled', 'layouts', 'post.js');
+      Layout = loadThemeModule(fallbackPath).default;
     } catch {
       // Last resort: try raw layouts directory (for development/default theme)
-      const rawPath = path.join(themesPath, themeName, 'layouts', layoutFile);
-      Layout = /* turbopackIgnore: true */ require(rawPath).default;
+      const rawPath = path.join(themesPath, themeName, 'layouts', layoutFile + '.tsx');
+      Layout = loadThemeModule(rawPath).default;
     }
   }
 
