@@ -62,6 +62,7 @@ export class ThemeCompiler {
           '--loader', `.${loader === 'tsx' ? 'tsx' : 'ts'}=${loader}`,
           '--jsx=automatic',
           '--target=es2020',
+          '--bundle',
           // Resolve @/ aliases to actual src/ paths
           `--alias:@=${this.srcDir}`,
           // Keep external packages as require() calls (React, Next.js, Node builtins)
