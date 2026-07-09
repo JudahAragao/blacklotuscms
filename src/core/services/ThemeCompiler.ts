@@ -1,7 +1,18 @@
-import { transform } from 'esbuild';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs/promises';
 import { logger } from '@/lib/logger';
+
+const execFileAsync = promisify(execFile);
+
+/**
+ * Returns the path to the esbuild binary in node_modules/.bin.
+ * Uses a static path to avoid Turbopack tracing issues.
+ */
+function getEsbuildBin(): string {
+  return path.join(process.cwd(), 'node_modules', '.bin', 'esbuild');
+}
 
 export class ThemeCompiler {
   /**
@@ -27,7 +38,7 @@ export class ThemeCompiler {
   }
 
   /**
-   * Compiles all .tsx/.ts files in a directory to .js files using esbuild.
+   * Compiles all .tsx/.ts files in a directory to .js files using esbuild CLI.
    */
   private async compileDirectory(sourceDir: string, outputDir: string): Promise<void> {
     let files: string[];
@@ -39,27 +50,30 @@ export class ThemeCompiler {
     }
 
     const tsFiles = files.filter(f => f.endsWith('.tsx') || f.endsWith('.ts'));
-
     if (tsFiles.length === 0) return;
+
+    const esbuild = getEsbuildBin();
 
     for (const file of tsFiles) {
       const sourceFile = path.join(sourceDir, file);
       const outputFile = path.join(outputDir, file.replace(/\.tsx?$/, '.js'));
 
       try {
-        const content = await fs.readFile(sourceFile, 'utf-8');
         const isTsx = file.endsWith('.tsx');
+        const loader = isTsx ? 'tsx' : 'ts';
 
-        const result = await transform(content, {
-          loader: isTsx ? 'tsx' : 'ts',
-          format: 'cjs',
-          target: 'es2020',
-          jsx: 'automatic',
-          // Preserve 'use client' directives
-          preserve: true,
-        });
-
-        await fs.writeFile(outputFile, result.code);
+        // Run esbuild CLI for each file individually
+        // --format=cjs: CommonJS output compatible with require()
+        // --jsx=automatic: React 17+ JSX transform
+        // --target=es2020: modern JS output
+        await execFileAsync(esbuild, [
+          sourceFile,
+          '--outfile', outputFile,
+          '--format=cjs',
+          '--loader', `${file.split('.').pop()}=${loader}`,
+          '--jsx=automatic',
+          '--target=es2020',
+        ]);
       } catch (err) {
         logger.error(`Failed to compile ${file}:`, err);
         // Copy original file as fallback
