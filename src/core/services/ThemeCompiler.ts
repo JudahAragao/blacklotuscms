@@ -1,10 +1,7 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { transform } from 'esbuild';
 import path from 'path';
 import fs from 'fs/promises';
 import { logger } from '@/lib/logger';
-
-const execAsync = promisify(exec);
 
 export class ThemeCompiler {
   /**
@@ -30,7 +27,7 @@ export class ThemeCompiler {
   }
 
   /**
-   * Compiles all .tsx/.ts files in a directory to .js files using bun build.
+   * Compiles all .tsx/.ts files in a directory to .js files using esbuild.
    */
   private async compileDirectory(sourceDir: string, outputDir: string): Promise<void> {
     let files: string[];
@@ -45,63 +42,30 @@ export class ThemeCompiler {
 
     if (tsFiles.length === 0) return;
 
-    // Create a temporary entry file that exports all components
-    const tempEntry = path.join(outputDir, '_entry.ts');
-    const exports = tsFiles.map(f => {
-      const name = f.replace(/\.tsx?$/, '');
-      return `export { default as ${name} } from '${path.join(sourceDir, f)}';`;
-    }).join('\n');
+    for (const file of tsFiles) {
+      const sourceFile = path.join(sourceDir, file);
+      const outputFile = path.join(outputDir, file.replace(/\.tsx?$/, '.js'));
 
-    await fs.writeFile(tempEntry, exports);
-
-    try {
-      // Use bun build to compile the entry file
-      const outputFile = path.join(outputDir, '_bundle.js');
-      const cmd = `bun build "${tempEntry}" --outdir "${outputDir}" --target node --format esm 2>&1 || true`;
-      
       try {
-        await execAsync(cmd, { cwd: process.cwd() });
-      } catch (buildError) {
-        // If bun build fails, try alternative approach
-        logger.warn('bun build failed, falling back to direct compilation');
-      }
+        const content = await fs.readFile(sourceFile, 'utf-8');
+        const isTsx = file.endsWith('.tsx');
 
-      // Direct compilation: copy and transform each file
-      for (const file of tsFiles) {
-        const sourceFile = path.join(sourceDir, file);
-        const outputFile = path.join(outputDir, file.replace(/\.tsx?$/, '.js'));
+        const result = await transform(content, {
+          loader: isTsx ? 'tsx' : 'ts',
+          format: 'cjs',
+          target: 'es2020',
+          jsx: 'automatic',
+          // Preserve 'use client' directives
+          preserve: true,
+        });
 
-        try {
-          const content = await fs.readFile(sourceFile, 'utf-8');
-          const compiled = this.transpileFile(content, file.endsWith('.tsx'));
-          await fs.writeFile(outputFile, compiled);
-        } catch (err) {
-          logger.error(`Failed to compile ${file}:`, err);
-          // Copy original file as fallback
-          await fs.copyFile(sourceFile, outputFile);
-        }
+        await fs.writeFile(outputFile, result.code);
+      } catch (err) {
+        logger.error(`Failed to compile ${file}:`, err);
+        // Copy original file as fallback
+        await fs.copyFile(sourceFile, outputFile);
       }
-    } finally {
-      // Clean up temp entry file
-      await fs.unlink(tempEntry).catch(() => {});
     }
-  }
-
-  /**
-   * Transpiles TSX/TS to JS with proper handling of imports and JSX.
-   */
-  private transpileFile(content: string, isTsx: boolean): string {
-    let result = content;
-
-    // Remove TypeScript type annotations (simplified)
-    result = result.replace(/:\s*(string|number|boolean|any|void|never|unknown|object|React\.\w+)\b/g, '');
-    result = result.replace(/<[^>]+>/g, ''); // Remove generic type parameters
-
-    // Keep imports as-is - they'll be resolved at runtime
-    // The key insight: we're keeping the same import structure but the compiled
-    // files will be loaded from a different path
-
-    return result;
   }
 
   /**
