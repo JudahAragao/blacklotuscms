@@ -4,7 +4,10 @@ import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { ShortcodeService } from '@/core/services/ShortcodeService';
 import { sanitizePath, maskSensitiveData, sanitizeHtml } from '@/lib/security-utils';
 import { themeStorage } from '@/lib/theme-context';
-import dynamic from 'next/dynamic';
+import { createRequire } from 'module';
+import path from 'path';
+
+const require = createRequire(import.meta.url);
 
 interface ThemeRendererProps {
   context: 'single' | 'search' | 'archive' | '404' | string;
@@ -39,12 +42,17 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
     layoutFile = '404';
   }
 
-  // 3. Safe dynamic import with props typing
-  const Layout = dynamic<{ data: any; context: string }>(() => 
-    import(`../../themes/${themeName}/layouts/${layoutFile}`).catch(() => 
-      import(`../../themes/${themeName}/layouts/post`)
-    ), { ssr: true }
-  );
+  // 3. Load layout using require with absolute paths (works in standalone builds)
+  const themesPath = path.join(process.cwd(), 'themes');
+  let Layout;
+
+  try {
+    const layoutPath = path.join(themesPath, themeName, 'layouts', layoutFile);
+    Layout = require(layoutPath).default;
+  } catch {
+    const fallbackPath = path.join(themesPath, themeName, 'layouts', 'post');
+    Layout = require(fallbackPath).default;
+  }
 
   // 4. Fetch custom variables to inject as CSS Variables
   const themeData = await ThemeDataService.listAll(themeName);
