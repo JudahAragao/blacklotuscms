@@ -1,8 +1,8 @@
 import React from 'react';
 import { ThemeService } from '@/core/services/ThemeService';
 import { ThemeDataService } from '@/core/services/ThemeDataService';
-import { approveThemePermissionAction, denyThemePermissionAction, setActiveThemeAction } from './actions';
-import { Palette, Shield, Check, X, Layout, Code, Plus, History } from 'lucide-react';
+import { approveThemePermissionAction, denyThemePermissionAction, setActiveThemeAction, deleteThemeAction } from './actions';
+import { Palette, Shield, Check, X, Layout, Code, Plus, History, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import ThemeUpload from './ThemeUpload';
 
@@ -25,6 +25,11 @@ export default async function ThemesPage() {
   async function setActiveThemeForm(themeName: string) {
     'use server';
     await setActiveThemeAction(themeName);
+  }
+
+  async function deleteThemeForm(themeName: string) {
+    'use server';
+    await deleteThemeAction(themeName);
   }
 
   return (
@@ -152,6 +157,22 @@ export default async function ThemesPage() {
                   >
                     <Code size={16} /> {isActive ? 'Customizar' : ''}
                   </Link>
+                  {!isActive && theme.name !== 'default' && (
+                    <form action={deleteThemeForm.bind(null, theme.name)}>
+                      <button
+                        type="submit"
+                        className="flex items-center justify-center gap-2 py-2 px-3 border border-border-default rounded text-sm text-text-muted hover:border-status-trash hover:text-status-trash hover:bg-status-trash/5 transition-all"
+                        title="Excluir tema"
+                        onClick={(e) => {
+                          if (!confirm(`Tem certeza que deseja excluir o tema "${theme.displayName}"? Esta ação não pode ser desfeita.`)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
             </div>

@@ -56,3 +56,11 @@ export async function installThemeAction(formData: FormData) {
   revalidatePath("/admin/themes");
   return { success: true };
 }
+
+export async function deleteThemeAction(themeName: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) throw new Error('Unauthorized');
+  await themeService.deleteTheme(themeName, session.user);
+  revalidatePath("/admin/themes");
+  return { success: true };
+}
