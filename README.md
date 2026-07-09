@@ -1,5 +1,7 @@
 # BlackLotusCMS
 
+> **⚠️ WARNING: This project is for testing and exploration purposes only. It is not production-ready.**
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-blue)](https://www.typescriptlang.org/)
