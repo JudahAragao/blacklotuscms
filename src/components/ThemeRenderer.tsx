@@ -4,9 +4,7 @@ import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { ShortcodeService } from '@/core/services/ShortcodeService';
 import { sanitizePath, maskSensitiveData, sanitizeHtml } from '@/lib/security-utils';
 import { themeStorage } from '@/lib/theme-context';
-import fs from 'fs';
 import path from 'path';
-import Module from 'module';
 
 interface ThemeRendererProps {
   context: 'single' | 'search' | 'archive' | '404' | string;
@@ -15,14 +13,15 @@ interface ThemeRendererProps {
 }
 
 /**
- * Loads a compiled theme module at runtime using eval + Module._compile.
- * This bypasses Turbopack's static analysis completely.
+ * Loads a theme module at runtime using native require().
+ * This works in custom server mode where require() is available natively.
  */
 function loadThemeModule(filePath: string): any {
-  const content = fs.readFileSync(filePath, 'utf-8');
-  const m = new Module(filePath) as any;
-  m._compile(content, filePath);
-  return m.exports;
+  const req = (globalThis as any).__themeRequire;
+  if (!req) {
+    throw new Error('Theme require not available. Make sure custom server is running.');
+  }
+  return req(filePath);
 }
 
 export default async function ThemeRenderer({ context, data, previewTheme }: ThemeRendererProps) {
@@ -52,7 +51,7 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
     layoutFile = '404';
   }
 
-  // 3. Load compiled layout using Module._compile (bypasses Turbopack)
+  // 3. Load compiled layout using native require (custom server mode)
   const themesPath = path.join(process.cwd(), 'themes');
   let Layout;
 

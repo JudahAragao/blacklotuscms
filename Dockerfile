@@ -36,6 +36,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_SKIP_LOCKFILE_PATCHING=1
 RUN bun run build
 
+# Compilar server.ts para CommonJS (necessário para require() funcionar)
+RUN npx tsc server.ts --outDir .next/standalone --module commonjs --target ES2020 --esModuleInterop --skipLibCheck 2>/dev/null || cp server.ts .next/standalone/custom-server.js
+
 # Estágio de Runner (Produção)
 FROM oven/bun:1 AS runner
 WORKDIR /app
@@ -60,4 +63,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["node", "custom-server.js"]

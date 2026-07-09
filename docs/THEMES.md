@@ -285,7 +285,8 @@ Each field supports these configuration options:
 2. Clique em "Adicionar Tema"
 3. Selecione um arquivo `.zip` contendo o tema
 4. O tema sera extraido automaticamente para `themes/<nome-do-tema>/`
-5. Ative o tema via Admin > Themes
+5. Tema sera compilado automaticamente (TSX → JS)
+6. Ative o tema via Admin > Themes
 
 ### Via Upload do Tema
 1. Crie uma pasta em `themes/my-theme/` no servidor
@@ -298,6 +299,35 @@ Each field supports these configuration options:
 - O arquivo deve ser um `.zip` valido
 - Deve conter um `theme.json` na raiz ou em subpasta
 - O nome da pasta do tema e derivado do nome do arquivo (sanitize: lowercase, espacos → hifens)
+
+## Runtime Theme Loading
+
+O BlackLotusCMS usa um **custom server** (`server.ts`) para carregar temas em runtime. Isso permite que `require()` funcione nativamente para importar módulos de temas compilados, sem interferência do Turbopack.
+
+### Arquitetura
+```
+Upload ZIP → Extrair → Compilar (.tsx → .js) → Salvar em compiled/
+                                                         ↓
+Runtime: Custom Server → require(compiled/layouts/post.js) → Renderizar
+```
+
+### Custom Server (`server.ts`)
+- Executa Next.js como HTTP server customizado
+- Expõe `require()` global via `globalThis.__themeRequire`
+- Permite carregar módulos de temas dinamicamente
+- Roda via `node custom-server.js` (não `next start`)
+
+### Compilacao de Temos
+Quando um tema é uploaded, o `ThemeCompiler` compila os arquivos `.tsx` para `.js` em um subdiretório `compiled/`:
+```
+themes/meu-tema/
+├── layouts/          ← fonte .tsx original
+├── components/       ← fonte .tsx original
+├── compiled/         ← .js compilados (carregados em runtime)
+│   ├── layouts/
+│   └── components/
+└── theme.json
+```
 
 ## ThemeContent Component
 

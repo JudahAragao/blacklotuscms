@@ -47,6 +47,7 @@ status: approved
 - **Trigger:** Push para `main`
 - **Registry:** ghcr.io
 - **Output:** Next.js standalone (minimal image)
+- **Server:** Custom server (`custom-server.js`) para theme loading via require()
 - **User:** nextjs (non-root, uid 1001)
 - **Restart:** unless-stopped
 - **Zero-downtime:** Health check antes de switch de Nginx
