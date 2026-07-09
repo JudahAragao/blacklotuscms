@@ -11,6 +11,13 @@ import DefaultCategoryLayout from '../../themes/default/layouts/category';
 import DefaultSearchLayout from '../../themes/default/layouts/search';
 import Default404Layout from '../../themes/default/layouts/404';
 
+import JudahPostLayout from '../../themes/judah-portfolio/layouts/post';
+import JudahPageLayout from '../../themes/judah-portfolio/layouts/page';
+import JudahArchiveLayout from '../../themes/judah-portfolio/layouts/archive';
+import JudahCategoryLayout from '../../themes/judah-portfolio/layouts/category';
+import JudahSearchLayout from '../../themes/judah-portfolio/layouts/search';
+import Judah404Layout from '../../themes/judah-portfolio/layouts/404';
+
 interface ThemeRendererProps {
   context: 'single' | 'search' | 'archive' | '404' | string;
   data: any;
@@ -25,6 +32,14 @@ const THEME_LAYOUTS: Record<string, Record<string, React.ComponentType<any>>> = 
     category: DefaultCategoryLayout,
     search: DefaultSearchLayout,
     '404': Default404Layout,
+  },
+  'judah-portfolio': {
+    post: JudahPostLayout,
+    page: JudahPageLayout,
+    archive: JudahArchiveLayout,
+    category: JudahCategoryLayout,
+    search: JudahSearchLayout,
+    '404': Judah404Layout,
   },
 };
 
