@@ -25,8 +25,6 @@ export default function PluginSidebarNav() {
       </div>
 
       {components.map((entry, idx) => {
-        const navItem = entry.Component as PluginNavItem;
-
         // If it's a function component, render it
         if (typeof entry.Component === 'function') {
           return (
@@ -37,6 +35,7 @@ export default function PluginSidebarNav() {
         }
 
         // If it's a nav item object, render as Link
+        const navItem = entry.Component as unknown as PluginNavItem;
         if (navItem && navItem.href && navItem.label) {
           return (
             <Link
