@@ -49,16 +49,16 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
   try {
     // First try compiled directory (themes compiled at upload time)
     const compiledPath = path.join(themesPath, themeName, 'compiled', 'layouts', layoutFile);
-    Layout = require(compiledPath).default;
+    Layout = /* turbopackIgnore: true */ require(compiledPath).default;
   } catch {
     try {
       // Fallback to compiled post layout
       const fallbackPath = path.join(themesPath, themeName, 'compiled', 'layouts', 'post');
-      Layout = require(fallbackPath).default;
+      Layout = /* turbopackIgnore: true */ require(fallbackPath).default;
     } catch {
       // Last resort: try raw layouts directory (for development/default theme)
       const rawPath = path.join(themesPath, themeName, 'layouts', layoutFile);
-      Layout = require(rawPath).default;
+      Layout = /* turbopackIgnore: true */ require(rawPath).default;
     }
   }
 
