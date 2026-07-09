@@ -86,6 +86,27 @@ async function validateThemePermission(capability: string) {
 
   if (permission?.status === 'approved') return true;
 
+  // Auto-approve the built-in default theme (trusted code shipped with CMS)
+  if (themeName === 'default') {
+    await prisma.themePermission.upsert({
+      where: {
+        requesterTheme_providerName_capability: {
+          requesterTheme: themeName,
+          providerName: 'system',
+          capability,
+        },
+      },
+      update: { status: 'approved' },
+      create: {
+        requesterTheme: themeName,
+        providerName: 'system',
+        capability,
+        status: 'approved',
+      },
+    });
+    return true;
+  }
+
   await requestThemePermission(capability, themeName);
   throw new BlackLotusCMSError(
     `[Segurança de Tema] Theme '${themeName}' does not have approved permission for '${capability}'.`,

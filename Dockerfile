@@ -77,6 +77,14 @@ COPY --from=builder --chown=nextjs:nodejs /app/themes ./bundled-themes
 COPY --from=deps /app/node_modules/.bin/esbuild ./node_modules/.bin/esbuild
 COPY --from=deps /app/node_modules/@esbuild ./node_modules/@esbuild
 
+# Prisma + pg packages for database connectivity (not bundled by standalone)
+COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=deps /app/node_modules/pg ./node_modules/pg
+COPY --from=deps /app/node_modules/pg-hstore ./node_modules/pg-hstore
+COPY --from=deps /app/node_modules/pg-query-stream ./node_modules/pg-query-stream
+COPY --from=deps /app/node_modules/protobufjs ./node_modules/protobufjs
+COPY --from=deps /app/node_modules/lossless-json ./node_modules/lossless-json
+
 USER nextjs
 
 EXPOSE 3000
