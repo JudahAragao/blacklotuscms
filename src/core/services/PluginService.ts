@@ -168,6 +168,14 @@ export class PluginService {
           }
           hookService.registerComponent(slot, component, pluginId, priority);
         },
+        registerAdminNav: async (navItem: { href: string; label: string; icon?: string; priority?: number }) => {
+          const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', 'system.ui.register.admin_nav');
+          if (!hasAccess) {
+            await pluginDataService.requestPermission(pluginName, 'system', 'system.ui.register.admin_nav');
+            return;
+          }
+          hookService.registerComponent('admin.sidebar.plugins', navItem, pluginId, navItem.priority || 10);
+        },
         addAction: async (hookName: string, callback: any) => {
           const ivmMod = await import('isolated-vm');
           hookService.addAction(hookName, async (data) => {

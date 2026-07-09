@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import UserControl from '@/components/admin/UserControl';
 import BlackLotusCMSSlot from '@/components/admin/BlackLotusCMSSlot';
+import PluginSidebarNav from '@/components/admin/PluginSidebarNav';
 import { hasCapability } from '@/lib/auth-utils';
 import {
   LayoutDashboard, FileText, Image, Menu, MessageSquare,
@@ -144,6 +145,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             )}
 
             <BlackLotusCMSSlot name="admin.sidebar.menu_after" />
+
+            <PluginSidebarNav />
           </nav>
 
           <BlackLotusCMSSlot name="admin.sidebar.bottom" />

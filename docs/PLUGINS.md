@@ -242,11 +242,41 @@ const config = await bridge.storage.get('config');
 ```
 
 ### bridge.hooks
-| Method | Description |
-|--------|-------------|
-| `addAction(name, callback)` | Register event handler |
-| `addFilter(name, callback)` | Register data transformer |
-| `registerComponent(slot, component, priority?)` | Register UI component |
+| Method | Description | Permission Required |
+|--------|-------------|---------------------|
+| `addAction(name, callback)` | Register event handler | - |
+| `addFilter(name, callback)` | Register data transformer | - |
+| `registerComponent(slot, component, priority?)` | Register UI component in slot | - (public.route slots require permission) |
+| `registerAdminNav(navItem)` | Register admin sidebar navigation | `system.ui.register.admin_nav` |
+
+#### bridge.hooks.registerAdminNav
+
+Registra um item de navegação no sidebar do admin. Requer permissão `system.ui.register.admin_nav`.
+
+```javascript
+// Register a sidebar navigation item
+bridge.hooks.registerAdminNav({
+  href: '/admin/plugins/my-plugin/settings',
+  label: 'My Plugin Settings',
+  icon: 'settings',  // optional
+  priority: 10        // optional, lower = higher in sidebar
+});
+
+// Register with custom component
+bridge.hooks.registerAdminNav({
+  href: '/admin/plugins/my-plugin',
+  label: 'My Plugin',
+  component: MyPluginNavComponent  // custom React component
+});
+```
+
+**Admin Sidebar Slots:**
+| Slot | Description |
+|------|-------------|
+| `admin.sidebar.top` | Top of sidebar (before Dashboard) |
+| `admin.sidebar.plugins` | Plugin navigation section (after System items) |
+| `admin.sidebar.menu_after` | After system menu items |
+| `admin.sidebar.bottom` | Bottom of sidebar (before user control) |
 
 ### bridge.http (Outbound HTTP)
 
