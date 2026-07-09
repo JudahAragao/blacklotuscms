@@ -63,7 +63,7 @@ export class ThemeCompiler {
           '--jsx=automatic',
           '--target=es2020',
           // Resolve @/ aliases to actual src/ paths
-          `--alias:@/=${this.srcDir}/`,
+          `--alias:@=${this.srcDir}`,
           // Keep external packages as require() calls (React, Next.js, Node builtins)
           '--packages=external',
         ]);

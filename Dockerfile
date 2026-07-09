@@ -42,13 +42,13 @@ RUN mkdir -p themes/default/compiled/layouts themes/default/compiled/components 
       node_modules/.bin/esbuild "$f" \
         --outfile="themes/default/compiled/layouts/$(basename "$f" .tsx).js" \
         --format=cjs --loader:.tsx=tsx --jsx=automatic --target=es2020 \
-        --alias:@/=/app/src/ --packages=external; \
+        --alias:@=/app/src --packages=external; \
     done && \
     for f in themes/default/components/*.tsx; do \
       node_modules/.bin/esbuild "$f" \
         --outfile="themes/default/compiled/components/$(basename "$f" .tsx).js" \
         --format=cjs --loader:.tsx=tsx --jsx=automatic --target=es2020 \
-        --alias:@/=/app/src/ --packages=external; \
+        --alias:@=/app/src --packages=external; \
     done
 
 # Copiar custom-server.js (JavaScript puro, sem necessidade de compilação)
