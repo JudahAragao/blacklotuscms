@@ -40,16 +40,14 @@ RUN bun run build
 RUN mkdir -p themes/default/compiled/layouts themes/default/compiled/components && \
     for f in themes/default/layouts/*.tsx; do \
       node_modules/.bin/esbuild "$f" \
-        --outdir=themes/default/compiled/layouts \
-        --outfile="$(basename "$f" .tsx).js" \
-        --format=cjs --loader:tsx=tsx --jsx=automatic --target=es2020 \
+        --outfile="themes/default/compiled/layouts/$(basename "$f" .tsx).js" \
+        --format=cjs --loader:.tsx=tsx --jsx=automatic --target=es2020 \
         --bundle --alias:@=/app/src --packages=external; \
     done && \
     for f in themes/default/components/*.tsx; do \
       node_modules/.bin/esbuild "$f" \
-        --outdir=themes/default/compiled/components \
-        --outfile="$(basename "$f" .tsx).js" \
-        --format=cjs --loader:tsx=tsx --jsx=automatic --target=es2020 \
+        --outfile="themes/default/compiled/components/$(basename "$f" .tsx).js" \
+        --format=cjs --loader:.tsx=tsx --jsx=automatic --target=es2020 \
         --bundle --alias:@=/app/src --packages=external; \
     done
 
