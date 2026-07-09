@@ -32,6 +32,10 @@ Alinhar seguranca, documentacao e qualidade ao estado real do codigo apos as mud
 - [x] **TASK-031:** E2E tests (Playwright) — 4 arquivos | priority: P4 | est: 8h | feature: testing
 - [x] **TASK-042:** Fix theme upload Docker volumes + error handling | priority: P1 | est: 2h | feature: theme-engine
 - [x] **TASK-043:** Fix plugin upload Docker volumes + error handling | priority: P1 | est: 2h | feature: plugin-system
+- [x] **TASK-044:** Theme compilation at upload time + Module._compile for runtime loading | priority: P1 | est: 4h | feature: theme-engine
+- [x] **TASK-045:** Plugin admin sidebar extensibility (registerAdminNav) | priority: P1 | est: 3h | feature: plugin-system
+- [x] **TASK-046:** Theme delete functionality with deactivation check | priority: P1 | est: 2h | feature: theme-engine
+- [x] **TASK-047:** Docker named volumes for themes persistence | priority: P1 | est: 1h | feature: deployment
 
 ## Review Notes
 - `bunx tsc --noEmit` passa sem erros.
@@ -45,3 +49,7 @@ Alinhar seguranca, documentacao e qualidade ao estado real do codigo apos as mud
 - Playwright instalado via bun, config com webServer bun run dev.
 - **TASK-042:** Fix theme upload: Dockerfile cria `themes/` e copia default; docker-compose monta `/opt/apps/shared/themes`; actions.ts remove try-catch para propagar erros; ThemeUpload.tsx verifica retorno antes de toast sucesso.
 - **TASK-043:** Fix plugin upload: Dockerfile cria `plugins/`; docker-compose monta `/opt/apps/shared/plugins`; actions.ts remove try-catch do importPluginAction para propagar erros.
+- **TASK-044:** Theme compilation: ThemeCompiler compila .tsx para .js em compiled/; ThemeRenderer usa Module._compile para bypass do Turbopack.
+- **TASK-045:** Plugin sidebar: PluginSidebarNav component + registerAdminNav bridge API + admin.sidebar.plugins slot.
+- **TASK-046:** Theme delete: deleteTheme() com verificação de tema ativo e default; botão de delete na UI com confirmação.
+- **TASK-047:** Named volumes: themes migrou de bind mount para Docker named volume (themes_data) para persistência entre redeployments.

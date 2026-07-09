@@ -26,9 +26,8 @@ status: approved
 │   ├── docker-compose.yml
 │   └── containers: blacklotus-green-app (:3002)
 ├── shared/
-│   ├── uploads/      ← media files (compartilhado)
-│   ├── themes/       ← temas instalados (compartilhado)
-│   ├── plugins/      ← plugins instalados (compartilhado)
+│   ├── uploads/      ← media files (bind mount)
+│   ├── plugins/      ← plugins instalados (bind mount)
 │   └── postgres_data/ ← database (volume Docker)
 ├── current          ← "blue" ou "green"
 └── scripts/
@@ -55,9 +54,9 @@ status: approved
 - **Zero-downtime:** Health check antes de switch de Nginx
 
 ## Volumes
-- `/opt/apps/shared/uploads` — Media files (bind mount, compartilhado entre blue/green)
-- `/opt/apps/shared/themes` — Temas instalados (bind mount, compartilhado entre blue/green)
-- `/opt/apps/shared/plugins` — Plugins instalados (bind mount, compartilhado entre blue/green)
+- `themes_data` — Temas instalados (Docker named volume, persiste entre redeployments)
+- `/opt/apps/shared/uploads` — Media files (bind mount)
+- `/opt/apps/shared/plugins` — Plugins instalados (bind mount)
 - `postgres_data` — Database persistence (volume Docker)
 - `.env` — Environment variables (bind mount por ambiente)
 

@@ -63,10 +63,14 @@ status: approved
 - [x] **TASK-038:** Responsive design admin panel (sidebar toggle mobile, table scroll, top bar adaptativa) | est: 4h | depends: [] | feature: ux
 - [x] **TASK-042:** Fix theme upload Docker volumes + error handling | est: 2h | depends: [TASK-007] | feature: theme-engine
 - [x] **TASK-043:** Fix plugin upload Docker volumes + error handling | est: 2h | depends: [TASK-007] | feature: plugin-system
+- [x] **TASK-044:** Theme compilation at upload time + Module._compile for runtime loading | est: 4h | depends: [TASK-042] | feature: theme-engine
+- [x] **TASK-045:** Plugin admin sidebar extensibility (registerAdminNav) | est: 3h | depends: [TASK-015] | feature: plugin-system
+- [x] **TASK-046:** Theme delete functionality with deactivation check | est: 2h | depends: [TASK-042] | feature: theme-engine
+- [x] **TASK-047:** Docker named volumes for themes persistence | est: 1h | depends: [TASK-042] | feature: deployment
 
 ## Metricas
-- Total de tasks: 43
-- Concluidas: 43
+- Total de tasks: 47
+- Concluidas: 47
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h
