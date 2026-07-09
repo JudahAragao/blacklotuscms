@@ -6,20 +6,19 @@ import { logger } from '@/lib/logger';
 
 const execFileAsync = promisify(execFile);
 
-function getEsbuildBin(): string {
-  return path.join(process.cwd(), 'node_modules', '.bin', 'esbuild');
-}
-
 export class ThemeCompiler {
   private srcDir: string;
+  private scriptPath: string;
 
   constructor() {
     this.srcDir = path.join(process.cwd(), 'src');
+    // Script is at scripts/compile-theme.mjs, not traced by Turbopack
+    this.scriptPath = path.join(process.cwd(), 'scripts', 'compile-theme.mjs');
   }
 
   /**
    * Compiles a theme's .tsx files to .js in a compiled/ subdirectory.
-   * Uses esbuild CLI with --alias to resolve @/ imports and bundle CMS modules.
+   * Uses Vite (via external script) to resolve @/ aliases and bundle CMS modules.
    */
   async compile(themePath: string): Promise<void> {
     const compiledPath = path.join(themePath, 'compiled');
@@ -46,29 +45,14 @@ export class ThemeCompiler {
     const tsFiles = files.filter(f => f.endsWith('.tsx') || f.endsWith('.ts'));
     if (tsFiles.length === 0) return;
 
-    const esbuild = getEsbuildBin();
-
     for (const file of tsFiles) {
       const sourceFile = path.join(sourceDir, file);
       const outputFile = path.join(outputDir, file.replace(/\.tsx?$/, '.js'));
 
       try {
-        const loader = file.endsWith('.tsx') ? 'tsx' : 'ts';
-
-        await execFileAsync(esbuild, [
-          sourceFile,
-          '--outfile', outputFile,
-          '--format=cjs',
-          '--loader', `.${loader === 'tsx' ? 'tsx' : 'ts'}=${loader}`,
-          '--jsx=automatic',
-          '--target=es2020',
-          // Resolve @/ aliases to actual src/ paths
-          `--alias:@/=${this.srcDir}/`,
-          // Bundle CMS modules, externalize React/Next.js/Node builtins
-          '--packages=external',
-        ]);
-      } catch (err) {
-        logger.error(`Failed to compile ${file}:`, err);
+        await execFileAsync('node', [this.scriptPath, sourceFile, outputFile, this.srcDir]);
+      } catch (err: any) {
+        logger.error(`Failed to compile ${file}:`, err.message || err);
         await fs.copyFile(sourceFile, outputFile);
       }
     }
