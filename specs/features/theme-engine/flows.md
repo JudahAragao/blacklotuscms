@@ -59,3 +59,35 @@ feature: "theme-engine"
 4. **Admin aprova/denega via painel**
    - Limpa cache de permissões para o theme afetado
    - State: Permission processada
+
+## Instalar Theme via ZIP Upload
+
+1. **Admin seleciona arquivo .zip**
+   - ThemeUpload component recebe o arquivo
+   - Validacao: extensao deve ser `.zip`
+   - State: Arquivo selecionado
+
+2. **FormData enviado ao Server Action**
+   - installThemeAction(formData)
+   - Autenticacao via getServerSession
+   - State: Request autenticada
+
+3. **ThemeService.installTheme()**
+   - Extrai buffer do arquivo
+   - Sanitiza nome: `originalName.replace(/\.[^/.]+$/, "").replace(/\s+/g, '-').toLowerCase()`
+   - Cria diretorio em `/opt/apps/shared/themes/<theme-folder>/`
+   - State: ZIP extraido
+
+4. **Validacao do theme.json**
+   - Verifica se `theme.json` existe na raiz do diretorio extraido
+   - Se nao existe: deleta diretorio e lanca erro
+   - State: Theme valido
+
+5. **Revalidacao da pagina**
+   - revalidatePath("/admin/themes")
+   - State: Lista de temas atualizada
+
+6. **Client recebe resultado**
+   - Sucesso: toast "Tema instalado com sucesso!"
+   - Erro: toast com mensagem de erro
+   - State: Upload concluido

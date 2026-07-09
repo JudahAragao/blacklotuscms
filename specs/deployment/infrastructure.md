@@ -25,8 +25,15 @@ status: approved
 ├── green/
 │   ├── docker-compose.yml
 │   └── containers: blacklotus-green-app (:3002)
+├── shared/
+│   ├── uploads/      ← media files (compartilhado)
+│   ├── themes/       ← temas instalados (compartilhado)
+│   ├── plugins/      ← plugins instalados (compartilhado)
+│   └── postgres_data/ ← database (volume Docker)
 ├── current          ← "blue" ou "green"
-└── postgres_data/   ← volume compartilado
+└── scripts/
+    ├── setup_vps.sh
+    └── switch.sh
 ```
 
 ## Services
@@ -48,10 +55,11 @@ status: approved
 - **Zero-downtime:** Health check antes de switch de Nginx
 
 ## Volumes
-- `postgres_data` — Database persistence
-- `uploads` — Media files persistence
-- `.secrets.json` — Configuration (bind mount)
-- `.installed` — Instalacao flag (bind mount)
+- `/opt/apps/shared/uploads` — Media files (bind mount, compartilhado entre blue/green)
+- `/opt/apps/shared/themes` — Temas instalados (bind mount, compartilhado entre blue/green)
+- `/opt/apps/shared/plugins` — Plugins instalados (bind mount, compartilhado entre blue/green)
+- `postgres_data` — Database persistence (volume Docker)
+- `.env` — Environment variables (bind mount por ambiente)
 
 ## Rollback
 Alternar `/opt/apps/current` e reload do Nginx.

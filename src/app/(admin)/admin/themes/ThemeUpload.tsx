@@ -23,8 +23,12 @@ export default function ThemeUpload() {
     formData.append('file', file);
 
     try {
-      await installThemeAction(formData);
-      toast.success('Tema instalado com sucesso!');
+      const result = await installThemeAction(formData);
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        toast.success('Tema instalado com sucesso!');
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Erro ao instalar tema');
     } finally {

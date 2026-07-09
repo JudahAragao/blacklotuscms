@@ -61,10 +61,12 @@ status: approved
 - [x] **TASK-036:** Error boundary admin | est: 2h | depends: [] | feature: ux
 - [x] **TASK-037:** Loading states e skeletons padronizados | est: 2h | depends: [] | feature: ux
 - [x] **TASK-038:** Responsive design admin panel (sidebar toggle mobile, table scroll, top bar adaptativa) | est: 4h | depends: [] | feature: ux
+- [x] **TASK-042:** Fix theme upload Docker volumes + error handling | est: 2h | depends: [TASK-007] | feature: theme-engine
+- [x] **TASK-043:** Fix plugin upload Docker volumes + error handling | est: 2h | depends: [TASK-007] | feature: plugin-system
 
 ## Metricas
-- Total de tasks: 41
-- Concluidas: 41
+- Total de tasks: 43
+- Concluidas: 43
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

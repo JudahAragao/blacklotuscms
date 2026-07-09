@@ -46,12 +46,14 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs
 
-RUN mkdir -p uploads && chown nextjs:nodejs uploads
+RUN mkdir -p uploads themes plugins && chown nextjs:nodejs uploads themes plugins
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/themes ./themes
+COPY --from=builder --chown=nextjs:nodejs /app/plugins ./plugins
 
 USER nextjs
 

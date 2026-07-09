@@ -279,11 +279,25 @@ Each field supports these configuration options:
 - `conditionalLogic` - Show/hide field based on other field values
 
 ## Instalacao
-1. Create theme folder in `themes/my-theme/`
-2. Add `theme.json` manifest
-3. Create layouts (at least `post.tsx`)
-4. Add components (Header, Footer)
-5. Activate via Admin > Themes
+
+### Via ZIP Upload (Recomendado)
+1. Acesse Admin > Themes
+2. Clique em "Adicionar Tema"
+3. Selecione um arquivo `.zip` contendo o tema
+4. O tema sera extraido automaticamente para `themes/<nome-do-tema>/`
+5. Ative o tema via Admin > Themes
+
+### Via Upload do Tema
+1. Crie uma pasta em `themes/my-theme/` no servidor
+2. Adicione o manifesto `theme.json`
+3. Crie os layouts (no minimo `post.tsx`)
+4. Adicione os componentes (Header, Footer)
+5. Ative o tema via Admin > Themes
+
+### Requisitos do ZIP
+- O arquivo deve ser um `.zip` valido
+- Deve conter um `theme.json` na raiz ou em subpasta
+- O nome da pasta do tema e derivado do nome do arquivo (sanitize: lowercase, espacos → hifens)
 
 ## ThemeContent Component
 

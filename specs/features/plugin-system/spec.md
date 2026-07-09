@@ -25,6 +25,7 @@ Sistema de plugins com installation via ZIP, execution em sandbox isolado (isola
 - **REQ-10:** Webhook inbound via bridge.webhook.on() com signature verification
 - **REQ-11:** Network audit log para todas as chamadas HTTP e webhooks
 - **REQ-12:** Rate limit separado para HTTP outbound (20 req/s, configurável por plugin)
+- **REQ-13:** Plugins instalados persistidos em volume compartilhado (`/opt/apps/shared/plugins`)
 
 ## User Roles
 - **Administrador:** Install, activate, desactivate plugins, manage permissions

@@ -68,7 +68,7 @@ server {
     }
 
     location /uploads/ {
-        alias /home/deploy/portfolio/uploads/;
+        alias /opt/apps/shared/uploads/;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }

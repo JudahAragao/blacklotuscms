@@ -20,6 +20,8 @@ Motor de themes baseado em React Server Components com CSS scoping, dynamic impo
 - **REQ-06:** Sanitization de data antes de passar ao theme
 - **REQ-07:** Theme permission requests (pending/approved/denied)
 - **REQ-08:** theme.json como manifest do theme
+- **REQ-09:** Theme upload via ZIP (extract + validate + install)
+- **REQ-10:** Temas instalados persistidos em volume compartilhado (`/opt/apps/shared/themes`)
 
 ## User Roles
 - **Administrador:** Gerenciar themes, activate, install, approve permissions

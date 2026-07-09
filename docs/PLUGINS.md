@@ -382,17 +382,29 @@ Permissions are managed via Admin > Plugins > Permissions.
 
 ## Instalacao
 
-### Via Admin Panel
-1. Create ZIP com `plugin.json` and `index.js`
-2. Admin > Plugins > Upload ZIP
-3. Click Activate
-4. Approve requested permissions in Permissions tab
+### Via ZIP Upload (Recomendado)
+1. Acesse Admin > Plugins
+2. Clique em "IMPORT EXTENSION"
+3. Selecione um arquivo `.zip` contendo o plugin
+4. O plugin sera extraido automaticamente para `/opt/apps/shared/plugins/<nome-do-plugin>/`
+5. Ative o plugin via Admin > Plugins
+6. Aprove as permissoes solicitadas na aba Permissions
 
-### Manual Instalacao
-1. Create folder in `plugins/my-plugin/`
-2. Add `plugin.json` and `index.js`
-3. Restart the application
-4. Activate via Admin panel
+### Via Upload Manual
+1. Crie uma pasta em `plugins/my-plugin/` no servidor
+2. Adicione o manifesto `plugin.json`
+3. Adicione o arquivo de entrada (`index.js` ou o definido em `manifest.entry`)
+4. Reinicie a aplicação
+5. Ative o plugin via Admin > Plugins
+
+### Requisitos do ZIP
+- O arquivo deve ser um `.zip` valido
+- Deve conter um `plugin.json` na raiz ou em subpasta
+- Deve conter o arquivo de entrada (`index.js` por padrao)
+- O nome da pasta do plugin e derivado do nome do arquivo (sanitize: lowercase, espacos → hifens)
+
+### Persistencia
+Plugins sao instalados em `/opt/apps/shared/plugins/` (volume compartilhado entre blue/green). Os dados persistem entre restarts e redeployments.
 
 ## Security
 

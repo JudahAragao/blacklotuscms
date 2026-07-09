@@ -30,6 +30,8 @@ Alinhar seguranca, documentacao e qualidade ao estado real do codigo apos as mud
 - [x] **TASK-038:** Responsive design admin panel | priority: P6 | est: 4h | feature: ux
 - [x] **TASK-030:** Integration tests — 32 tests, 3 arquivos | priority: P4 | est: 6h | feature: testing
 - [x] **TASK-031:** E2E tests (Playwright) — 4 arquivos | priority: P4 | est: 8h | feature: testing
+- [x] **TASK-042:** Fix theme upload Docker volumes + error handling | priority: P1 | est: 2h | feature: theme-engine
+- [x] **TASK-043:** Fix plugin upload Docker volumes + error handling | priority: P1 | est: 2h | feature: plugin-system
 
 ## Review Notes
 - `bunx tsc --noEmit` passa sem erros.
@@ -41,3 +43,5 @@ Alinhar seguranca, documentacao e qualidade ao estado real do codigo apos as mud
 - Admin sidebar responsiva com toggle em mobile via CSS peer.
 - S3Driver.delete implementado com DeleteObjectCommand.
 - Playwright instalado via bun, config com webServer bun run dev.
+- **TASK-042:** Fix theme upload: Dockerfile cria `themes/` e copia default; docker-compose monta `/opt/apps/shared/themes`; actions.ts remove try-catch para propagar erros; ThemeUpload.tsx verifica retorno antes de toast sucesso.
+- **TASK-043:** Fix plugin upload: Dockerfile cria `plugins/`; docker-compose monta `/opt/apps/shared/plugins`; actions.ts remove try-catch do importPluginAction para propagar erros.

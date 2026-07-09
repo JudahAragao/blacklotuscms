@@ -25,10 +25,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - /home/deploy/portfolio/uploads:/app/uploads
-      # Persiste o arquivo de instalação e configuração
-      - ./.secrets.json:/app/.secrets.json
-      - ./.installed:/app/.installed
+      - /opt/apps/shared/uploads:/app/uploads
+      - /opt/apps/shared/themes:/app/themes
+      - /opt/apps/shared/plugins:/app/plugins
     networks:
       - blacklotuscms-network
     restart: unless-stopped

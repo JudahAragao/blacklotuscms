@@ -5,7 +5,9 @@ services:
     ports:
       - "3002:3000"
     volumes:
-      - /home/deploy/portfolio/uploads:/app/uploads
+      - /opt/apps/shared/uploads:/app/uploads
+      - /opt/apps/shared/themes:/app/themes
+      - /opt/apps/shared/plugins:/app/plugins
       - ./.env:/app/.env
     env_file:
       - .env

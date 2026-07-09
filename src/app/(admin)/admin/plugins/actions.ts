@@ -56,18 +56,14 @@ export async function deactivatePluginAction(pluginId: string) {
 }
 
 export async function importPluginAction(formData: FormData) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) throw new Error('Unauthorized');
-    const file = formData.get("pluginZip") as File;
-    if (!file) throw new Error("Nenhum arquivo enviado");
+  const session = await getServerSession(authOptions);
+  if (!session?.user) throw new Error('Unauthorized');
+  const file = formData.get("pluginZip") as File;
+  if (!file) throw new Error("Nenhum arquivo enviado");
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await pluginService.installPlugin(buffer, file.name, session.user);
-    
-    revalidatePath("/admin/plugins");
-    return { success: true };
-  } catch (error) {
-    return handleApiError(error);
-  }
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await pluginService.installPlugin(buffer, file.name, session.user);
+  
+  revalidatePath("/admin/plugins");
+  return { success: true };
 }
