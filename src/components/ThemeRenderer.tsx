@@ -20,7 +20,7 @@ interface ThemeRendererProps {
  */
 function loadThemeModule(filePath: string): any {
   const content = fs.readFileSync(filePath, 'utf-8');
-  const m = new Module(filePath);
+  const m = new Module(filePath) as any;
   m._compile(content, filePath);
   return m.exports;
 }
