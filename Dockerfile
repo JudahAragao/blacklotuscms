@@ -36,6 +36,21 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_SKIP_LOCKFILE_PATCHING=1
 RUN bun run build
 
+# Pre-compile default theme with esbuild (alias resolution + bundling)
+RUN mkdir -p themes/default/compiled/layouts themes/default/compiled/components && \
+    for f in themes/default/layouts/*.tsx; do \
+      node_modules/.bin/esbuild "$f" \
+        --outfile="themes/default/compiled/layouts/$(basename "$f" .tsx).js" \
+        --format=cjs --loader:.tsx=tsx --jsx=automatic --target=es2020 \
+        --alias:@/=/app/src/ --packages=external; \
+    done && \
+    for f in themes/default/components/*.tsx; do \
+      node_modules/.bin/esbuild "$f" \
+        --outfile="themes/default/compiled/components/$(basename "$f" .tsx).js" \
+        --format=cjs --loader:.tsx=tsx --jsx=automatic --target=es2020 \
+        --alias:@/=/app/src/ --packages=external; \
+    done
+
 # Copiar custom-server.js (JavaScript puro, sem necessidade de compilação)
 RUN cp custom-server.js .next/standalone/custom-server.js
 
