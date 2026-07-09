@@ -57,9 +57,10 @@ export class ThemeCompiler {
 
         await execFileAsync(esbuild, [
           sourceFile,
-          '--outfile', outputFile,
+          '--outdir', outputDir,
+          '--outfile', path.basename(outputFile),
           '--format=cjs',
-          '--loader', `.${loader === 'tsx' ? 'tsx' : 'ts'}=${loader}`,
+          '--loader', `${loader === 'tsx' ? 'tsx' : 'ts'}=${loader}`,
           '--jsx=automatic',
           '--target=es2020',
           '--bundle',
