@@ -25,16 +25,18 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - /opt/apps/shared/uploads:/app/uploads
+      - uploads_data:/app/uploads
       - themes_data:/app/themes
-      - /opt/apps/shared/plugins:/app/plugins
+      - plugins_data:/app/plugins
     networks:
       - blacklotuscms-network
     restart: unless-stopped
 
 volumes:
   postgres_data:
+  uploads_data:
   themes_data:
+  plugins_data:
 
 networks:
   blacklotuscms-network:

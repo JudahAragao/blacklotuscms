@@ -5,9 +5,9 @@ services:
     ports:
       - "3001:3000"
     volumes:
-      - /opt/apps/shared/uploads:/app/uploads
+      - blacklotus_blue_uploads:/app/uploads
       - blacklotus_blue_themes:/app/themes
-      - /opt/apps/shared/plugins:/app/plugins
+      - blacklotus_blue_plugins:/app/plugins
       - ./.env:/app/.env
     env_file:
       - .env
@@ -16,7 +16,9 @@ services:
     restart: unless-stopped
 
 volumes:
+  blacklotus_blue_uploads:
   blacklotus_blue_themes:
+  blacklotus_blue_plugins:
 
 networks:
   blacklotus-network:

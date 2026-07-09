@@ -67,10 +67,11 @@ status: approved
 - [x] **TASK-045:** Plugin admin sidebar extensibility (registerAdminNav) | est: 3h | depends: [TASK-015] | feature: plugin-system
 - [x] **TASK-046:** Theme delete functionality with deactivation check | est: 2h | depends: [TASK-042] | feature: theme-engine
 - [x] **TASK-047:** Docker named volumes for themes persistence | est: 1h | depends: [TASK-042] | feature: deployment
+- [x] **TASK-048:** Docker named volumes for uploads and plugins persistence | est: 1h | depends: [TASK-047] | feature: deployment
 
 ## Metricas
-- Total de tasks: 47
-- Concluidas: 47
+- Total de tasks: 48
+- Concluidas: 48
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

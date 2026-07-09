@@ -36,6 +36,7 @@ Alinhar seguranca, documentacao e qualidade ao estado real do codigo apos as mud
 - [x] **TASK-045:** Plugin admin sidebar extensibility (registerAdminNav) | priority: P1 | est: 3h | feature: plugin-system
 - [x] **TASK-046:** Theme delete functionality with deactivation check | priority: P1 | est: 2h | feature: theme-engine
 - [x] **TASK-047:** Docker named volumes for themes persistence | priority: P1 | est: 1h | feature: deployment
+- [x] **TASK-048:** Docker named volumes for uploads and plugins persistence | priority: P1 | est: 1h | feature: deployment
 
 ## Review Notes
 - `bunx tsc --noEmit` passa sem erros.
@@ -53,3 +54,4 @@ Alinhar seguranca, documentacao e qualidade ao estado real do codigo apos as mud
 - **TASK-045:** Plugin sidebar: PluginSidebarNav component + registerAdminNav bridge API + admin.sidebar.plugins slot.
 - **TASK-046:** Theme delete: deleteTheme() com verificação de tema ativo e default; botão de delete na UI com confirmação.
 - **TASK-047:** Named volumes: themes migrou de bind mount para Docker named volume (themes_data) para persistência entre redeployments.
+- **TASK-048:** Named volumes: uploads e plugins migraram de bind mount para Docker named volumes (uploads_data, plugins_data). Removida criação manual de diretórios no setup_vps.sh.
