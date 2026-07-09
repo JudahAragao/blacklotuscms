@@ -4,12 +4,7 @@ import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { sanitizePath, maskSensitiveData } from '@/lib/security-utils';
 import { themeStorage } from '@/lib/theme-context';
 
-import DefaultPostLayout from '../../themes/default/layouts/post';
-import DefaultPageLayout from '../../themes/default/layouts/page';
-import DefaultArchiveLayout from '../../themes/default/layouts/archive';
-import DefaultCategoryLayout from '../../themes/default/layouts/category';
-import DefaultSearchLayout from '../../themes/default/layouts/search';
-import Default404Layout from '../../themes/default/layouts/404';
+import * as DefaultLayouts from '../../themes/default/layouts';
 
 interface ThemeRendererProps {
   context: 'single' | 'search' | 'archive' | '404' | string;
@@ -17,37 +12,32 @@ interface ThemeRendererProps {
   previewTheme?: string;
 }
 
-const THEME_LAYOUTS: Record<string, Record<string, React.ComponentType<any>>> = {
-  default: {
-    post: DefaultPostLayout,
-    page: DefaultPageLayout,
-    archive: DefaultArchiveLayout,
-    category: DefaultCategoryLayout,
-    search: DefaultSearchLayout,
-    '404': Default404Layout,
-  },
+const THEME_REGISTRY: Record<string, Record<string, React.ComponentType<any>>> = {
+  default: DefaultLayouts as any,
+};
+
+const LAYOUT_MAP: Record<string, string> = {
+  single: 'post',
+  search: 'search',
+  archive: 'archive',
+  '404': 'notFound',
+  blog: 'blog',
 };
 
 export default async function ThemeRenderer({ context, data, previewTheme }: ThemeRendererProps) {
   const rawThemeName = previewTheme || await ThemeService.getActiveTheme();
   const themeName = sanitizePath(rawThemeName);
 
-  let layoutKey = sanitizePath(context);
-
-  let safeData = maskSensitiveData(data);
+  let layoutKey = LAYOUT_MAP[context] || sanitizePath(context);
 
   if (context === 'single') {
     layoutKey = sanitizePath(data.postType.slug);
-  } else if (context === 'search') {
-    layoutKey = 'search';
-  } else if (context === 'archive') {
-    layoutKey = 'archive';
-  } else if (context === '404') {
-    layoutKey = '404';
   }
 
-  const themeLayouts = THEME_LAYOUTS[themeName] || THEME_LAYOUTS.default;
-  const Layout = themeLayouts[layoutKey] || themeLayouts.post || DefaultPostLayout;
+  let safeData = maskSensitiveData(data);
+
+  const themeLayouts = THEME_REGISTRY[themeName] || THEME_REGISTRY.default;
+  const Layout = themeLayouts[layoutKey] || themeLayouts.post || (DefaultLayouts as any).post;
 
   const themeData = await ThemeDataService.listAll(themeName);
   const cssVariables = themeData
