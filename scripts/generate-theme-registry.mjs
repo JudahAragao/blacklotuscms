@@ -112,7 +112,12 @@ const scopedStyles = themes
   .join('');
 
 const fallbackStyles = themes
-  .map((t) => `\n.blacklotuscms-theme[data-bl-theme="${t.id}"] {\n${t.css}\n}\n`)
+  .map((t) => {
+    // Replace .blacklotuscms-theme with the scoped selector so CSS variables
+    // are applied directly to the wrapper element, not as descendants.
+    const scoped = t.css.replace(/\.blacklotuscms-theme\b/g, `.blacklotuscms-theme[data-bl-theme="${t.id}"]`);
+    return `\n${scoped}\n`;
+  })
   .join('');
 
 const styles = [
