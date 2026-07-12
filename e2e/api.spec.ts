@@ -1,16 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Theme API', () => {
-  test('GET /api/themes/default/style serves CSS', async ({ request }) => {
-    const response = await request.get('/api/themes/default/style');
-    // May return 200 with CSS or 404 if no active theme
-    expect([200, 404]).toContain(response.status());
-    if (response.status() === 200) {
-      const contentType = response.headers()['content-type'] || '';
-      expect(contentType).toContain('text/css');
-    }
-  });
-
+test.describe('Theme Assets', () => {
   test('GET /api/themes/default/assets/* serves static files', async ({ request }) => {
     const response = await request.get('/api/themes/default/assets/favicon.ico');
     expect([200, 404]).toContain(response.status());

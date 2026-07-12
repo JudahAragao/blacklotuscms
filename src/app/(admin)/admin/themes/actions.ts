@@ -44,11 +44,3 @@ export async function setActiveThemeAction(themeName: string) {
     return handleApiError(error);
   }
 }
-
-export async function deleteThemeAction(themeName: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) throw new Error('Unauthorized');
-  await themeService.deleteTheme(themeName, session.user);
-  revalidatePath("/admin/themes");
-  return { success: true };
-}

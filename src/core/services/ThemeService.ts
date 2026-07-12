@@ -83,48 +83,11 @@ export class ThemeService {
     }
   }
 
-  /**
-   * Deletes a theme from the filesystem.
-   * Cannot delete the active theme - must deactivate first.
-   */
-  async deleteTheme(themeName: string, user: any) {
-    if (!canPerformAction(user, 'theme.manage')) {
-      throw new BlackLotusCMSError('No permission to delete themes', 403, 'AUTH_FORBIDDEN');
-    }
-
-    // Prevent deleting the active theme
-    const activeTheme = await this.getActiveTheme();
-    if (themeName === activeTheme) {
-      throw new BlackLotusCMSError('Cannot delete the active theme. Deactivate it first.', 400, 'VALIDATION_ERROR');
-    }
-
-    // Prevent deleting the default theme
-    if (themeName === 'default') {
-      throw new BlackLotusCMSError('Cannot delete the default theme', 400, 'VALIDATION_ERROR');
-    }
-
-    const themesPath = path.join(process.cwd(), 'themes');
-    const themePath = path.join(themesPath, themeName);
-
-    // Check if theme exists
-    try {
-      await fs.access(themePath);
-    } catch {
-      throw new BlackLotusCMSError('Theme not found', 404, 'RESOURCE_NOT_FOUND');
-    }
-
-    // Delete the theme directory
-    await fs.rm(themePath, { recursive: true, force: true });
-
-    return { success: true, themeName };
-  }
-
   // --- Static Proxy ---
   static async getActiveTheme() { return themeService.getActiveTheme(); }
   static async setActiveTheme(themeName: string, user: any) { return themeService.setActiveTheme(themeName, user); }
   static async listThemes() { return themeService.listThemes(); }
   static async getThemeManifest(themeName: string) { return themeService.getThemeManifest(themeName); }
-  static async deleteTheme(themeName: string, user: any) { return themeService.deleteTheme(themeName, user); }
 }
 
 export const themeService = new ThemeService();

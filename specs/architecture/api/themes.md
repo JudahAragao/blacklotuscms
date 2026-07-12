@@ -1,12 +1,20 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-06"
+spec_version: "1.3"
+last_updated: "2026-07-12"
 author: "BlackLotusCMS Team"
 status: approved
 module: "themes"
 ---
 
 # API - Themes
+
+## Overview
+
+Themes are source-controlled folders compiled into the application build at
+build time. There is no runtime upload, ZIP install, or hot-editing endpoint.
+All theme CSS is bundled via `@scope` (with a `@supports` fallback) in the
+generated `theme-styles.css`. Layouts are imported statically through the
+generated `theme-registry.ts`.
 
 ## Endpoints
 
@@ -16,36 +24,55 @@ module: "themes"
 - **Auth:** Public
 - **RBAC:** N/A
 
-### EP-02: Serve Theme CSS
-- **Method:** `GET`
-- **Path:** `/api/themes/:name/style`
-- **Auth:** Public
-- **RBAC:** N/A
+Serves static files (images, fonts, favicon) from `themes/:name/assets/`.
 
-**Response:** CSS content-type text/css
-
-### EP-03: Theme Editor Save
-- **Method:** `POST`
-- **Path:** `/api/admin/themes/editor`
-- **Auth:** Required
-- **RBAC:** `theme.edit`
-
-### EP-04: List Themes
-- **Method:** Via admin panel
+### EP-02: List Themes
+- **Method:** Via admin panel (`/admin/themes`)
 - **Auth:** Required
 - **RBAC:** `theme.manage`
 
-### EP-05: Activate Theme
-- **Method:** Via admin panel
+### EP-03: Activate Theme
+- **Method:** Via admin panel (`/admin/themes`)
 - **Auth:** Required
 - **RBAC:** `theme.manage`
 
-### EP-06: Install Theme (ZIP Upload)
-- **Method:** Via admin panel
+### EP-04: Theme Permissions Management
+- **Method:** Via admin panel (`/admin/themes`)
 - **Auth:** Required
 - **RBAC:** `theme.manage`
 
-### EP-07: Theme Permissions Management
-- **Method:** Via admin panel
-- **Auth:** Required
-- **RBAC:** `theme.manage`
+## Removed Endpoints
+
+The following endpoints existed in spec v1.2 but have been removed because
+theme CSS is now bundled at build time and themes are no longer editable
+at runtime:
+
+- ~~`GET /api/themes/:name/style`~~ — CSS is bundled in `theme-styles.css`
+- ~~`POST /api/admin/themes/editor`~~ — Theme files are source-controlled
+- ~~ZIP Upload / Theme Install~~ — Themes are added by placing a folder in `themes/`
+
+## Theme Contract
+
+Themes must declare `"themeApiVersion": 1` in their `theme.json` manifest.
+The build script validates this field and rejects themes with unsupported
+versions.
+
+### Official Semantic Tokens
+
+Themes may override these CSS custom properties within their scoped CSS:
+
+```
+--color-background, --color-foreground
+--color-primary, --color-primary-foreground
+--color-secondary, --color-secondary-foreground
+--color-muted, --color-muted-foreground
+--color-card, --color-card-foreground
+--color-accent, --color-accent-foreground
+--color-border, --color-input, --color-ring
+--color-destructive, --color-destructive-foreground
+--font-sans, --font-display, --font-mono
+--radius-sm, --radius-md, --radius-lg, --radius-xl
+```
+
+Themes may also define custom variables (e.g. `--vj-gold`) and use Tailwind
+arbitrary values (`bg-[var(--vj-gold)]`).

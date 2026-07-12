@@ -4,17 +4,13 @@ import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { sanitizePath, maskSensitiveData } from '@/lib/security-utils';
 import { themeStorage } from '@/lib/theme-context';
 
-import * as DefaultLayouts from '../../themes/default/layouts';
+import { themeRegistry } from '@/generated/theme-registry';
 
 interface ThemeRendererProps {
   context: 'single' | 'search' | 'archive' | '404' | string;
   data: any;
   previewTheme?: string;
 }
-
-const THEME_REGISTRY: Record<string, Record<string, React.ComponentType<any>>> = {
-  default: DefaultLayouts as any,
-};
 
 const LAYOUT_MAP: Record<string, string> = {
   single: 'post',
@@ -26,7 +22,10 @@ const LAYOUT_MAP: Record<string, string> = {
 
 export default async function ThemeRenderer({ context, data, previewTheme }: ThemeRendererProps) {
   const rawThemeName = previewTheme || await ThemeService.getActiveTheme();
-  const themeName = sanitizePath(rawThemeName);
+  const requestedThemeName = sanitizePath(rawThemeName);
+  // A database setting can outlive a removed source folder. Render a complete
+  // default theme instead of an unstyled default layout under an unknown id.
+  const themeName = themeRegistry[requestedThemeName] ? requestedThemeName : 'default';
 
   let layoutKey = LAYOUT_MAP[context] || sanitizePath(context);
 
@@ -36,23 +35,18 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
 
   let safeData = maskSensitiveData(data);
 
-  const themeLayouts = THEME_REGISTRY[themeName] || THEME_REGISTRY.default;
-  const Layout = themeLayouts[layoutKey] || themeLayouts.post || (DefaultLayouts as any).post;
+  const themeLayouts = themeRegistry[themeName] || themeRegistry.default;
+  const Layout = themeLayouts[layoutKey] || themeLayouts.post || themeRegistry.default.post;
 
   const themeData = await ThemeDataService.listAll(themeName);
-  const cssVariables = themeData
-    .map(item => `--${item.key}: ${item.value};`)
-    .join('\n');
+  const themeSettings = Object.fromEntries(
+    themeData
+      .filter((item) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.key) && ['string', 'number'].includes(typeof item.value))
+      .map((item) => [`--theme-setting-${item.key}`, String(item.value)])
+  ) as React.CSSProperties;
 
   return (
-    <div className="blacklotuscms-theme min-h-screen">
-      <style dangerouslySetInnerHTML={{ __html: `
-        @import url('/api/themes/${themeName}/style');
-        
-        .blacklotuscms-theme {
-          ${cssVariables}
-        }
-      `}} />
+    <div data-bl-theme={themeName} className="blacklotuscms-theme min-h-screen" style={themeSettings}>
       
       {themeStorage.run({ themeName, currentPost: safeData }, () => (
         <Layout data={safeData} context={context} />

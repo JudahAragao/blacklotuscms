@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../generated/theme-styles.css";
 
 @source "../../themes";
 @source "../components";
@@ -7,6 +8,7 @@
 @theme {
   /* Colors - Aura Noir Palette (System Defaults) */
   --color-background: #121317;
+  --color-foreground: #e3e2e7;
   --color-on-background: #e3e2e7;
 
   --color-surface: #121317;
@@ -21,11 +23,22 @@
   --color-on-surface-variant: #d0c5af;
 
   --color-primary: #f2ca50;
+  --color-primary-foreground: #3c2f00;
   --color-on-primary: #3c2f00;
   --color-primary-container: #d4af37;
   --color-on-primary-container: #554300;
 
   --color-secondary: #c8c6c5;
+  --color-secondary-foreground: #313030;
+  --color-muted: #1e1f23;
+  --color-muted-foreground: #d0c5af;
+  --color-card: #1e1f23;
+  --color-card-foreground: #e3e2e7;
+  --color-border: #4d4635;
+  --color-input: #4d4635;
+  --color-ring: #f2ca50;
+  --color-accent: #4B5A3A;
+  --color-accent-foreground: #E8E4DD;
   --color-on-secondary: #313030;
   --color-secondary-container: #474746;
   --color-on-secondary-container: #b7b5b4;
@@ -60,6 +73,8 @@
 
   /* Typography */
   --font-sans: var(--font-roboto), system-ui, sans-serif;
+  --font-display: var(--font-roboto), system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Radius */
   --radius-sm: 0.375rem;

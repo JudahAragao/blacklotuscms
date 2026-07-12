@@ -1,6 +1,7 @@
 {
   "name": "Lotus Default",
   "version": "1.0.0",
+  "themeApiVersion": 1,
   "author": "BlackLotusCMS Core",
   "description": "The official master theme for BlackLotusCMS. Minimalist, fast, and elegant.",
   "favicon": "assets/favicon.ico",

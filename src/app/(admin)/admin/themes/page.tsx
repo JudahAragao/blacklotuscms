@@ -1,9 +1,8 @@
 import React from 'react';
 import { ThemeService } from '@/core/services/ThemeService';
 import { ThemeDataService } from '@/core/services/ThemeDataService';
-import { approveThemePermissionAction, denyThemePermissionAction, setActiveThemeAction, deleteThemeAction } from './actions';
-import { Palette, Shield, Check, X, Layout, Code, History, Trash2 } from 'lucide-react';
-import Link from 'next/link';
+import { approveThemePermissionAction, denyThemePermissionAction, setActiveThemeAction } from './actions';
+import { Palette, Shield, Check, X, Layout, History } from 'lucide-react';
 
 export default async function ThemesPage() {
   const themes = await ThemeService.listThemes();
@@ -26,22 +25,12 @@ export default async function ThemesPage() {
     await setActiveThemeAction(themeName);
   }
 
-  async function deleteThemeForm(themeName: string) {
-    'use server';
-    await deleteThemeAction(themeName);
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-semibold text-text-heading">Aparencia</h1>
           <p className="text-sm text-text-muted mt-1">Gerenciar temas do site</p>
-        </div>
-        <div className="flex gap-3">
-          <Link href="/admin/themes/editor" className="btn-action-secondary flex items-center gap-2">
-            <Code size={16} /> Lotus Studio
-          </Link>
         </div>
       </div>
 
@@ -140,27 +129,6 @@ export default async function ThemesPage() {
                     <form action={setActiveThemeForm.bind(null, theme.name)} className="flex-1">
                       <button className="w-full btn-action flex items-center justify-center gap-2">
                         <Layout size={16} /> Ativar
-                      </button>
-                    </form>
-                  )}
-                  <Link
-                    href={`/admin/themes/editor?theme=${theme.name}`}
-                    className={`flex items-center justify-center gap-2 py-2 px-4 border rounded transition-all text-sm ${
-                      isActive
-                        ? 'flex-1 border-border-default text-text-body hover:bg-surface-muted'
-                        : 'border-border-default text-text-muted hover:border-action hover:text-action'
-                    }`}
-                  >
-                    <Code size={16} /> {isActive ? 'Customizar' : ''}
-                  </Link>
-                  {!isActive && theme.name !== 'default' && (
-                    <form action={deleteThemeForm.bind(null, theme.name)}>
-                      <button
-                        type="submit"
-                        className="flex items-center justify-center gap-2 py-2 px-3 border border-border-default rounded text-sm text-text-muted hover:border-status-trash hover:text-status-trash hover:bg-status-trash/5 transition-all"
-                        title="Excluir tema"
-                      >
-                        <Trash2 size={16} />
                       </button>
                     </form>
                   )}

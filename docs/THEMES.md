@@ -1,353 +1,91 @@
-# Theme Development Guide
+# Desenvolvimento de temas
 
-## Overview
-BlackLotusCMS themes are React Server Components com CSS scoping, dynamic imports, and permission-gated data access.
+Temas são parte do código-fonte e entram na build única do BlackLotusCMS. Não há upload de ZIP, instalação pelo painel ou compilação de layouts em runtime.
 
-## Theme Structure
+## Fluxo
+
+1. Crie ou copie uma pasta em `themes/meu-tema/`.
+2. Inclua `theme.json`, `theme.ts`, `style.css`, layouts e assets.
+3. Execute `npm run dev` ou `npm run build`.
+4. Ative no painel um dos temas incluídos na build.
+
+Os hooks `predev`, `prebuild` e `pretest` executam `themes:generate`. Ele valida as pastas e gera o registry estático e o CSS isolado em `src/generated/`; esses arquivos não devem ser editados manualmente.
+
+## Estrutura
+
+```text
+themes/meu-tema/
+├── theme.json
+├── theme.ts
+├── style.css
+├── assets/
+├── components/
+└── layouts/
+    ├── index.ts
+    ├── page.tsx
+    ├── post.tsx
+    ├── archive.tsx
+    ├── search.tsx
+    └── 404.tsx
 ```
-themes/
-└── my-theme/
-    ├── theme.json          # Manifest (required)
-    ├── style.css           # Global styles
-    ├── assets/
-    │   └── favicon.ico
-    ├── layouts/
-    │   ├── page.tsx        # Static pages
-    │   ├── post.tsx        # Single post
-    │   ├── archive.tsx     # Post listings
-    │   ├── category.tsx    # Category/taxonomy listings
-    │   ├── search.tsx      # Busca results
-    │   └── 404.tsx         # Not found
-    └── components/
-        ├── Header.tsx
-        ├── Footer.tsx
-        ├── Comments.tsx
-        ├── CommentForm.tsx
-        └── HeaderSearch.tsx
-```
 
-## theme.json Manifest
+`theme.ts` exporta os layouts do tema. Os nomes reconhecidos são `page`, `post`, `archive`, `search`, `category`, `blog` e `notFound`. O nome da pasta é o ID: use apenas minúsculas, números e hífens. O tema `default` é obrigatório.
+
+## Manifesto
+
 ```json
 {
-  "name": "My Theme",
+  "name": "Meu tema",
   "version": "1.0.0",
-  "author": "Developer Name",
-  "description": "Theme description",
-  "favicon": "assets/favicon.ico",
-  "screenshot": "https://example.com/screenshot.png"
+  "themeApiVersion": 1,
+  "author": "Nome",
+  "description": "Descrição",
+  "favicon": "assets/favicon.ico"
 }
 ```
 
-## Layout Components
+`themeApiVersion` indica a versão do contrato de temas. Atualmente apenas `1` é suportado.
 
-### Props
-All layouts receive:
-```typescript
-interface LayoutProps {
-  data: ThemePostDTO;
-  context: string;  // 'single' | 'archive' | 'search' | '404' | 'category'
-}
+## CSS puro, isolamento e assets
+
+Todo `style.css` entra na build e é isolado no root ativo:
+
+```html
+<div data-bl-theme="meu-tema" class="blacklotuscms-theme">…</div>
 ```
 
-### Single Post (post.tsx)
+CSS puro é suportado. `:root` é convertido para o root do tema; não use `html` ou `body`. Animações recebem o namespace `bl-<id-do-tema>-`; referências inline no JSX usam esse nome gerado. Prefira classes e variáveis próprias, por exemplo `--meu-accent` e `.meu-hero`. Para assets, use `/api/themes/meu-tema/assets/...`.
+
+## Tailwind CSS v4
+
+Tailwind é compilado uma vez para todos os temas. Use os tokens semânticos oficiais:
+
+```text
+background, foreground, primary, primary-foreground,
+secondary, secondary-foreground, muted, muted-foreground,
+card, card-foreground, accent, accent-foreground,
+border, input, ring,
+destructive, destructive-foreground
+```
+
 ```tsx
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Comments from '../components/Comments';
-import ThemeContent from '@/components/ThemeContent';
-
-export default async function PostLayout({ data, context }: LayoutProps) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 py-20">
-        <article className="max-w-3xl mx-auto">
-          {/* Post Type Badge */}
-          <div className="mb-8">
-            <span className="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full uppercase">
-              {data.postType?.label || 'Post'}
-            </span>
-            <span className="ml-3 text-sm text-gray-400">
-              {new Date(data.publishedAt).toLocaleDateString()}
-            </span>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-5xl font-bold mb-8">{data.title}</h1>
-
-          {/* Content */}
-          <div className="prose prose-lg max-w-none">
-            <ThemeContent content={data.content} />
-          </div>
-
-          {/* SEO Meta */}
-          {data.seo?.description && (
-            <p className="mt-8 text-gray-500 italic">{data.seo.description}</p>
-          )}
-
-          {/* Terms/Tags */}
-          {data.terms?.length > 0 && (
-            <div className="mt-12 flex flex-wrap gap-2">
-              {data.terms.map((pt: any) => (
-                <a
-                  key={pt.term.id}
-                  href={`/archive/${pt.term.slug}`}
-                  className="bg-gray-100 text-gray-600 hover:bg-primary hover:text-white px-3 py-1 rounded-full text-sm"
-                >
-                  #{pt.term.name}
-                </a>
-              ))}
-            </div>
-          )}
-
-          {/* Comments */}
-          <Comments postId={data.id} />
-        </article>
-      </main>
-
-      <Footer />
-    </div>
-  );
-}
+<section className="bg-card text-foreground border border-border">
+  <h1 className="font-display text-primary">Título</h1>
+</section>
 ```
 
-### Archive (archive.tsx)
-```tsx
-export default async function ArchiveLayout({ data }: LayoutProps) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 py-20">
-        <header className="mb-12 text-center">
-          <h1 className="text-4xl font-bold">
-            {data.term?.name || 'All Posts'}
-          </h1>
-        </header>
+O `style.css` do tema sobrescreve os valores em `.blacklotuscms-theme`. Para valores exclusivos use CSS normal ou utilities arbitrárias, como `bg-[var(--meu-surface)]`. Não crie nomes Tailwind novos somente no `style.css`: eles não existem para o compilador.
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {data.results?.map((post: any) => (
-            <article key={post.id} className="bg-white border rounded-lg p-6 hover:shadow-lg">
-              <h2 className="text-xl font-bold mb-2">
-                <a href={`/${post.slug}`} className="hover:text-primary">
-                  {post.title}
-                </a>
-              </h2>
-              <p className="text-gray-500 text-sm">
-                {post.content?.substring(0, 100)}...
-              </p>
-            </article>
-          ))}
-        </div>
-      </main>
+## Configurações visuais
 
-      <Footer />
-    </div>
-  );
-}
-```
+Settings fornecidos por integrações são expostos como `--theme-setting-<chave>` (chave em kebab-case; valor string ou número). Eles nunca substituem diretamente tokens internos. O tema pode consumi-los explicitamente:
 
-### Category (category.tsx)
-```tsx
-export default async function CategoryLayout({ data }: LayoutProps) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 py-20">
-        <h1 className="text-4xl font-bold text-center mb-12">
-          Browse {data.taxonomy?.label || 'Categories'}
-        </h1>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          {data.terms?.map((term: any) => (
-            <a
-              key={term.id}
-              href={`/archive/${term.slug}`}
-              className="bg-white border rounded-lg p-6 text-center hover:border-primary hover:shadow"
-            >
-              <h3 className="font-bold">{term.name}</h3>
-            </a>
-          ))}
-        </div>
-      </main>
-
-      <Footer />
-    </div>
-  );
-}
-```
-
-## Lotus SDK
-
-Import from `@/lib/lotus-sdk`:
-
-```typescript
-import { getPost, getField, getPostsByType, getThemeSetting, getSiteSetting } from '@/lib/lotus-sdk';
-```
-
-### Available Functions
-
-#### getPost()
-Returns the current post from context.
-```tsx
-const post = getPost();
-console.log(post?.title);
-```
-
-#### getField(fieldName, postId?)
-Gets a custom field value. Uses current post if postId not provided.
-```tsx
-const phone = await getField('phone', postId);
-```
-
-#### getPostsByType(slug, limit?)
-Lists posts of a specific type.
-```tsx
-const posts = await getPostsByType('blog', 10);
-```
-
-#### getThemeSetting(key)
-Gets a theme-specific setting.
-```tsx
-const color = await getThemeSetting('primary_color');
-```
-
-#### getSiteSetting(key)
-Gets global CMS settings (supports nested keys).
-```tsx
-const siteName = await getSiteSetting('seo.site_name');
-```
-
-## CSS Variables
-Theme settings are injected as CSS variables:
 ```css
 .blacklotuscms-theme {
-  --primary-color: #8b5cf6;
-  --font-heading: 'Inter', sans-serif;
-  --spacing-section: 4rem;
+  --color-primary: var(--theme-setting-primary-color, #b08a3c);
 }
 ```
 
-## Permissions
-Themes must request permission to access sistema data:
-- `db.read.post` - Read posts
-- `db.read.media` - Read media library
-- `sistema.auth.read` - Acesso user auth
+A build falha para manifesto/ID inválido, `themeApiVersion` incompatível, ausência de `default`, uso de `html` ou `body`, e referências a variáveis CSS não declaradas. Essas falhas devem bloquear o deploy.
 
-Permissions are managed via Admin > Themes > Permissions.
-
-## Custom Field Types
-
-The CMS supports the following custom field types via Admin > Settings > Post Types > Fields:
-
-| Type | Description | Validation |
-|------|-------------|------------|
-| `text` | Single-line text input | min/max characters, regex pattern |
-| `textarea` | Multi-line text area | min/max characters, regex pattern |
-| `number` | Numeric input | min/max value |
-| `email` | Email input with format validation | Email format (auto-validated) |
-| `select` | Dropdown with custom options | Options defined in config |
-| `image` | Image upload (returns URL) | - |
-| `gallery` | Multiple image upload | - |
-| `file` | File upload (returns URL) | - |
-| `boolean` | True/false checkbox | - |
-| `wysiwyg` | Rich text editor (HTML content) | - |
-| `json` | JSON data input | - |
-| `repeater` | Repeatable group of sub-fields | minItems/maxItems |
-
-### Accessing Custom Fields in Themes
-
-```tsx
-import { getField } from '@/lib/lotus-sdk';
-
-// Get a single field value
-const phone = await getField('phone');
-
-// Get field from specific post
-const subtitle = await getField('subtitle', postId);
-```
-
-### Field Config Options
-
-Each field supports these configuration options:
-- `required` - Field must have a value
-- `width` - Layout width (1-100%)
-- `instructions` - Helper text for editors
-- `validation` - Type-specific validation rules
-- `conditionalLogic` - Show/hide field based on other field values
-
-## Instalacao
-
-### Via ZIP Upload (Recomendado)
-1. Acesse Admin > Themes
-2. Clique em "Adicionar Tema"
-3. Selecione um arquivo `.zip` contendo o tema
-4. O tema sera extraido automaticamente para `themes/<nome-do-tema>/`
-5. Tema sera compilado automaticamente (TSX → JS)
-6. Ative o tema via Admin > Themes
-
-### Via Upload do Tema
-1. Crie uma pasta em `themes/my-theme/` no servidor
-2. Adicione o manifesto `theme.json`
-3. Crie os layouts (no minimo `post.tsx`)
-4. Adicione os componentes (Header, Footer)
-5. Ative o tema via Admin > Themes
-
-### Requisitos do ZIP
-- O arquivo deve ser um `.zip` valido
-- Deve conter um `theme.json` na raiz ou em subpasta
-- O nome da pasta do tema e derivado do nome do arquivo (sanitize: lowercase, espacos → hifens)
-
-## Runtime Theme Loading
-
-O BlackLotusCMS usa um **custom server** (`server.ts`) para carregar temas em runtime. Isso permite que `require()` funcione nativamente para importar módulos de temas compilados, sem interferência do Turbopack.
-
-### Arquitetura
-```
-Upload ZIP → Extrair → Compilar (.tsx → .js) → Salvar em compiled/
-                                                         ↓
-Runtime: Custom Server → require(compiled/layouts/post.js) → Renderizar
-```
-
-### Custom Server (`server.ts`)
-- Executa Next.js como HTTP server customizado
-- Expõe `require()` global via `globalThis.__themeRequire`
-- Permite carregar módulos de temas dinamicamente
-- Roda via `node custom-server.js` (não `next start`)
-
-### Compilacao de Temos
-Quando um tema é uploaded, o `ThemeCompiler` compila os arquivos `.tsx` para `.js` em um subdiretório `compiled/`:
-```
-themes/meu-tema/
-├── layouts/          ← fonte .tsx original
-├── components/       ← fonte .tsx original
-├── compiled/         ← .js compilados (carregados em runtime)
-│   ├── layouts/
-│   └── components/
-└── theme.json
-```
-
-## ThemeContent Component
-
-O componente `ThemeContent` (`src/components/ThemeContent.tsx`) é responsável por renderizar o conteúdo HTML de um post com sanitização automática via DOMPurify. Deve ser usado em todos os layouts que exibem `data.content`:
-
-```tsx
-import ThemeContent from '@/components/ThemeContent';
-
-<div className="prose prose-lg max-w-none">
-  <ThemeContent content={data.content} />
-</div>
-```
-
-- Sanitiza HTML contra XSS (DOMPurify)
-- Suporta shortcodes via `ShortcodeService`
-- Usado no `post.tsx` e em qualquer layout que renderize conteúdo rich text
-
-## Security
-- Theme names sanitized com `sanitizePath()`
-- Data masked (no passwords, tokens exposed)
-- CSS scoped via `.blacklotuscms-theme` class
-- HTML sanitized com DOMPurify via `ThemeContent`
-- Dynamic imports use try/catch fallback
+O painel não edita arquivos de tema: layouts, manifestos e CSS são alterados no repositório e entram na próxima build.

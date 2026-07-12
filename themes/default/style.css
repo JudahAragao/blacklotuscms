@@ -15,7 +15,7 @@
 
 /* Tipografia e Base */
 .blacklotuscms-theme {
-  font-family: var(--font-roboto), system-ui, sans-serif;
+  font-family: var(--font-sans);
   color: var(--theme-text-main);
   background-color: var(--theme-bg-body);
 }
