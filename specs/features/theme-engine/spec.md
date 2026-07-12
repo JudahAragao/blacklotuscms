@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-06"
+spec_version: "1.3"
+last_updated: "2026-07-12"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "theme-engine"
@@ -9,31 +9,43 @@ feature: "theme-engine"
 # Theme Engine Specification
 
 ## Description
-Motor de themes baseado em React Server Components com CSS scoping, dynamic imports, variaveis CSS e sistema de permissions para acesso a data.
+Motor de themes baseado em React Server Components com CSS scoping via build-time bundling, static imports gerados, variáveis CSS e sistema de permissions para acesso a data.
 
 ## Requirements
-- **REQ-01:** Dynamic import de layouts baseado no contexto (single, archive, search, 404)
-- **REQ-02:** CSS Variables customizaveis via ThemeData
-- **REQ-03:** CSS scoping via div.blacklotuscms-theme
-- **REQ-04:** ThemeDataService com validacao de permissions
+- **REQ-01:** Static import de layouts via `theme-registry.ts` gerado pelo `themes:generate`
+- **REQ-02:** CSS Variables customizáveis via `style.css` do tema
+- **REQ-03:** CSS scoping via selector replacement (`.blacklotuscms-theme` → `.blacklotuscms-theme[data-bl-theme="id"]`) + `@scope` nativo para Chrome 118+
+- **REQ-04:** ThemeDataService com validação de permissions
 - **REQ-05:** AsyncLocalStorage para contexto do theme por request
-- **REQ-06:** Sanitization de data antes de passar ao theme
+- **REQ-06:** Sanitização de data antes de passar ao theme
 - **REQ-07:** Theme permission requests (pending/approved/denied)
-- **REQ-08:** theme.json como manifest do theme
-- **REQ-09:** Theme upload via ZIP (extract + validate + install)
-- **REQ-10:** Temas instalados persistidos em volume compartilhado (`/opt/apps/shared/themes`)
+- **REQ-08:** `theme.json` como manifest do theme com `themeApiVersion: 1`
+- **REQ-09:** Namespace automático de `@keyframes` com prefixo `bl-<id>-`
+- **REQ-10:** Validação de tokens CSS declarados vs. usados no build
 
 ## User Roles
-- **Administrador:** Gerenciar themes, activate, install, approve permissions
-- **Temos:** Acessam data via ThemeDataService com permissions validadas
+- **Administrador:** Gerenciar themes (ativar/desativar via painel)
+- **Temas:** Acessam data via ThemeDataService com permissions validadas
 
 ## Constraints
-- **C01:** Themes so acessam data com permissao aprovada
-- **C02:** Nome do theme e sanitizado com sanitizePath
-- **C03:** Dados passados ao theme sao mascarados (maskSensitiveData)
+- **C01:** Themes só acessam data com permissão aprovada
+- **C02:** Nome do theme é sanitizado com `sanitizePath`
+- **C03:** Dados passados ao theme são mascarados (`maskSensitiveData`)
 - **C04:** Fallback para layout "post" se import falhar
+- **C05:** Temas são source-controlled — não há upload, instalação ou edição runtime
+- **C06:** `:root` é convertido para `:scope` no CSS; uso de `html`/`body` é proibido
+- **C07:** `predev`, `prebuild` e `pretest` executam `themes:generate` automaticamente
+
+## Build Pipeline
+
+1. Script `scripts/generate-theme-registry.mjs` descobre pastas em `themes/`
+2. Para cada tema, lê `theme.json`, `theme.ts` e `style.css`
+3. Valida manifesto, `themeApiVersion`, variáveis CSS declaradas vs. usadas
+4. Namespace `@keyframes` com prefixo `bl-<id>-`
+5. Gera `src/generated/theme-registry.ts` (imports estáticos dos layouts)
+6. Gera `src/generated/theme-styles.css` (CSS isolado com selector replacement + `@scope`)
 
 ## Dependencies
 - **Depends on:** Post Management, ThemeDataService
-- **Blocks:** NONE (feature publica principal)
+- **Blocks:** NONE (feature pública principal)
 - **Related to:** Plugins, Security

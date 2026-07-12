@@ -12,9 +12,9 @@ module: "themes"
 
 Themes are source-controlled folders compiled into the application build at
 build time. There is no runtime upload, ZIP install, or hot-editing endpoint.
-All theme CSS is bundled via `@scope` (with a `@supports` fallback) in the
-generated `theme-styles.css`. Layouts are imported statically through the
-generated `theme-registry.ts`.
+All theme CSS is bundled via selector replacement (`.blacklotuscms-theme[data-bl-theme="id"]`)
+with `@scope` for Chrome 118+ isolation in the generated `theme-styles.css`.
+Layouts are imported statically through the generated `theme-registry.ts`.
 
 ## Endpoints
 

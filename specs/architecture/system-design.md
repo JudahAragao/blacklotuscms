@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-06"
+spec_version: "1.3"
+last_updated: "2026-07-12"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -9,7 +9,7 @@ status: approved
 
 ## Architecture Overview
 
-BlackLotusCMS é um CMS headless construído sobre Next.js 16 (App Router) com Prisma ORM e Pothos GraphQL. A arquitetura segue o padrão "Zero .env" onde toda configuration é carregada de `.secrets.json`. O sistema é fully containerized com Docker multi-stage build.
+BlackLotusCMS é um CMS headless construído sobre Next.js 16 (App Router) com Prisma ORM e Pothos GraphQL. A arquitetura segue o padrão "Zero .env" onde toda configuração é carregada de `.secrets.json`. O sistema é fully containerized com Docker multi-stage build.
 
 ## Tech Stack
 
@@ -18,7 +18,7 @@ BlackLotusCMS é um CMS headless construído sobre Next.js 16 (App Router) com P
 - **GraphQL:** Apollo Server 5 + Pothos (type-safe schema builder com Prisma plugin)
 - **Auth:** NextAuth v4 (JWT strategy, CredentialsProvider, PrismaAdapter)
 - **Validation:** Zod v4 (schemas em src/schemas/)
-- **Styling:** Tailwind CSS v4
+- **Styling:** Tailwind CSS v4 (compilado uma vez para todos os temas)
 - **Rich Text:** TipTap (editor component)
 - **Images:** Sharp (WebP conversion, thumbnails)
 - **Storage:** Local filesystem ou AWS S3/Cloudflare R2
@@ -45,6 +45,28 @@ Inspirado no WordPress, o HookService fornece pontos de extensibilidade:
 4. **Audit Log**: Todas as chamadas de hook são registradas com source, type e timestamp
 5. **Auto-sanitization**: Filtros que processam conteúdo (title, body, etc.) são automaticamente sanitizados com DOMPurify
 
+## Theme Engine (Build-Time)
+
+O sistema de temas é 100% build-time. Não há upload, instalação ou edição em runtime.
+
+### Geração Estática
+1. Script `scripts/generate-theme-registry.mjs` descobre pastas em `themes/`
+2. Para cada tema, lê `theme.json`, `theme.ts` e `style.css`
+3. Valida manifesto, `themeApiVersion`, variáveis CSS declaradas vs. usadas
+4. Namespace `@keyframes` com prefixo `bl-<id>-`
+5. Gera `src/generated/theme-registry.ts` (imports estáticos dos layouts)
+6. Gera `src/generated/theme-styles.css` (CSS isolado)
+
+### Isolamento CSS
+- **Camada 1 (fallback):** Selector replacement — `.blacklotuscms-theme` → `.blacklotuscms-theme[data-bl-theme="id"]`
+- **Camada 2 (Chrome 118+):** `@scope ([data-bl-theme="id"])` para shadow-dom-like isolation
+- CSS variables são aplicadas diretamente ao wrapper element (sem CSS nesting)
+
+### Hooks Automáticos
+- `predev` → `themes:generate` antes de `npm run dev`
+- `prebuild` → `themes:generate` antes de `npm run build`
+- `pretest` → `themes:generate` antes de `npm run test`
+
 ## Component Diagram
 
 1. **Proxy Layer (src/proxy.ts):** Intercepta todas as requisições, valida instalação, autenticação, API keys e rate limiting
@@ -53,7 +75,7 @@ Inspirado no WordPress, o HookService fornece pontos de extensibilidade:
 4. **GraphQL (src/app/api/graphql/):** Apollo Server com Pothos schema
 5. **REST API (src/app/api/v1/):** Endpoints REST com withApiAuth middleware
 6. **Plugin Sandbox (src/core/sandbox/):** isolated-vm com Bridge API
-7. **Theme Renderer (src/components/ThemeRenderer.tsx):** Dynamic import de layouts com CSS variables
+7. **Theme Renderer (src/components/ThemeRenderer.tsx):** Import estático de layouts via registry gerado + CSS isolado
 
 ## Data Flow
 

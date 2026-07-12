@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-06"
+spec_version: "1.3"
+last_updated: "2026-07-12"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "theme-engine"
@@ -8,18 +8,39 @@ feature: "theme-engine"
 
 # Theme Engine Error States
 
-## ERR-01: Theme Nao Found
-- **Condition:** Diretorio do theme nao existe
-- **Código HTTP:** N/A (fallback para layout "post")
-- **Ação do sistema:** import fallthrough para fallback
+## ERR-01: Theme Not Found in Registry
+- **Condition:** Theme name exists in database but not in generated `themeRegistry`
+- **Código HTTP:** N/A (renderização continua)
+- **Ação do sistema:** Fallback para theme `default` — `themeRegistry.default`
+- **Nota:** Pode ocorrer se um tema foi removido do código mas ainda está ativo no banco
 
 ## ERR-02: Theme Permission Denied
-- **Condition:** Theme sem permissao aprovada
+- **Condition:** Theme sem permissão aprovada para capability solicitada
 - **Código HTTP:** 403
 - **Mensagem:** "Theme '[name]' does not have approved permission for '[capability]'"
 - **Código:** AUTH_FORBIDDEN
 
-## ERR-03: Layout Nao Found
-- **Condition:** File de layout nao existe no theme
-- **Código HTTP:** N/A (fallback automatico)
-- **Ação do sistema:** import catch para layouts/post
+## ERR-03: Layout Not Found
+- **Condition:** Layout key não existe no exports do tema
+- **Código HTTP:** N/A (fallback automático)
+- **Ação do sistema:** Tenta `themeRegistry[theme].post`, depois `themeRegistry.default.post`
+
+## ERR-04: Invalid Theme Manifest
+- **Condition:** `theme.json` ausente, sem `name`/`version`, ou `themeApiVersion` incompatível
+- **Código HTTP:** N/A (bloqueia build)
+- **Ação do sistema:** `themes:generate` lança erro e build falha
+
+## ERR-05: Undeclared CSS Variables
+- **Condition:** `style.css` usa `var(--xxx)` mas não declara `--xxx`
+- **Código HTTP:** N/A (bloqueia build)
+- **Ação do sistema:** `themes:generate` lança erro com lista de variáveis faltantes
+
+## ERR-06: Invalid Theme ID
+- **Condition:** Nome da pasta contém caracteres inválidos (maiúsculas, underscores, etc.)
+- **Código HTTP:** N/A (bloqueia build)
+- **Ação do sistema:** `themes:generate` lança erro — IDs devem ser kebab-case
+
+## ERR-07: Missing Default Theme
+- **Condition:** Pasta `themes/default/` não existe
+- **Código HTTP:** N/A (bloqueia build)
+- **Ação do sistema:** `themes:generate` lança erro — `default` é obrigatório

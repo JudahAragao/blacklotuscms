@@ -56,7 +56,7 @@ status: approved
   - Priority: P1
   - Status: implemented
   - Depends on: FR02
-- **FR11: Theme Sistema:** Dynamic theme loading com CSS variables, layout templates, and permission-gated data access
+- **FR11: Theme Sistema:** Build-time theme bundling com CSS isolado via selector replacement + @scope, layout templates via static imports, and permission-gated data access
   - Priority: P1
   - Status: implemented
   - Depends on: FR04
