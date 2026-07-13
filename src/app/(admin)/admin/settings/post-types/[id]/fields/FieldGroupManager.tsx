@@ -12,6 +12,7 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
   const [isSaving, setIsSaving] = useState(false);
   const [expandedField, setExpandedField] = useState<number | null>(null);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   useEffect(() => {
     // 1. Inicializar Campos do Sistema
@@ -144,21 +145,30 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
 
   const onDragEnd = () => {
     setDraggedItem(null);
+    setDragOverIndex(null);
   };
 
-  const onDragOver = (e: React.DragEvent) => {
+  const onDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
+    if (draggedItem !== null && draggedItem !== index && !fields[index].isSystem) {
+      setDragOverIndex(index);
+    }
   };
 
   const onDrop = (index: number) => {
-    if (draggedItem === null || draggedItem === index || fields[index].isSystem) return;
-    
+    if (draggedItem === null || draggedItem === index || fields[index].isSystem) {
+      setDraggedItem(null);
+      setDragOverIndex(null);
+      return;
+    }
+
     const newFields = [...fields];
     const item = newFields.splice(draggedItem, 1)[0];
     newFields.splice(index, 0, item);
-    
+
     setFields(newFields);
     setDraggedItem(null);
+    setDragOverIndex(null);
   };
 
   const handleSave = async () => {
@@ -234,19 +244,26 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
       </div>
 
       <div className="space-y-3">
-        {fields.map((field, index) => (
+        {fields.map((field, index) => {
+          const isOrganizer = field.type === 'tab' || field.type === 'section';
+          return (
           <div
             key={field.id || index}
             draggable={!field.isSystem}
             onDragStart={() => onDragStart(index)}
             onDragEnd={onDragEnd}
-            onDragOver={onDragOver}
+            onDragOver={(e) => onDragOver(e, index)}
             onDrop={() => onDrop(index)}
             className={`border rounded overflow-hidden transition-all ${
-              field.isSystem ? 'border-action/20 bg-action-light/30' : 'border-border-default'
+              field.isSystem ? 'border-action/20 bg-action-light/30' :
+              isOrganizer ? 'border-action/30 bg-action-light/50' :
+              dragOverIndex === index ? 'border-action border-dashed bg-action-light/20' : 'border-border-default'
             } ${draggedItem === index ? 'opacity-50 scale-[0.98]' : 'opacity-100'}`}
           >
-            <div className={`flex items-center gap-3 p-3 ${field.isSystem ? 'bg-action-light/30' : 'bg-surface-muted'}`}>
+            <div className={`flex items-center gap-3 p-3 ${
+              field.isSystem ? 'bg-action-light/30' :
+              isOrganizer ? 'bg-action-light/50' : 'bg-surface-muted'
+            }`}>
               <div className={`flex-none ${field.isSystem ? 'opacity-20' : 'cursor-grab text-text-muted hover:text-action'}`}>
                 <GripVertical size={14} />
               </div>
@@ -260,9 +277,9 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
                     placeholder="Rotulo do Campo"
                   />
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-mono text-action/60">{field.isSystem ? 'sistema' : field.type}</span>
+                    <span className={`text-[10px] font-mono ${isOrganizer ? 'text-action' : 'text-action/60'}`}>{field.isSystem ? 'sistema' : isOrganizer ? 'separador' : field.type}</span>
                     <span className="text-[10px] text-text-muted">|</span>
-                    <span className="text-[10px] font-mono text-text-muted">{field.name}</span>
+                    <span className="text-[10px] font-mono text-text-muted">{isOrganizer ? field.label : field.name}</span>
                   </div>
                 </div>
               </div>
@@ -379,7 +396,8 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex justify-end pt-4 border-t border-border-default">
