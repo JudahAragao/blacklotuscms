@@ -25,12 +25,29 @@ export async function saveFieldsAction(postTypeId: string, data: { systemFields:
       settings: data.systemFields.settings || {}
     }, session?.user);
 
-    // 2. Sincronizar Campos Customizados
-    await fieldService.syncFields(postTypeId, data.customFields, session?.user);
+    // 2. Encontrar ou criar FieldGroup para este PostType
+    const existingGroups = await fieldService.listByLocation('post_type', postTypeId);
+    let groupId: string;
+
+    if (existingGroups.length > 0) {
+      groupId = existingGroups[0].id;
+    } else {
+      // Criar novo grupo para este post type
+      const group = await fieldService.createFieldGroup({
+        title: `Campos: ${postType.label}`,
+        locations: [{ type: 'post_type', value: postTypeId }],
+        fields: []
+      }, session?.user);
+      groupId = group.id;
+    }
+
+    // 3. Sincronizar campos
+    await fieldService.syncFields(groupId, data.customFields, session?.user);
 
     revalidatePath(`/admin/settings/post-types/${postTypeId}/fields`);
     revalidatePath('/admin/settings/post-types');
-    revalidatePath('/admin'); // Revalida sidebar
+    revalidatePath('/admin/settings/field-groups');
+    revalidatePath('/admin');
     return { success: true };
   } catch (error: any) {
     return handleApiError(error);
@@ -49,12 +66,12 @@ export async function createFieldGroupAction(postTypeId: string, data: any) {
 
     await fieldService.createFieldGroup({
       title: data.title,
-      postTypeId,
-      locationRules: {},
+      locations: [{ type: 'post_type', value: postTypeId }],
       fields
     }, session?.user);
 
     revalidatePath(`/admin/settings/post-types/${postTypeId}/fields`);
+    revalidatePath('/admin/settings/field-groups');
     return { success: true };
   } catch (error: any) {
     return handleApiError(error);
@@ -66,6 +83,7 @@ export async function deleteFieldGroupAction(id: string, postTypeId: string) {
     const session = await getServerSession(authOptions);
     await fieldService.deleteFieldGroup(id, session?.user);
     revalidatePath(`/admin/settings/post-types/${postTypeId}/fields`);
+    revalidatePath('/admin/settings/field-groups');
     return { success: true };
   } catch (error: any) {
     return handleApiError(error);
