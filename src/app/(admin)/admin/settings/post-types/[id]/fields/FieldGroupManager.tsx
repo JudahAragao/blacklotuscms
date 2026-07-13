@@ -277,7 +277,7 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
                     placeholder="Rotulo do Campo"
                   />
                   <div className="flex items-center gap-1.5">
-                    <span className={`text-[10px] font-mono ${isOrganizer ? 'text-action' : 'text-action/60'}`}>{field.isSystem ? 'sistema' : isOrganizer ? 'separador' : field.type}</span>
+                    <span className={`text-[10px] font-mono ${isOrganizer ? 'text-action' : 'text-action/60'}`}>{field.isSystem ? 'sistema' : field.type === 'tab' ? 'aba' : field.type === 'section' ? 'secao' : field.type}</span>
                     <span className="text-[10px] text-text-muted">|</span>
                     <span className="text-[10px] font-mono text-text-muted">{isOrganizer ? field.label : field.name}</span>
                   </div>
