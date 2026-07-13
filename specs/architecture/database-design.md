@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-13"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -91,7 +91,7 @@ erDiagram
 - `fieldGroupId`: UUID (FK -> FieldGroup)
 - `name`: String - chave interna (ex: "telefone_contato")
 - `label`: String - nome exibido
-- `type`: String - text, image, repeater, etc.
+- `type`: String - text, image, repeater, tab, section, etc. (tab/section are visual organizers, no MetaValue)
 - `config`: JSON - min/max, required, etc.
 
 ### MetaValue

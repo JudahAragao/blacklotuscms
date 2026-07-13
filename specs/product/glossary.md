@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-13"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -26,6 +26,8 @@ status: approved
 - **G15 Proxy (middleware):** Camada de rede (src/proxy.ts) que valida instalação, autenticação e rate limiting antes de rotear.
 - **G16 Shortcode:** Macro que pode ser registrada por plugins e processada no conteúdo.
 - **G17 Stable Proxy:** Padrão onde cada Service exporta tanto métodos de instância quanto métodos estáticos proxy.
+- **G18 Tab (Field Type):** Campo organizador visual que cria abas navegáveis no editor de posts. Campos abaixo de uma Tab (até a próxima Tab) ficam agrupados nessa aba. Não armazena dados.
+- **G19 Section (Field Type):** Campo organizador visual que cria divisores/títulos de seção dentro de uma aba no editor de posts. Não quebra o agrupamento da aba pai. Não armazena dados.
 
 ## Relacionamentos
 

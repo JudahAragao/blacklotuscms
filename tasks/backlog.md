@@ -1,6 +1,6 @@
 ---
 spec_version: "1.3"
-last_updated: "2026-07-12"
+last_updated: "2026-07-13"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -77,10 +77,12 @@ status: approved
 - [x] **TASK-053:** Fix CSS nesting bug (variables not applying to wrapper) | est: 1h | depends: [TASK-050] | feature: theme-engine
 - [x] **TASK-054:** Add `themeApiVersion` validation and accent tokens | est: 1h | depends: [TASK-049] | feature: theme-engine
 - [x] **TASK-055:** Update all documentation to reflect build-time theme system | est: 2h | depends: [TASK-049] | feature: docs
+- [x] **TASK-056:** Tab and Section custom field types for visual editor organization | est: 3h | depends: [TASK-010] | feature: post-management
+- [x] **TASK-057:** Fix accent/special char handling in field name generation (NFD normalization) | est: 1h | depends: [TASK-010] | feature: post-management
 
 ## Métricas
-- Total de tasks: 55
-- Concluídas: 55
+- Total de tasks: 57
+- Concluídas: 57
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

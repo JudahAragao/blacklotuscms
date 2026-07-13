@@ -58,6 +58,8 @@ POST /api/v1/posts/:type
 }
 ```
 
+**Note:** Field types include data fields (text, image, repeater, etc.) and organizer fields (tab, section). Tab/Section fields are visual-only and do not generate metaFields.
+
 ### Get Post by ID
 ```
 GET /api/v1/posts/:type/:id

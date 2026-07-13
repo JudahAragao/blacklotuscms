@@ -167,3 +167,5 @@ curl -X POST http://localhost:3000/api/graphql \
   -H "Content-Type: application/json" \
   -d '{"query": "{ postBySlug(slug: \"hello-world\") { id title content metaFields } }"}'
 ```
+
+**Note:** metaFields contains only data field values. Tab and Section fields are visual organizers and do not appear in metaFields.

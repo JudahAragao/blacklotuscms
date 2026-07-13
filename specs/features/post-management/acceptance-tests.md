@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-13"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "post-management"
@@ -57,3 +57,16 @@ feature: "post-management"
 - **WHEN** um post e criado ou atualizado
 - **THEN** revalidateTag('posts') e chamado e cache e invalidado
 - **Referencia:** FR05, NFR01
+
+## AT-09: Tab and Section Field Types
+- **GIVEN** um PostType com campos Tab e Section configurados
+- **WHEN** usuario cria uma Aba "Dados Gerais" com campos abaixo, e uma Secao "Midia" com campos abaixo
+- **THEN** o editor de posts exibe navegacao por abas, com secao visual dentro da aba ativa
+- **AND** campos Tab/Section nao geram MetaValues nem validacao
+- **Referencia:** FR06
+
+## AT-10: Tab Field Groups Correctly
+- **GIVEN** um PostType com 3 abas: "Geral", "SEO", "Avancado"
+- **WHEN** usuario navega entre as abas no editor
+- **THEN** cada aba exibe apenas seus campos (campos entre uma Tab e a proxima Tab)
+- **Referencia:** FR06

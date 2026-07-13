@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-13"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -13,9 +13,10 @@ status: approved
 - **Feature vinculada:** authentication
 
 ## 2. Post Editor
-- **Visuals:** Title input, TipTap editor, meta fields panel, taxonomy sidebar
-- **Components:** PostEditor, RichTextEditor, MediaPicker
+- **Visuals:** Title input, TipTap editor, meta fields panel com tabs/seções, taxonomy sidebar
+- **Components:** PostEditor (com groupedFields: tab navigation + section dividers), RichTextEditor, MediaPicker
 - **Feature vinculada:** post-management
+- **Nota:** Campos do tipo Tab criam abas navegáveis; campos do tipo Section criam divisores visuais dentro da aba
 
 ## 3. Media Library
 - **Visuals:** Grid de thumbnails com upload area
