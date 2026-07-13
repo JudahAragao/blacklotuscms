@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 
 interface PostEditorProps {
   post: any;
+  fieldGroups?: any[];
   onSave: (data: any) => Promise<any>;
   readOnly?: boolean;
   capabilities?: {
@@ -17,8 +18,12 @@ interface PostEditorProps {
   };
 }
 
-export default function PostEditor({ post, onSave, readOnly, capabilities }: PostEditorProps) {
+export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave, readOnly, capabilities }: PostEditorProps) {
   const router = useRouter();
+  
+  // fieldGroups: prop ou fallback para post.postType.fieldGroups (compatibilidade)
+  const fieldGroups = propFieldGroups || post?.postType?.fieldGroups || [];
+  
   const [formData, setFormData] = useState({
     title: post?.title || '',
     slug: post?.slug || '',
@@ -46,7 +51,7 @@ export default function PostEditor({ post, onSave, readOnly, capabilities }: Pos
     const tabs: { label: string | null; sections: { label: string | null; fields: any[] }[] }[] = [];
     let currentTab = { label: null as string | null, sections: [{ label: null as string | null, fields: [] as any[] }] };
 
-    for (const field of post?.postType?.fieldGroups?.flatMap((g: any) => g.fields) || []) {
+    for (const field of fieldGroups?.flatMap((g: any) => g.fields) || []) {
       if (field.type === 'tab') {
         tabs.push(currentTab);
         currentTab = { label: field.label, sections: [{ label: null, fields: [] }] };
@@ -58,20 +63,20 @@ export default function PostEditor({ post, onSave, readOnly, capabilities }: Pos
     }
     tabs.push(currentTab);
     return tabs;
-  }, [post?.postType?.fieldGroups]);
+  }, [fieldGroups]);
 
   const hasTabs = groupedFields.length > 1 || groupedFields[0].label !== null;
 
   // Mapeia IDs de campos para nomes para facilitar a lógica condicional
   const fieldIdToNameMap = useMemo(() => {
     const map: Record<string, string> = {};
-    post?.postType?.fieldGroups?.forEach((group: any) => {
+    fieldGroups?.forEach((group: any) => {
       group.fields.forEach((field: any) => {
         map[field.id] = field.name;
       });
     });
     return map;
-  }, [post?.postType?.fieldGroups]);
+  }, [fieldGroups]);
 
   // Dados formatados para avaliação de lógica condicional (usa nomes em vez de IDs)
   const evalData = useMemo(() => {
@@ -97,7 +102,7 @@ export default function PostEditor({ post, onSave, readOnly, capabilities }: Pos
 
   const validateAll = () => {
     const newErrors: Record<string, string> = {};
-    post?.postType?.fieldGroups?.forEach((group: any) => {
+    fieldGroups?.forEach((group: any) => {
       group.fields.forEach((field: any) => {
         if (shouldShowField(field.config, evalData)) {
           const error = validateField(field, formData.metaFields[field.id]);
@@ -407,7 +412,7 @@ export default function PostEditor({ post, onSave, readOnly, capabilities }: Pos
         </div>
 
         {/* GRUPOS DE CAMPOS */}
-        {post?.postType?.fieldGroups?.map((group: any) => (
+        {fieldGroups?.map((group: any) => (
           <div key={group.id} className="content-card p-6">
             <div className="flex items-center gap-2 mb-5 pb-3 border-b border-border-default">
               <h3 className="font-semibold text-sm text-text-heading">{group.title}</h3>

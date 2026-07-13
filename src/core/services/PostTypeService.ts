@@ -61,7 +61,7 @@ export class PostTypeService {
   }
 
   /**
-   * Fetch a Post Type by slug, including field groups (ACF).
+   * Fetch a Post Type by slug.
    */
   async findBySlug(slug: string) {
     return unstable_cache(
@@ -69,11 +69,6 @@ export class PostTypeService {
         return await this.db.postType.findUnique({
           where: { slug: s },
           include: {
-            fieldGroups: {
-              include: {
-                fields: true
-              }
-            },
             taxonomies: true
           }
         });

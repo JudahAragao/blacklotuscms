@@ -2,7 +2,7 @@ import React from 'react';
 import { SettingService } from '@/core/services/SettingService';
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
-import { Key, Save, Server, Layers, Users, Tags } from 'lucide-react';
+import { Key, Save, Server, Layers, Users, Tags, Settings } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { hasCapability } from '@/lib/auth-utils';
@@ -135,8 +135,21 @@ export default async function SettingsPage() {
             <Layers size={20} />
           </div>
           <div>
-            <h4 className="font-semibold text-sm text-text-heading">Tipos de Conteudo</h4>
-            <p className="text-xs text-text-muted">Definir estruturas de dados</p>
+            <h4 className="font-semibold text-sm text-text-heading">Tipos de Posts</h4>
+            <p className="text-xs text-text-muted">Definir estruturas de conteudo</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/settings/field-groups"
+          className="content-card p-5 flex items-center gap-4 hover:shadow-md transition-all group"
+        >
+          <div className="w-10 h-10 rounded bg-action-light flex items-center justify-center text-action group-hover:bg-action group-hover:text-white transition-colors">
+            <Settings size={20} />
+          </div>
+          <div>
+            <h4 className="font-semibold text-sm text-text-heading">Campos Customizados</h4>
+            <p className="text-xs text-text-muted">Gerenciar grupos de campos</p>
           </div>
         </Link>
 

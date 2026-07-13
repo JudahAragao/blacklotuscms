@@ -15,10 +15,11 @@ erDiagram
     User ||--o{ ApiKey : owns
     User }o--|| Role : has
     PostType ||--o{ Post : contains
-    PostType ||--o{ FieldGroup : has
     PostType ||--o{ Taxonomy : has
     FieldGroup ||--o{ Field : has
+    FieldGroup ||--o{ FieldGroupLocation : has
     Post ||--o{ MetaValue : has
+    Term ||--o{ MetaValue : has
     Field ||--o{ MetaValue : stores
     Taxonomy ||--o{ Term : has
     Post }o--o{ Term : via_PostTerm
@@ -82,9 +83,15 @@ erDiagram
 
 ### FieldGroup
 - `id`: UUID (PK)
-- `postTypeId`: UUID (FK -> PostType)
 - `title`: String
-- `locationRules`: JSON - rules de exibição
+
+### FieldGroupLocation
+- `id`: UUID (PK)
+- `fieldGroupId`: UUID (FK -> FieldGroup, onDelete: Cascade)
+- `locationType`: String - "post_type", "taxonomy", "post", "template", "post_status"
+- `locationValue`: String - ex: "post", "page", "category", "my-specific-post"
+- `locationParam`: String? - ex: "technology" (para taxonomy term específico)
+- Unique: [fieldGroupId, locationType, locationValue, locationParam]
 
 ### Field
 - `id`: UUID (PK)
@@ -96,10 +103,11 @@ erDiagram
 
 ### MetaValue
 - `id`: UUID (PK)
-- `postId`: UUID (FK -> Post)
+- `postId`: UUID? (FK -> Post, onDelete: Cascade) - nullable para taxonomias
+- `termId`: UUID? (FK -> Term, onDelete: Cascade) - nullable para posts
 - `fieldId`: UUID (FK -> Field)
 - `value`: JSON - o dado real
-- Indexes: [postId], [fieldId]
+- Indexes: [postId], [fieldId], [termId]
 
 ### Taxonomy
 - `id`: UUID (PK)

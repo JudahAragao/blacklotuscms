@@ -60,13 +60,23 @@ export const CreateFieldSchema: z.ZodType<any> = z.object({
   config: FieldConfigSchema.optional().default({ required: false, width: 100 }),
 });
 
+export const LocationTypeEnum = z.enum([
+  'post_type', 'taxonomy', 'post', 'template', 'post_status'
+]);
+
+export const LocationRuleSchema = z.object({
+  type: LocationTypeEnum,
+  value: z.string().min(1),
+  param: z.string().optional(),
+});
+
 export const CreateFieldGroupSchema = z.object({
   title: z.string().min(2),
-  postTypeId: z.string().uuid(),
-  locationRules: z.record(z.string(), z.any()).optional().default({}),
+  locations: z.array(LocationRuleSchema).min(1, "Pelo menos uma localização é obrigatória"),
   fields: z.array(CreateFieldSchema),
 });
 
 export type CreateFieldGroupInput = z.infer<typeof CreateFieldGroupSchema>;
 export type FieldConfig = z.infer<typeof FieldConfigSchema>;
 export type ConditionalRule = z.infer<typeof ConditionalRuleSchema>;
+export type LocationRule = z.infer<typeof LocationRuleSchema>;

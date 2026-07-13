@@ -10,7 +10,7 @@ import PluginSidebarNav from '@/components/admin/PluginSidebarNav';
 import { hasCapability } from '@/lib/auth-utils';
 import {
   LayoutDashboard, FileText, Image, Menu, MessageSquare,
-  Palette, Puzzle, Search, Settings, ExternalLink
+  Palette, Puzzle, Search, Settings, ExternalLink, Layers
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -22,6 +22,7 @@ const iconMap: Record<string, React.ReactNode> = {
   plugins: <Puzzle size={16} />,
   seo: <Search size={16} />,
   settings: <Settings size={16} />,
+  'field-groups': <Layers size={16} />,
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -62,6 +63,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: '/admin/themes', label: 'Aparencia', icon: 'themes', visible: canSeeThemes },
     { href: '/admin/plugins', label: 'Plugins', icon: 'plugins', visible: canSeePlugins },
     { href: '/admin/seo', label: 'SEO', icon: 'seo', visible: canSeeSettings },
+    { href: '/admin/settings/field-groups', label: 'Campos Customizados', icon: 'field-groups', visible: canSeeSettings },
     { href: '/admin/settings', label: 'Configuracoes', icon: 'settings', visible: canSeeSettings },
   ].filter(item => item.visible);
 

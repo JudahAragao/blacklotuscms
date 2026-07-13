@@ -60,7 +60,6 @@ model PostType {
   supportsTaxonomies Boolean    @default(true)
 
   posts           Post[]
-  fieldGroups     FieldGroup[]
   taxonomies      Taxonomy[]
 }
 
@@ -100,11 +99,21 @@ model Post {
 
 model FieldGroup {
   id            String    @id @default(uuid())
-  postTypeId    String
-  postType      PostType  @relation(fields: [postTypeId], references: [id])
   title         String
-  locationRules Json      // Regras de onde mostrar esse grupo
+  locations     FieldGroupLocation[]
   fields        Field[]
+}
+
+model FieldGroupLocation {
+  id            String    @id @default(uuid())
+  fieldGroupId  String
+  fieldGroup    FieldGroup @relation(fields: [fieldGroupId], references: [id], onDelete: Cascade)
+  locationType  String    // "post_type" | "taxonomy" | "post" | "template" | "post_status"
+  locationValue String    // ex: "post", "page", "category", "my-specific-post"
+  locationParam String?   // ex: "technology" (para taxonomy term específico)
+
+  @@unique([fieldGroupId, locationType, locationValue, locationParam])
+  @@index([fieldGroupId])
 }
 
 model Field {
@@ -120,14 +129,17 @@ model Field {
 
 model MetaValue {
   id        String   @id @default(uuid())
-  postId    String
-  post      Post     @relation(fields: [postId], references: [id])
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  termId    String?
+  term      Term?    @relation(fields: [termId], references: [id], onDelete: Cascade)
   fieldId   String
   field     Field    @relation(fields: [fieldId], references: [id])
   value     Json     // O dado real (string, array, object, etc)
 
   @@index([postId])
   @@index([fieldId])
+  @@index([termId])
 }
 
 model Taxonomy {
@@ -146,6 +158,7 @@ model Term {
   name        String
   slug        String     @unique
   posts       PostTerm[]
+  metaValues  MetaValue[]
 }
 
 model PostTerm {

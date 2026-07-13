@@ -82,10 +82,15 @@ status: approved
 - [x] **TASK-058:** Fix drag and drop accidental reorder (dragOverIndex tracking) | est: 1h | depends: [TASK-056] | feature: post-management
 - [x] **TASK-059:** Tab/Section visual distinction (separador styling + type badge) | est: 1h | depends: [TASK-056] | feature: post-management
 - [x] **TASK-060:** Auto-deduplicate field anchors (titulo, titulo_2, titulo_3...) | est: 1h | depends: [TASK-057] | feature: post-management
+- [x] **TASK-061:** Decouple FieldGroup from PostType (ACF-like location rules) | est: 8h | depends: [TASK-010] | feature: post-management
+- [x] **TASK-062:** Implement evaluateLocations service (runtime field group matching) | est: 4h | depends: [TASK-061] | feature: post-management
+- [x] **TASK-063:** Create FieldGroups admin page (independent from PostTypes) | est: 3h | depends: [TASK-061] | feature: post-management
+- [x] **TASK-064:** Add taxonomy MetaValue support (termId nullable in MetaValue) | est: 2h | depends: [TASK-061] | feature: post-management
+- [x] **TASK-065:** Rename "Tipos de Conteúdo" → "Tipos de Posts" + add "Campos Customizados" button | est: 1h | depends: [] | feature: ux
 
 ## Métricas
-- Total de tasks: 60
-- Concluídas: 60
+- Total de tasks: 65
+- Concluídas: 65
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import PostEditor from '@/components/admin/PostEditor';
 import { redirect } from 'next/navigation';
 import { PostService } from '@/core/services/PostService';
+import { FieldService } from '@/core/services/FieldService';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -29,11 +30,6 @@ export default async function NewPostPage({
         include: {
           terms: true
         }
-      },
-      fieldGroups: {
-        include: {
-          fields: true
-        }
       }
     }
   });
@@ -46,6 +42,13 @@ export default async function NewPostPage({
   if (!hasCapability((session.user as any).role, 'post.create')) {
     return <div className="p-20 text-center label-caps text-error">No permission to create content</div>;
   }
+
+  // Buscar fieldGroups via evaluateLocations
+  const fieldGroups = await FieldService.evaluateLocations({
+    postTypeId: postType.id,
+    postSlug: undefined,
+    postStatus: 'draft',
+  });
 
   // Objeto de post "vazio" para o editor
   const emptyPost = {
@@ -98,6 +101,7 @@ export default async function NewPostPage({
 
       <PostEditor
         post={JSON.parse(JSON.stringify(emptyPost))}
+        fieldGroups={JSON.parse(JSON.stringify(fieldGroups))}
         onSave={savePostAction}
         capabilities={userCapabilities}
       />

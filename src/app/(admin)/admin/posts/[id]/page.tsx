@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import PostEditor from '@/components/admin/PostEditor';
 import { notFound, redirect } from 'next/navigation';
 import { PostService } from '@/core/services/PostService';
+import { FieldService } from '@/core/services/FieldService';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -27,11 +28,6 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
             include: {
               terms: true
             }
-          },
-          fieldGroups: {
-            include: {
-              fields: true
-            }
           }
         }
       }
@@ -54,6 +50,13 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
   // Verify EDIT permission
   const canEdit = canPerformAction(session.user, `${postTypeSlug}.update`, post.authorId) || 
                   hasCapability(userRole, `${postTypeSlug}.manage`);
+
+  // Buscar fieldGroups via evaluateLocations
+  const fieldGroups = await FieldService.evaluateLocations({
+    postTypeId: post.postTypeId,
+    postSlug: post.slug,
+    postStatus: post.status,
+  });
 
   // Server Action to save the post
   async function savePostAction(data: any) {
@@ -99,6 +102,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
 
       <PostEditor
         post={JSON.parse(JSON.stringify(post))}
+        fieldGroups={JSON.parse(JSON.stringify(fieldGroups))}
         onSave={savePostAction}
         readOnly={!canEdit}
         capabilities={userCapabilities}

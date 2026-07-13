@@ -12,7 +12,7 @@ status: approved
 - **G01 PostType:** Tipo de conteúdo definido pelo user (ex: "post", "page"). Define quais fields e taxonomias estão disponíveis.
 - **G02 Post:** Instância de um PostType. Contém título, slug, conteúdo, status, SEO metadata e fields customizeds.
 - **G03 MetaField:** Field customized associado a um Post via FieldGroup. Armazenado na tabela MetaValue como JSON.
-- **G04 FieldGroup:** Grouping de fields customizeds com rules de location. Linked a um PostType.
+- **G04 FieldGroup:** Grouping de fields customizeds com locations que determinam onde aparecem (post types, taxonomias, posts específicos, etc).
 - **G05 Taxonomy:** Classification vinculada a um PostType (ex: "categorias", "tags"). Contém Terms.
 - **G06 Term:** Ihas dentro de uma Taxonomy (ex: "Tecnologia", "Design").
 - **G07 Hook (Action/Filter):** Ponto de extensibilidade. Actions executam código; Filters transformam data. Plugins e themes os utilizam.
@@ -31,9 +31,10 @@ status: approved
 
 ## Relacionamentos
 
-- PostType contains FieldGroups que contêm Fields
+- FieldGroup contém FieldGroupLocations que determinam onde aparece
 - PostType contains Taxonomies que contêm Terms
 - Post está vinculado a Terms via PostTerm (N:N)
 - Post contains MetaValues (fields customizeds preenchidos)
+- Term contains MetaValues (fields customizeds de taxonomias)
 - Plugin executed em PluginSandbox com Bridge API
 - Theme acessa data via ThemeDataService com validação de ThemePermission

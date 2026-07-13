@@ -32,7 +32,7 @@ status: approved
   - Priority: P0
   - Status: implemented
   - Depends on: FR04
-- **FR06: Custom Fields (MetaFields):** Extensible field sistema com typed config (text, image, repeater, tab, section, etc.) linked to post types via FieldGroups. Tab and Section field types provide visual organization (tabs and section dividers) in the post editor without storing data.
+- **FR06: Custom Fields (MetaFields):** Extensible field sistema com typed config (text, image, repeater, tab, section, etc.) via FieldGroups independentes com location rules que determinam onde aparecem (post types, taxonomias, posts específicos, templates, status).
   - Priority: P1
   - Status: implemented
   - Depends on: FR04
