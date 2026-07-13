@@ -43,6 +43,8 @@ type PostType {
   slug: String!
   label: String!
   posts: [Post!]!
+  # Note: fieldGroups are no longer directly linked to PostType
+  # Use FieldGroup locations to determine which fields apply
 }
 ```
 

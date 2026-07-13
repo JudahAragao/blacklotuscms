@@ -89,3 +89,28 @@ feature: "post-management"
 - **WHEN** usuario visualiza a lista de campos
 - **THEN** campos Tab e Section exibem fundo mais escuro e badge "aba"/"secao"
 - **Referencia:** FR06
+
+## AT-14: FieldGroup Location Rules
+- **GIVEN** um FieldGroup com location "Post Type = Post"
+- **WHEN** usuario cria um post no tipo "Post"
+- **THEN** os campos do FieldGroup aparecem no editor
+- **AND** posts em outros tipos NÃO mostram esses campos
+- **Referencia:** FR06
+
+## AT-15: Multiple Location Rules
+- **GIVEN** um FieldGroup com locations "Post Type = Post" e "Post Type = Page"
+- **WHEN** usuario cria um post ou uma página
+- **THEN** os campos do FieldGroup aparecem em ambos
+- **Referencia:** FR06
+
+## AT-16: Taxonomy Field Groups
+- **GIVEN** um FieldGroup com location "Taxonomy = category"
+- **WHEN** usuario edita uma categoria
+- **THEN** os campos do FieldGroup aparecem na edição da categoria
+- **Referencia:** FR06
+
+## AT-17: FieldGroups Admin Page
+- **GIVEN** um administrador
+- **WHEN** acessa /admin/settings/field-groups
+- **THEN** pode listar, criar, editar e excluir FieldGroups com locations
+- **Referencia:** FR06

@@ -20,7 +20,7 @@ export default async function EditFieldsPage({ params }: { params: { id: string 
 
   if (!postType) return <div>Post Type não encontrado.</div>;
 
-  const fieldGroups = await FieldService.listByPostType(id);
+  const fieldGroups = await FieldService.listByLocation('post_type', id);
 
   async function updatePostTypeAction(formData: FormData) {
     'use server';
