@@ -292,7 +292,7 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
               </div>
             </div>
 
-            {expandedField === index && !field.isSystem && (
+            {expandedField === index && !field.isSystem && field.type !== 'tab' && field.type !== 'section' && (
               <div className="p-4 bg-surface-muted/50 border-t border-border-default grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layout size={12} /> Geral</h5>
@@ -312,6 +312,8 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
                         <option value="wysiwyg">Editor Rico</option>
                         <option value="json">JSON</option>
                         <option value="repeater">Repetidor</option>
+                        <option value="tab">Aba</option>
+                        <option value="section">Secao</option>
                       </select>
                     </div>
                     <div className="flex flex-col gap-1">

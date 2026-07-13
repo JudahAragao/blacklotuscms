@@ -39,6 +39,28 @@ export default function PostEditor({ post, onSave, readOnly, capabilities }: Pos
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+
+  // Organiza campos em abas e seções (Tab/Section são organizadores visuais)
+  const groupedFields = useMemo(() => {
+    const tabs: { label: string | null; sections: { label: string | null; fields: any[] }[] }[] = [];
+    let currentTab = { label: null as string | null, sections: [{ label: null as string | null, fields: [] as any[] }] };
+
+    for (const field of post?.postType?.fieldGroups?.flatMap((g: any) => g.fields) || []) {
+      if (field.type === 'tab') {
+        tabs.push(currentTab);
+        currentTab = { label: field.label, sections: [{ label: null, fields: [] }] };
+      } else if (field.type === 'section') {
+        currentTab.sections.push({ label: field.label, fields: [] });
+      } else {
+        currentTab.sections[currentTab.sections.length - 1].fields.push(field);
+      }
+    }
+    tabs.push(currentTab);
+    return tabs;
+  }, [post?.postType?.fieldGroups]);
+
+  const hasTabs = groupedFields.length > 1 || groupedFields[0].label !== null;
 
   // Mapeia IDs de campos para nomes para facilitar a lógica condicional
   const fieldIdToNameMap = useMemo(() => {
@@ -390,39 +412,114 @@ export default function PostEditor({ post, onSave, readOnly, capabilities }: Pos
             <div className="flex items-center gap-2 mb-5 pb-3 border-b border-border-default">
               <h3 className="font-semibold text-sm text-text-heading">{group.title}</h3>
             </div>
-            <div className="flex flex-wrap -mx-2">
-              {group.fields.map((field: any) => {
-                const isVisible = shouldShowField(field.config, evalData);
-                if (!isVisible) return null;
 
-                const width = field.config?.width || 100;
-
-                return (
-                  <div
-                    key={field.id}
-                    className="px-2 mb-6 transition-all duration-300"
-                    style={{ width: `${width}%`, minWidth: width < 100 ? '300px' : '100%' }}
-                  >
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex justify-between items-center">
-                        <label className="label-field">
-                          {field.label} {field.config?.required && <span className="text-status-trash">*</span>}
-                        </label>
-                        {errors[field.id] && (
-                          <span className="text-status-trash text-xs flex items-center gap-1">
-                            <AlertCircle size={12} /> {errors[field.id]}
-                          </span>
+            {/* Se não há abas, renderiza flat (comportamento original) */}
+            {!hasTabs && (
+              <div className="flex flex-wrap -mx-2">
+                {group.fields.filter((f: any) => f.type !== 'tab' && f.type !== 'section').map((field: any) => {
+                  const isVisible = shouldShowField(field.config, evalData);
+                  if (!isVisible) return null;
+                  const width = field.config?.width || 100;
+                  return (
+                    <div key={field.id} className="px-2 mb-6 transition-all duration-300" style={{ width: `${width}%`, minWidth: width < 100 ? '300px' : '100%' }}>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex justify-between items-center">
+                          <label className="label-field">
+                            {field.label} {field.config?.required && <span className="text-status-trash">*</span>}
+                          </label>
+                          {errors[field.id] && (
+                            <span className="text-status-trash text-xs flex items-center gap-1">
+                              <AlertCircle size={12} /> {errors[field.id]}
+                            </span>
+                          )}
+                        </div>
+                        {field.config?.instructions && (
+                          <p className="text-xs text-text-muted italic">{field.config.instructions}</p>
                         )}
+                        {renderFieldInput(field, formData.metaFields[field.id], (val) => updateMetaField(field.id, val, field))}
                       </div>
-                      {field.config?.instructions && (
-                        <p className="text-xs text-text-muted italic">{field.config.instructions}</p>
-                      )}
-                      {renderFieldInput(field, formData.metaFields[field.id], (val) => updateMetaField(field.id, val, field))}
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Se há abas, renderiza com navegação de abas */}
+            {hasTabs && (
+              <>
+                {/* Barra de navegação das abas */}
+                <div className="flex gap-1 mb-5 pb-3 border-b border-border-default overflow-x-auto">
+                  {groupedFields.map((tab, tabIdx) => {
+                    const tabFields = tab.sections.flatMap(s => s.fields);
+                    if (tabIdx === 0 && !tab.label && tabFields.length === 0) return null;
+                    return (
+                      <button
+                        key={tabIdx}
+                        onClick={() => setActiveTab(tabIdx)}
+                        className={`px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-all ${
+                          activeTab === tabIdx
+                            ? 'bg-action text-white'
+                            : 'bg-surface-muted text-text-muted hover:text-text-heading hover:bg-surface-card'
+                        }`}
+                      >
+                        {tab.label || `Campos`}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Conteúdo da aba ativa */}
+                {groupedFields.map((tab, tabIdx) => {
+                  if (activeTab !== tabIdx) return null;
+                  const tabFields = tab.sections.flatMap(s => s.fields);
+                  if (tabIdx === 0 && !tab.label && tabFields.length === 0) return null;
+
+                  return (
+                    <div key={tabIdx} className="flex flex-wrap -mx-2">
+                      {tab.sections.map((section, sIdx) => (
+                        <div key={sIdx} className="w-full">
+                          {/* Título da seção (visual divider) */}
+                          {section.label && (
+                            <div className="w-full px-2 mb-3 mt-2">
+                              <h4 className="text-xs font-semibold text-action uppercase tracking-wider">{section.label}</h4>
+                              <div className="mt-1.5 border-b border-border-default/50"></div>
+                            </div>
+                          )}
+                          {/* Campos da seção */}
+                          <div className="flex flex-wrap -mx-2">
+                            {section.fields.map((field: any) => {
+                              const isVisible = shouldShowField(field.config, evalData);
+                              if (!isVisible) return null;
+                              const width = field.config?.width || 100;
+                              return (
+                                <div key={field.id} className="px-2 mb-6 transition-all duration-300" style={{ width: `${width}%`, minWidth: width < 100 ? '300px' : '100%' }}>
+                                  <div className="flex flex-col gap-1.5">
+                                    <div className="flex justify-between items-center">
+                                      <label className="label-field">
+                                        {field.label} {field.config?.required && <span className="text-status-trash">*</span>}
+                                      </label>
+                                      {errors[field.id] && (
+                                        <span className="text-status-trash text-xs flex items-center gap-1">
+                                          <AlertCircle size={12} /> {errors[field.id]}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {field.config?.instructions && (
+                                      <p className="text-xs text-text-muted italic">{field.config.instructions}</p>
+                                    )}
+                                    {renderFieldInput(field, formData.metaFields[field.id], (val) => updateMetaField(field.id, val, field))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
         ))}
 

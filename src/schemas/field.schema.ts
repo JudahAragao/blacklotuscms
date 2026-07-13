@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const FieldTypeEnum = z.enum([
-  'text', 'number', 'textarea', 'email', 'image', 'gallery', 'file', 'boolean', 'select', 'repeater', 'json', 'wysiwyg'
+  'text', 'number', 'textarea', 'email', 'image', 'gallery', 'file', 'boolean', 'select', 'repeater', 'json', 'wysiwyg', 'tab', 'section'
 ]);
 
 export const ConditionalOperatorEnum = z.enum([

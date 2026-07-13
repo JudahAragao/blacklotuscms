@@ -56,6 +56,7 @@ export function shouldShowField(config: FieldConfig, formData: any): boolean {
  * Validates a field's value based on its settings.
  */
 export function validateField(field: any, value: any): string | null {
+  if (field.type === 'tab' || field.type === 'section') return null;
   const config = field.config as FieldConfig;
   
   if (config.required && (value === undefined || value === null || value === '')) {
