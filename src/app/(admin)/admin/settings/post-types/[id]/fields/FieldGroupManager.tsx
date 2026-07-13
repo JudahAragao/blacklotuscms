@@ -91,12 +91,23 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
     if (expandedField === index) setExpandedField(null);
   };
 
+  const generateUniqueName = (baseName: string, currentIndex: number): string => {
+    let candidate = baseName;
+    let counter = 2;
+    const exists = (name: string) => fields.some((f, i) => i !== currentIndex && f.name === name);
+    while (exists(candidate)) {
+      candidate = `${baseName}_${counter}`;
+      counter++;
+    }
+    return candidate;
+  };
+
   const updateField = (index: number, key: string, value: any) => {
     const newFields = [...fields];
     const updatedField = { ...newFields[index], [key]: value };
 
     if (key === 'label' && !updatedField.isSystem) {
-      updatedField.name = value
+      const baseName = value
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
@@ -105,6 +116,7 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
         .replace(/[^a-z0-9_]/g, '')
         .replace(/_+/g, '_')
         .replace(/^_|_$/g, '');
+      updatedField.name = generateUniqueName(baseName, index);
     }
     newFields[index] = updatedField;
     setFields(newFields);
