@@ -67,7 +67,7 @@ export const LocationTypeEnum = z.enum([
 export const LocationRuleSchema = z.object({
   type: LocationTypeEnum,
   value: z.string().min(1),
-  param: z.string().optional(),
+  param: z.string().nullish(),
 });
 
 export const CreateFieldGroupSchema = z.object({
