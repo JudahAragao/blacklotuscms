@@ -87,10 +87,11 @@ status: approved
 - [x] **TASK-063:** Create FieldGroups admin page (independent from PostTypes) | est: 3h | depends: [TASK-061] | feature: post-management
 - [x] **TASK-064:** Add taxonomy MetaValue support (termId nullable in MetaValue) | est: 2h | depends: [TASK-061] | feature: post-management
 - [x] **TASK-065:** Rename "Tipos de Conteúdo" → "Tipos de Posts" + add "Campos Customizados" button | est: 1h | depends: [] | feature: ux
+- [x] **TASK-066:** Searchable post select for location rules (debounced search by title/slug) | est: 2h | depends: [TASK-061] | feature: post-management
 
 ## Métricas
-- Total de tasks: 65
-- Concluídas: 65
+- Total de tasks: 66
+- Concluídas: 66
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

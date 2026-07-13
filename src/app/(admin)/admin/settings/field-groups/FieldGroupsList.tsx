@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Plus, Trash2, Settings, Layers, ChevronLeft, GripVertical } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Trash2, Settings, Layers, ChevronLeft, GripVertical, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { createFieldGroupAction, deleteFieldGroupAction } from './actions';
+import { createFieldGroupAction, deleteFieldGroupAction, searchPostsAction } from './actions';
 
 interface FieldGroupsListProps {
   initialFieldGroups: any[];
@@ -20,6 +20,39 @@ export default function FieldGroupsList({ initialFieldGroups, postTypes, taxonom
   const [newTitle, setNewTitle] = useState('');
   const [newLocations, setNewLocations] = useState<{ type: string; value: string; param?: string }[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [postSearchQuery, setPostSearchQuery] = useState('');
+  const [postSearchResults, setPostSearchResults] = useState<any[]>([]);
+  const [postSearchLoading, setPostSearchLoading] = useState(false);
+  const [activePostSearchIdx, setActivePostSearchIdx] = useState<number | null>(null);
+  const [posts, setPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    searchPostsAction('').then(result => {
+      if ('success' in result && result.success) {
+        setPosts(result.data);
+      }
+    });
+  }, []);
+
+  const searchPosts = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setPostSearchResults([]);
+      return;
+    }
+    setPostSearchLoading(true);
+    const result = await searchPostsAction(query);
+    setPostSearchLoading(false);
+    if ('success' in result && result.success) {
+      setPostSearchResults(result.data);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchPosts(postSearchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [postSearchQuery, searchPosts]);
 
   const addLocation = () => {
     setNewLocations([...newLocations, { type: 'post_type', value: '' }]);
@@ -180,12 +213,67 @@ export default function FieldGroupsList({ initialFieldGroups, postTypes, taxonom
                 )}
 
                 {loc.type === 'post' && (
-                  <input
-                    value={loc.value}
-                    onChange={(e) => updateLocation(idx, 'value', e.target.value)}
-                    className="field-input text-xs flex-1"
-                    placeholder="Slug do post"
-                  />
+                  <div className="flex-1 relative">
+                    <div className="flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted" />
+                        <input
+                          value={activePostSearchIdx === idx ? postSearchQuery : (loc.value ? posts.find((p: any) => p.id === loc.value)?.title || '' : '')}
+                          onChange={(e) => {
+                            setPostSearchQuery(e.target.value);
+                            setActivePostSearchIdx(idx);
+                          }}
+                          onFocus={() => {
+                            setActivePostSearchIdx(idx);
+                            if (loc.value) {
+                              const post = posts.find((p: any) => p.id === loc.value);
+                              if (post) setPostSearchQuery(post.title);
+                            }
+                          }}
+                          onBlur={() => {
+                            setTimeout(() => {
+                              setActivePostSearchIdx(null);
+                              setPostSearchResults([]);
+                            }, 200);
+                          }}
+                          className="field-input text-xs pl-7 w-full"
+                          placeholder="Buscar post por título..."
+                        />
+                      </div>
+                      <button
+                        onClick={() => updateLocation(idx, 'value', '')}
+                        className="p-1 text-text-muted hover:text-status-trash text-xs"
+                        title="Limpar seleção"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    {activePostSearchIdx === idx && postSearchResults.length > 0 && (
+                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-surface-card border border-border-default rounded shadow-lg max-h-48 overflow-y-auto">
+                        {postSearchResults.map((post: any) => (
+                          <button
+                            key={post.id}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              updateLocation(idx, 'value', post.id);
+                              setPostSearchResults([]);
+                              setPostSearchQuery('');
+                              setActivePostSearchIdx(null);
+                            }}
+                            className="w-full text-left px-3 py-2 text-xs hover:bg-action-light/30 flex flex-col gap-0.5"
+                          >
+                            <span className="font-medium text-text-heading">{post.title}</span>
+                            <span className="text-text-muted">/{post.slug} — {post.postType?.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {activePostSearchIdx === idx && postSearchLoading && (
+                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-surface-card border border-border-default rounded shadow-lg p-2 text-xs text-text-muted">
+                        Buscando...
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 {loc.type === 'template' && (

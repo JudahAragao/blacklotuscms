@@ -3,6 +3,7 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { fieldService } from '@/core/services/FieldService';
+import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 export async function listFieldGroupsAction() {
@@ -79,6 +80,40 @@ export async function deleteFieldGroupAction(id: string) {
     await fieldService.deleteFieldGroup(id, session.user);
     revalidatePath('/admin/settings/field-groups');
     return { success: true };
+  } catch (error: any) {
+    return { error: error.message };
+  }
+}
+
+export async function searchPostsAction(query: string, postTypeId?: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) return { error: 'Unauthorized' };
+
+  try {
+    const where: any = {
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        { slug: { contains: query, mode: 'insensitive' } },
+      ]
+    };
+
+    if (postTypeId) {
+      where.postTypeId = postTypeId;
+    }
+
+    const posts = await prisma.post.findMany({
+      where,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        postType: { select: { label: true, slug: true } }
+      },
+      take: 20,
+      orderBy: { title: 'asc' }
+    });
+
+    return { success: true, data: posts };
   } catch (error: any) {
     return { error: error.message };
   }
