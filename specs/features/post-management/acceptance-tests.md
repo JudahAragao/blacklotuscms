@@ -70,3 +70,22 @@ feature: "post-management"
 - **WHEN** usuario navega entre as abas no editor
 - **THEN** cada aba exibe apenas seus campos (campos entre uma Tab e a proxima Tab)
 - **Referencia:** FR06
+
+## AT-11: Drag and Drop No Accidental Reorder
+- **GIVEN** um FieldGroup com campos customizados
+- **WHEN** usuario arrasta um campo e solta no mesmo lugar
+- **THEN** a ordem dos campos nao e alterada
+- **Referencia:** FR06
+
+## AT-12: Auto-Deduplicate Field Anchors
+- **GIVEN** um PostType com campo "Titulo" (anchor: titulo)
+- **WHEN** usuario cria outro campo com rotulo "Titulo"
+- **THEN** o anchor do segundo campo e "titulo_2"
+- **AND** terceiro "Titulo" gera "titulo_3"
+- **Referencia:** FR06
+
+## AT-13: Tab/Section Visual Distinction
+- **GIVEN** um FieldGroup com campos Tab, Section e campos de dados
+- **WHEN** usuario visualiza a lista de campos
+- **THEN** campos Tab e Section exibem fundo mais escuro e badge "aba"/"secao"
+- **Referencia:** FR06

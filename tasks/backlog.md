@@ -79,10 +79,13 @@ status: approved
 - [x] **TASK-055:** Update all documentation to reflect build-time theme system | est: 2h | depends: [TASK-049] | feature: docs
 - [x] **TASK-056:** Tab and Section custom field types for visual editor organization | est: 3h | depends: [TASK-010] | feature: post-management
 - [x] **TASK-057:** Fix accent/special char handling in field name generation (NFD normalization) | est: 1h | depends: [TASK-010] | feature: post-management
+- [x] **TASK-058:** Fix drag and drop accidental reorder (dragOverIndex tracking) | est: 1h | depends: [TASK-056] | feature: post-management
+- [x] **TASK-059:** Tab/Section visual distinction (separador styling + type badge) | est: 1h | depends: [TASK-056] | feature: post-management
+- [x] **TASK-060:** Auto-deduplicate field anchors (titulo, titulo_2, titulo_3...) | est: 1h | depends: [TASK-057] | feature: post-management
 
 ## Métricas
-- Total de tasks: 57
-- Concluídas: 57
+- Total de tasks: 60
+- Concluídas: 60
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

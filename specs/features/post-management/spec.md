@@ -14,7 +14,7 @@ Sistema completo de gerenciamento de conteudo com Custom Post Types, MetaFields,
 ## Requirements
 - **REQ-01:** CRUD completo de posts com validacao Zod
 - **REQ-02:** Suporte a Custom Post Types configuraveis
-- **REQ-03:** Fields customizeds (MetaFields) via FieldGroups, incluindo tipos organizadores Tab (abas) e Section (seções visuais)
+- **REQ-03:** Fields customizeds (MetaFields) via FieldGroups, incluindo tipos organizadores Tab (abas) e Section (seções visuais), com deduplicação automática de anchors
 - **REQ-04:** Taxonomys hierarquicas e flat
 - **REQ-05:** SEO metadata (title, description, ogImage, noIndex)
 - **REQ-06:** Status de publicacao (draft, published, private)
