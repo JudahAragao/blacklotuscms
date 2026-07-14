@@ -409,12 +409,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
 
       {/* Campos */}
       <div className="content-card p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-sm text-text-heading">Campos</h3>
-          <button onClick={addField} className="btn-action flex items-center gap-2">
-            <Plus size={14} /> Novo Campo
-          </button>
-        </div>
+        <h3 className="font-semibold text-sm text-text-heading">Campos</h3>
 
         <div className="space-y-3">
           {fields.map((field, index) => {
@@ -610,6 +605,10 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
             );
           })}
         </div>
+
+        <button onClick={addField} className="w-full py-3 border border-dashed border-border-default hover:border-action hover:bg-action-light transition-all rounded flex items-center justify-center gap-2 text-sm text-text-muted hover:text-action">
+          <Plus size={14} /> Novo Campo
+        </button>
       </div>
 
       {/* Botão Salvar */}
