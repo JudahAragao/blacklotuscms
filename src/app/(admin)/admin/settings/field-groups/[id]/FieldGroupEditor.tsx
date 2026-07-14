@@ -316,7 +316,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
 
               {(loc.locationType || loc.type) === 'post' && (
                 <div className="flex-1 relative">
-                  {(loc.locationValue || loc.value) && !activePostSearchIdx ? (
+                  {(loc.locationValue || loc.value) && activePostSearchIdx !== idx ? (
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2 px-3 py-2 bg-action-light/50 border border-action/20 rounded text-xs text-text-heading">
                         <span className="font-medium">{posts.find((p: any) => p.id === (loc.locationValue || loc.value))?.title || 'Post'}</span>
@@ -509,16 +509,18 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
 
                       <div className="space-y-4">
                         <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><ShieldCheck size={12} /> Validação</h5>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-1">
-                            <label className="label-field-muted">Min</label>
-                            <input type="number" value={field.config.validation?.min ?? ''} onChange={(e) => updateConfig(index, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
+                        {field.type !== 'repeater' && field.type !== 'flexible_content' && (
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted">Min</label>
+                              <input type="number" value={field.config.validation?.min ?? ''} onChange={(e) => updateConfig(index, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted">Max</label>
+                              <input type="number" value={field.config.validation?.max ?? ''} onChange={(e) => updateConfig(index, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
+                            </div>
                           </div>
-                          <div className="flex flex-col gap-1">
-                            <label className="label-field-muted">Max</label>
-                            <input type="number" value={field.config.validation?.max ?? ''} onChange={(e) => updateConfig(index, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
-                          </div>
-                        </div>
+                        )}
 
                         <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Eye size={12} /> Lógica Condicional</h5>
                         <button onClick={() => updateConfig(index, 'conditionalLogic.status', !field.config.conditionalLogic?.status)} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${field.config.conditionalLogic?.status ? 'bg-status-published/10 text-status-published' : 'bg-surface-muted text-text-muted'}`}>

@@ -90,12 +90,14 @@ export async function searchPostsAction(query: string, postTypeId?: string) {
   if (!session?.user) return { error: 'Unauthorized' };
 
   try {
-    const where: any = {
-      OR: [
+    const where: any = {};
+
+    if (query && query.length > 0) {
+      where.OR = [
         { title: { contains: query, mode: 'insensitive' } },
         { slug: { contains: query, mode: 'insensitive' } },
-      ]
-    };
+      ];
+    }
 
     if (postTypeId) {
       where.postTypeId = postTypeId;
@@ -109,7 +111,7 @@ export async function searchPostsAction(query: string, postTypeId?: string) {
         slug: true,
         postType: { select: { label: true, slug: true } }
       },
-      take: 20,
+      take: 50,
       orderBy: { title: 'asc' }
     });
 
