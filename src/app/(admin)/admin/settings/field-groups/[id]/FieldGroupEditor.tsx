@@ -463,49 +463,51 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                 </div>
 
                 {expandedField === index && !org && (
-                  <div className="p-4 bg-surface-muted/50 border-t border-border-default grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-4">
-                      <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layout size={12} /> Geral</h5>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="flex flex-col gap-1">
-                          <label className="label-field-muted">Tipo</label>
-                          <FieldTypeSelector
-                            value={field.type}
-                            onChange={(type) => updateField(index, 'type', type)}
-                          />
+                  <div className="p-4 bg-surface-muted/50 border-t border-border-default space-y-4">
+                    {/* Grid 2 colunas: Geral + Validação/Lógica */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-4">
+                        <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layout size={12} /> Geral</h5>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex flex-col gap-1">
+                            <label className="label-field-muted">Tipo</label>
+                            <FieldTypeSelector
+                              value={field.type}
+                              onChange={(type) => updateField(index, 'type', type)}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="label-field-muted">Largura (%)</label>
+                            <input type="number" value={field.config.width} onChange={(e) => updateConfig(index, 'width', Number(e.target.value))} className="field-input text-xs" />
+                          </div>
                         </div>
                         <div className="flex flex-col gap-1">
-                          <label className="label-field-muted">Largura (%)</label>
-                          <input type="number" value={field.config.width} onChange={(e) => updateConfig(index, 'width', Number(e.target.value))} className="field-input text-xs" />
+                          <label className="label-field-muted">Instruções</label>
+                          <input value={field.config.instructions || ''} onChange={(e) => updateConfig(index, 'instructions', e.target.value)} className="field-input text-xs" placeholder="Aparece abaixo do campo" />
                         </div>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <label className="label-field-muted">Instruções</label>
-                        <input value={field.config.instructions || ''} onChange={(e) => updateConfig(index, 'instructions', e.target.value)} className="field-input text-xs" placeholder="Aparece abaixo do campo" />
-                      </div>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={field.config.required} onChange={(e) => updateConfig(index, 'required', e.target.checked)} className="check-field" />
-                        <span className="text-xs text-text-body">Obrigatório</span>
-                      </label>
-                    </div>
-
-                    <div className="space-y-4">
-                      <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><ShieldCheck size={12} /> Validação</h5>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="flex flex-col gap-1">
-                          <label className="label-field-muted">Min</label>
-                          <input type="number" value={field.config.validation?.min ?? ''} onChange={(e) => updateConfig(index, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label className="label-field-muted">Max</label>
-                          <input type="number" value={field.config.validation?.max ?? ''} onChange={(e) => updateConfig(index, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
-                        </div>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={field.config.required} onChange={(e) => updateConfig(index, 'required', e.target.checked)} className="check-field" />
+                          <span className="text-xs text-text-body">Obrigatório</span>
+                        </label>
                       </div>
 
-                      <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Eye size={12} /> Lógica Condicional</h5>
-                      <button onClick={() => updateConfig(index, 'conditionalLogic.status', !field.config.conditionalLogic?.status)} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${field.config.conditionalLogic?.status ? 'bg-status-published/10 text-status-published' : 'bg-surface-muted text-text-muted'}`}>
-                        {field.config.conditionalLogic?.status ? 'Ativo' : 'Inativo'}
-                      </button>
+                      <div className="space-y-4">
+                        <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><ShieldCheck size={12} /> Validação</h5>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex flex-col gap-1">
+                            <label className="label-field-muted">Min</label>
+                            <input type="number" value={field.config.validation?.min ?? ''} onChange={(e) => updateConfig(index, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="label-field-muted">Max</label>
+                            <input type="number" value={field.config.validation?.max ?? ''} onChange={(e) => updateConfig(index, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
+                          </div>
+                        </div>
+
+                        <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Eye size={12} /> Lógica Condicional</h5>
+                        <button onClick={() => updateConfig(index, 'conditionalLogic.status', !field.config.conditionalLogic?.status)} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${field.config.conditionalLogic?.status ? 'bg-status-published/10 text-status-published' : 'bg-surface-muted text-text-muted'}`}>
+                          {field.config.conditionalLogic?.status ? 'Ativo' : 'Inativo'}
+                        </button>
                       {field.config.conditionalLogic?.status && (
                         <div className="space-y-2 p-2 bg-surface-card rounded border border-border-default">
                           {field.config.conditionalLogic.rules?.map((rule: any, rIdx: number) => (
@@ -531,9 +533,12 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                           ))}
                         </div>
                       )}
+                      </div>
+                    </div>
 
-                      {field.type === 'repeater' && (
-                        <div className="space-y-3 md:col-span-2">
+                    {/* Repetidor - full width abaixo do grid */}
+                    {field.type === 'repeater' && (
+                      <div className="space-y-3 pt-4 border-t border-border-default">
                           <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Sub-campos do Repetidor</h5>
                           <SubFieldEditor
                             fields={field.config.repeater?.fields || []}
@@ -554,8 +559,9 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                         </div>
                       )}
 
-                      {field.type === 'flexible_content' && (
-                        <div className="space-y-4 md:col-span-2">
+                    {/* Flexible Content - full width abaixo do grid */}
+                    {field.type === 'flexible_content' && (
+                      <div className="space-y-4 pt-4 border-t border-border-default">
                           <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Layouts</h5>
                           {(field.config.flexibleContent?.layouts || []).map((layout: any, lIdx: number) => (
                             <div key={lIdx} className="border border-border-default rounded p-3 space-y-3">
