@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { updateFieldGroupAction, syncFieldsAction, searchPostsAction } from '../actions';
-import SubFieldEditor from '@/components/admin/SubFieldEditor';
 import FieldTypeSelector from '@/components/admin/FieldTypeSelector';
 
 interface FieldGroupEditorProps {
@@ -14,6 +13,21 @@ interface FieldGroupEditorProps {
   postTypes: { id: string; slug: string; label: string }[];
   taxonomies: { id: string; slug: string; label: string }[];
 }
+
+type DragSource = {
+  type: 'root' | 'repeater' | 'flexible_layout';
+  fieldIndex: number;
+  parentFieldIndex?: number;
+  layoutIndex?: number;
+} | null;
+
+type DropTarget = {
+  type: 'root' | 'repeater' | 'flexible_layout';
+  fieldIndex?: number;
+  parentFieldIndex?: number;
+  layoutIndex?: number;
+  position?: 'before' | 'after' | 'inside';
+} | null;
 
 export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: FieldGroupEditorProps) {
   const router = useRouter();
@@ -23,8 +37,8 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
   const [isSaving, setIsSaving] = useState(false);
   const [expandedField, setExpandedField] = useState<number | null>(null);
   const [activeFieldTab, setActiveFieldTab] = useState<{ [key: number]: string }>({});
-  const [draggedItem, setDraggedItem] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [dragSource, setDragSource] = useState<DragSource>(null);
+  const [dropTarget, setDropTarget] = useState<DropTarget>(null);
   const [postSearchQuery, setPostSearchQuery] = useState('');
   const [postSearchResults, setPostSearchResults] = useState<any[]>([]);
   const [postSearchLoading, setPostSearchLoading] = useState(false);
@@ -144,24 +158,360 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
     setLocations(locations.filter((_: any, i: number) => i !== index));
   };
 
-  const onDragStart = (index: number) => setDraggedItem(index);
-  const onDragEnd = () => { setDraggedItem(null); setDragOverIndex(null); };
-  const onDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (draggedItem !== null && draggedItem !== index) setDragOverIndex(index);
+  // ===== UNIFIED DRAG AND DROP =====
+
+  const onDragStart = (source: DragSource) => {
+    setDragSource(source);
   };
-  const onDrop = (index: number) => {
-    if (draggedItem === null || draggedItem === index) {
-      setDraggedItem(null);
-      setDragOverIndex(null);
+
+  const onDragEnd = () => {
+    setDragSource(null);
+    setDropTarget(null);
+  };
+
+  const onDragOverRoot = (e: React.DragEvent, index: number, position: 'before' | 'after') => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dragSource) {
+      setDropTarget({ type: 'root', fieldIndex: index, position });
+    }
+  };
+
+  const onDropRoot = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!dragSource || !dropTarget) {
+      setDragSource(null);
+      setDropTarget(null);
       return;
     }
+
     const newFields = [...fields];
-    const item = newFields.splice(draggedItem, 1)[0];
-    newFields.splice(index, 0, item);
+
+    // Remove field from source
+    let movedField: any = null;
+    if (dragSource.type === 'root') {
+      movedField = newFields.splice(dragSource.fieldIndex, 1)[0];
+    } else if (dragSource.type === 'repeater' && dragSource.parentFieldIndex !== undefined) {
+      const parentField = newFields[dragSource.parentFieldIndex];
+      const subFields = [...(parentField.config.repeater?.fields || [])];
+      movedField = subFields.splice(dragSource.fieldIndex, 1)[0];
+      newFields[dragSource.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+      };
+    } else if (dragSource.type === 'flexible_layout' && dragSource.parentFieldIndex !== undefined && dragSource.layoutIndex !== undefined) {
+      const parentField = newFields[dragSource.parentFieldIndex];
+      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+      const layoutFields = [...(layouts[dragSource.layoutIndex].fields || [])];
+      movedField = layoutFields.splice(dragSource.fieldIndex, 1)[0];
+      layouts[dragSource.layoutIndex] = { ...layouts[dragSource.layoutIndex], fields: layoutFields };
+      newFields[dragSource.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+      };
+    }
+
+    if (!movedField) {
+      setDragSource(null);
+      setDropTarget(null);
+      return;
+    }
+
+    // Insert at target position
+    const insertIndex = dropTarget.fieldIndex ?? newFields.length;
+    if (dropTarget.position === 'after') {
+      newFields.splice(insertIndex + 1, 0, movedField);
+    } else {
+      newFields.splice(insertIndex, 0, movedField);
+    }
+
     setFields(newFields);
-    setDraggedItem(null);
-    setDragOverIndex(null);
+    setDragSource(null);
+    setDropTarget(null);
+  };
+
+  const onDragOverRepeaterDropZone = (e: React.DragEvent, parentIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dragSource && dragSource.type !== 'repeater' && dragSource.fieldIndex !== parentIndex) {
+      setDropTarget({ type: 'repeater', parentFieldIndex: parentIndex, position: 'inside' });
+    }
+  };
+
+  const onDropInRepeater = (e: React.DragEvent, parentIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!dragSource || !dropTarget || dropTarget.type !== 'repeater') {
+      setDragSource(null);
+      setDropTarget(null);
+      return;
+    }
+
+    const newFields = [...fields];
+    let movedField: any = null;
+
+    // Remove from source
+    if (dragSource.type === 'root') {
+      movedField = newFields.splice(dragSource.fieldIndex, 1)[0];
+      // Adjust parentIndex if needed after removal
+      if (dragSource.fieldIndex < parentIndex) {
+        parentIndex--;
+      }
+    } else if (dragSource.type === 'repeater' && dragSource.parentFieldIndex !== undefined) {
+      const parentField = newFields[dragSource.parentFieldIndex];
+      const subFields = [...(parentField.config.repeater?.fields || [])];
+      movedField = subFields.splice(dragSource.fieldIndex, 1)[0];
+      newFields[dragSource.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+      };
+      // Adjust parentIndex if needed
+      if (dragSource.parentFieldIndex < parentIndex) {
+        parentIndex--;
+      }
+    } else if (dragSource.type === 'flexible_layout' && dragSource.parentFieldIndex !== undefined && dragSource.layoutIndex !== undefined) {
+      const parentField = newFields[dragSource.parentFieldIndex];
+      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+      const layoutFields = [...(layouts[dragSource.layoutIndex].fields || [])];
+      movedField = layoutFields.splice(dragSource.fieldIndex, 1)[0];
+      layouts[dragSource.layoutIndex] = { ...layouts[dragSource.layoutIndex], fields: layoutFields };
+      newFields[dragSource.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+      };
+      if (dragSource.parentFieldIndex < parentIndex) {
+        parentIndex--;
+      }
+    }
+
+    if (!movedField) {
+      setDragSource(null);
+      setDropTarget(null);
+      return;
+    }
+
+    // Insert into repeater
+    const parentField = newFields[parentIndex];
+    const subFields = [...(parentField.config.repeater?.fields || [])];
+    subFields.push(movedField);
+    newFields[parentIndex] = {
+      ...parentField,
+      config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+    };
+
+    setFields(newFields);
+    setDragSource(null);
+    setDropTarget(null);
+  };
+
+  const onDragOverFlexibleLayoutDropZone = (e: React.DragEvent, parentIndex: number, layoutIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dragSource && !(dragSource.type === 'flexible_layout' && dragSource.parentFieldIndex === parentIndex && dragSource.layoutIndex === layoutIndex)) {
+      setDropTarget({ type: 'flexible_layout', parentFieldIndex: parentIndex, layoutIndex, position: 'inside' });
+    }
+  };
+
+  const onDropInFlexibleLayout = (e: React.DragEvent, parentIndex: number, layoutIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!dragSource || !dropTarget || dropTarget.type !== 'flexible_layout') {
+      setDragSource(null);
+      setDropTarget(null);
+      return;
+    }
+
+    const newFields = [...fields];
+    let movedField: any = null;
+
+    // Remove from source
+    if (dragSource.type === 'root') {
+      movedField = newFields.splice(dragSource.fieldIndex, 1)[0];
+      if (dragSource.fieldIndex < parentIndex) {
+        parentIndex--;
+      }
+    } else if (dragSource.type === 'repeater' && dragSource.parentFieldIndex !== undefined) {
+      const parentField = newFields[dragSource.parentFieldIndex];
+      const subFields = [...(parentField.config.repeater?.fields || [])];
+      movedField = subFields.splice(dragSource.fieldIndex, 1)[0];
+      newFields[dragSource.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+      };
+      if (dragSource.parentFieldIndex < parentIndex) {
+        parentIndex--;
+      }
+    } else if (dragSource.type === 'flexible_layout' && dragSource.parentFieldIndex !== undefined && dragSource.layoutIndex !== undefined) {
+      const parentField = newFields[dragSource.parentFieldIndex];
+      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+      const layoutFields = [...(layouts[dragSource.layoutIndex].fields || [])];
+      movedField = layoutFields.splice(dragSource.fieldIndex, 1)[0];
+      layouts[dragSource.layoutIndex] = { ...layouts[dragSource.layoutIndex], fields: layoutFields };
+      newFields[dragSource.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+      };
+      if (dragSource.parentFieldIndex < parentIndex) {
+        parentIndex--;
+      } else if (dragSource.parentFieldIndex === parentIndex && dragSource.layoutIndex < layoutIndex) {
+        layoutIndex--;
+      }
+    }
+
+    if (!movedField) {
+      setDragSource(null);
+      setDropTarget(null);
+      return;
+    }
+
+    // Insert into flexible layout
+    const parentField = newFields[parentIndex];
+    const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+    const layoutFields = [...(layouts[layoutIndex].fields || [])];
+    layoutFields.push(movedField);
+    layouts[layoutIndex] = { ...layouts[layoutIndex], fields: layoutFields };
+    newFields[parentIndex] = {
+      ...parentField,
+      config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+    };
+
+    setFields(newFields);
+    setDragSource(null);
+    setDropTarget(null);
+  };
+
+  const isDragOverRepeater = (parentIndex: number) => {
+    return dropTarget?.type === 'repeater' && dropTarget.parentFieldIndex === parentIndex;
+  };
+
+  const isDragOverFlexibleLayout = (parentIndex: number, layoutIndex: number) => {
+    return dropTarget?.type === 'flexible_layout' && dropTarget.parentFieldIndex === parentIndex && dropTarget.layoutIndex === layoutIndex;
+  };
+
+  // ===== SUB-FIELD HANDLERS =====
+
+  const onSubDragStart = (source: DragSource) => {
+    setDragSource(source);
+  };
+
+  const updateSubFields = (parentIndex: number, subFields: any[]) => {
+    updateConfig(parentIndex, 'repeater.fields', subFields);
+  };
+
+  const updateFlexLayoutSubFields = (parentIndex: number, layoutIndex: number, subFields: any[]) => {
+    const newFields = [...fields];
+    const parentField = newFields[parentIndex];
+    const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+    layouts[layoutIndex] = { ...layouts[layoutIndex], fields: subFields };
+    newFields[parentIndex] = {
+      ...parentField,
+      config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+    };
+    setFields(newFields);
+  };
+
+  const removeSubField = (parentIndex: number, subIndex: number) => {
+    const newFields = [...fields];
+    const parentField = newFields[parentIndex];
+    const subFields = [...(parentField.config.repeater?.fields || [])];
+    subFields.splice(subIndex, 1);
+    newFields[parentIndex] = {
+      ...parentField,
+      config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+    };
+    setFields(newFields);
+  };
+
+  const removeFlexLayoutSubField = (parentIndex: number, layoutIndex: number, subIndex: number) => {
+    const newFields = [...fields];
+    const parentField = newFields[parentIndex];
+    const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+    const layoutFields = [...(layouts[layoutIndex].fields || [])];
+    layoutFields.splice(subIndex, 1);
+    layouts[layoutIndex] = { ...layouts[layoutIndex], fields: layoutFields };
+    newFields[parentIndex] = {
+      ...parentField,
+      config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+    };
+    setFields(newFields);
+  };
+
+  // ===== RENDER SUB-FIELD =====
+
+  const renderSubField = (sub: any, idx: number, source: DragSource, onDragStartFn: (s: DragSource) => void, onRemove: () => void) => {
+    const org = isOrganizer(sub.type);
+    const isDragging = dragSource?.type === source?.type && dragSource?.fieldIndex === idx && dragSource?.parentFieldIndex === source?.parentFieldIndex && dragSource?.layoutIndex === source?.layoutIndex;
+
+    return (
+      <div
+        key={sub.id || idx}
+        draggable
+        onDragStart={(e) => {
+          e.stopPropagation();
+          onDragStartFn(source);
+        }}
+        onDragEnd={onDragEnd}
+        className={`border rounded overflow-hidden transition-all ${
+          org ? 'border-action/30 bg-action-light/50' : 'border-border-default'
+        } ${isDragging ? 'opacity-50 scale-[0.98]' : ''}`}
+      >
+        <div className={`flex items-center gap-2 p-2 ${org ? 'bg-action-light/50' : 'bg-surface-muted'}`}>
+          <div className="cursor-grab text-text-muted hover:text-action">
+            <GripVertical size={12} />
+          </div>
+          <div className="flex-1 flex items-center gap-2">
+            <span className="text-[10px] text-text-muted w-5">{idx + 1}.</span>
+            <input
+              value={sub.label}
+              onChange={(e) => {
+                const newLabel = e.target.value;
+                const newFieldsCopy = [...fields];
+                let subFields: any[];
+                if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
+                  const parentField = newFieldsCopy[source.parentFieldIndex];
+                  subFields = [...(parentField.config.repeater?.fields || [])];
+                  subFields[idx] = { ...subFields[idx], label: newLabel };
+                  if (!sub.name) {
+                    subFields[idx].name = newLabel
+                      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+                      .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                  }
+                  newFieldsCopy[source.parentFieldIndex] = {
+                    ...parentField,
+                    config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+                  };
+                } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
+                  const parentField = newFieldsCopy[source.parentFieldIndex];
+                  const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+                  subFields = [...(layouts[source.layoutIndex].fields || [])];
+                  subFields[idx] = { ...subFields[idx], label: newLabel };
+                  if (!sub.name) {
+                    subFields[idx].name = newLabel
+                      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+                      .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                  }
+                  layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: subFields };
+                  newFieldsCopy[source.parentFieldIndex] = {
+                    ...parentField,
+                    config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+                  };
+                }
+                setFields(newFieldsCopy);
+              }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-transparent border-none outline-none font-medium text-xs text-text-heading flex-1"
+              placeholder="Rótulo"
+            />
+            <span className="text-[9px] font-mono text-text-muted truncate max-w-[80px]">{sub.name || '...'}</span>
+            <span className="text-[9px] font-mono text-action/60">{sub.type}</span>
+          </div>
+          <button onClick={(e) => { e.stopPropagation(); onRemove(); }} className="p-1 text-text-muted hover:text-status-trash">
+            <Trash2 size={12} />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   const handleSave = async () => {
@@ -241,7 +591,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
           <ChevronLeft size={20} />
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-semibold text-text-heading">Editar: {fieldGroup.title}</h1>
+          <h1 className="text-2xl font-semibold text-text-heading">Editar: Campos Customizados</h1>
           <p className="text-sm text-text-muted mt-1">Configurar campos e localizações</p>
         </div>
       </div>
@@ -435,14 +785,14 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
               <div
                 key={field.id || index}
                 draggable
-                onDragStart={() => onDragStart(index)}
+                onDragStart={() => onDragStart({ type: 'root', fieldIndex: index })}
                 onDragEnd={onDragEnd}
-                onDragOver={(e) => onDragOver(e, index)}
-                onDrop={() => onDrop(index)}
+                onDragOver={(e) => onDragOverRoot(e, index, 'before')}
+                onDrop={(e) => onDropRoot(e, index)}
                 className={`border rounded overflow-hidden transition-all ${
                   org ? 'border-action/30 bg-action-light/50' :
-                  dragOverIndex === index ? 'border-action border-dashed bg-action-light/20' : 'border-border-default'
-                } ${draggedItem === index ? 'opacity-50 scale-[0.98]' : 'opacity-100'}`}
+                  dropTarget?.type === 'root' && dropTarget.fieldIndex === index ? 'border-action border-dashed bg-action-light/20' : 'border-border-default'
+                } ${dragSource?.type === 'root' && dragSource.fieldIndex === index ? 'opacity-50 scale-[0.98]' : 'opacity-100'}`}
               >
                 <div className={`flex items-center gap-3 p-3 ${org ? 'bg-action-light/50' : 'bg-surface-muted'}`}>
                   <div className="cursor-grab text-text-muted hover:text-action">
@@ -617,74 +967,156 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                         </div>
                       )}
                     </div>
+                  </div>
+                )}
 
-                    {/* Repetidor - full width abaixo do grid */}
-                    {field.type === 'repeater' && (
-                      <div className="space-y-3 pt-4 border-t border-border-default">
-                          <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Sub-campos do Repetidor</h5>
-                          <SubFieldEditor
-                            fields={field.config.repeater?.fields || []}
-                            onChange={(subFields) => updateConfig(index, 'repeater.fields', subFields)}
-                            layout={field.config.repeater?.layout || 'block'}
-                            onLayoutChange={(layout) => updateConfig(index, 'repeater.layout', layout)}
+                {/* Repetidor */}
+                {field.type === 'repeater' && (
+                  <div className="space-y-3 p-4 border-t border-border-default">
+                    <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Sub-campos do Repetidor</h5>
+
+                    {/* Sub-fields list */}
+                    <div className="space-y-2">
+                      {(field.config.repeater?.fields || []).map((sub: any, subIdx: number) => {
+                        const subSource: DragSource = { type: 'repeater', fieldIndex: subIdx, parentFieldIndex: index };
+                        return renderSubField(
+                          sub,
+                          subIdx,
+                          subSource,
+                          onSubDragStart,
+                          () => removeSubField(index, subIdx)
+                        );
+                      })}
+                    </div>
+
+                    {/* Drop zone for repeater */}
+                    <div
+                      onDragOver={(e) => onDragOverRepeaterDropZone(e, index)}
+                      onDrop={(e) => onDropInRepeater(e, index)}
+                      className={`w-full py-3 border-2 border-dashed rounded flex items-center justify-center gap-2 text-xs transition-all ${
+                        isDragOverRepeater(index)
+                          ? 'border-action bg-action-light/30 text-action'
+                          : 'border-border-default text-text-muted hover:border-action hover:text-action'
+                      }`}
+                    >
+                      <Plus size={12} />
+                      {isDragOverRepeater(index) ? 'Soltar aqui para adicionar como sub-campo' : 'Arraste um campo aqui para adicionar como sub-campo'}
+                    </div>
+
+                    {/* Layout selector */}
+                    <div className="flex items-center gap-2 pt-2">
+                      <span className="text-[10px] text-text-muted">Layout:</span>
+                      <button
+                        onClick={() => updateConfig(index, 'repeater.layout', 'block')}
+                        className={`px-2 py-0.5 rounded text-[10px] ${field.config.repeater?.layout === 'block' || !field.config.repeater?.layout ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}
+                      >Bloco</button>
+                      <button
+                        onClick={() => updateConfig(index, 'repeater.layout', 'table')}
+                        className={`px-2 py-0.5 rounded text-[10px] ${field.config.repeater?.layout === 'table' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}
+                      >Tabela</button>
+                      <button
+                        onClick={() => updateConfig(index, 'repeater.layout', 'row')}
+                        className={`px-2 py-0.5 rounded text-[10px] ${field.config.repeater?.layout === 'row' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}
+                      >Linha</button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Flexible Content */}
+                {field.type === 'flexible_content' && (
+                  <div className="space-y-4 p-4 border-t border-border-default">
+                    <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Layouts</h5>
+                    {(field.config.flexibleContent?.layouts || []).map((layout: any, lIdx: number) => (
+                      <div key={lIdx} className="border border-border-default rounded p-3 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <input
+                            value={layout.label}
+                            onChange={(e) => {
+                              const layouts = [...(field.config.flexibleContent?.layouts || [])];
+                              layouts[lIdx] = { ...layouts[lIdx], label: e.target.value };
+                              if (!layout.name) {
+                                layouts[lIdx].name = e.target.value
+                                  .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+                                  .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                              }
+                              updateConfig(index, 'flexibleContent.layouts', layouts);
+                            }}
+                            className="field-input text-xs flex-1 font-medium"
+                            placeholder="Nome do Layout"
                           />
-                        </div>
-                      )}
-
-                    {/* Flexible Content - full width abaixo do grid */}
-                    {field.type === 'flexible_content' && (
-                      <div className="space-y-4 pt-4 border-t border-border-default">
-                          <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Layouts</h5>
-                          {(field.config.flexibleContent?.layouts || []).map((layout: any, lIdx: number) => (
-                            <div key={lIdx} className="border border-border-default rounded p-3 space-y-3">
-                              <div className="flex items-center gap-2">
-                                <input
-                                  value={layout.label}
-                                  onChange={(e) => {
-                                    const layouts = [...(field.config.flexibleContent?.layouts || [])];
-                                    layouts[lIdx] = { ...layouts[lIdx], label: e.target.value };
-                                    if (!layout.name) {
-                                      layouts[lIdx].name = e.target.value
-                                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-                                        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
-                                    }
-                                    updateConfig(index, 'flexibleContent.layouts', layouts);
-                                  }}
-                                  className="field-input text-xs flex-1 font-medium"
-                                  placeholder="Nome do Layout"
-                                />
-                                <button onClick={() => {
-                                  const layouts = (field.config.flexibleContent?.layouts || []).filter((_: any, i: number) => i !== lIdx);
-                                  updateConfig(index, 'flexibleContent.layouts', layouts);
-                                }} className="p-1 text-text-muted hover:text-status-trash">
-                                  <Trash2 size={12} />
-                                </button>
-                              </div>
-                              <SubFieldEditor
-                                fields={layout.fields || []}
-                                onChange={(subFields) => {
-                                  const layouts = [...(field.config.flexibleContent?.layouts || [])];
-                                  layouts[lIdx] = { ...layouts[lIdx], fields: subFields };
-                                  updateConfig(index, 'flexibleContent.layouts', layouts);
-                                }}
-                                layout={layout.layout || 'block'}
-                                onLayoutChange={(layoutMode) => {
-                                  const layouts = [...(field.config.flexibleContent?.layouts || [])];
-                                  layouts[lIdx] = { ...layouts[lIdx], layout: layoutMode };
-                                  updateConfig(index, 'flexibleContent.layouts', layouts);
-                                }}
-                              />
-                            </div>
-                          ))}
                           <button onClick={() => {
-                            const layouts = [...(field.config.flexibleContent?.layouts || []), { name: '', label: '', fields: [] }];
+                            const layouts = (field.config.flexibleContent?.layouts || []).filter((_: any, i: number) => i !== lIdx);
                             updateConfig(index, 'flexibleContent.layouts', layouts);
-                          }} className="w-full py-2 border border-dashed border-border-default rounded text-xs text-text-muted hover:text-action hover:border-action">
-                            + Adicionar Layout
+                          }} className="p-1 text-text-muted hover:text-status-trash">
+                            <Trash2 size={12} />
                           </button>
                         </div>
-                      )}
-                    </div>
+
+                        {/* Layout sub-fields */}
+                        <div className="space-y-2">
+                          {(layout.fields || []).map((sub: any, subIdx: number) => {
+                            const subSource: DragSource = { type: 'flexible_layout', fieldIndex: subIdx, parentFieldIndex: index, layoutIndex: lIdx };
+                            return renderSubField(
+                              sub,
+                              subIdx,
+                              subSource,
+                              onSubDragStart,
+                              () => removeFlexLayoutSubField(index, lIdx, subIdx)
+                            );
+                          })}
+                        </div>
+
+                        {/* Drop zone for flexible layout */}
+                        <div
+                          onDragOver={(e) => onDragOverFlexibleLayoutDropZone(e, index, lIdx)}
+                          onDrop={(e) => onDropInFlexibleLayout(e, index, lIdx)}
+                          className={`w-full py-2 border-2 border-dashed rounded flex items-center justify-center gap-2 text-[10px] transition-all ${
+                            isDragOverFlexibleLayout(index, lIdx)
+                              ? 'border-action bg-action-light/30 text-action'
+                              : 'border-border-default text-text-muted hover:border-action hover:text-action'
+                          }`}
+                        >
+                          <Plus size={10} />
+                          {isDragOverFlexibleLayout(index, lIdx) ? 'Soltar aqui' : 'Arraste campo aqui'}
+                        </div>
+
+                        {/* Layout selector */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-text-muted">Layout:</span>
+                          <button
+                            onClick={() => {
+                              const layouts = [...(field.config.flexibleContent?.layouts || [])];
+                              layouts[lIdx] = { ...layouts[lIdx], layout: 'block' };
+                              updateConfig(index, 'flexibleContent.layouts', layouts);
+                            }}
+                            className={`px-2 py-0.5 rounded text-[10px] ${layout.layout === 'block' || !layout.layout ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}
+                          >Bloco</button>
+                          <button
+                            onClick={() => {
+                              const layouts = [...(field.config.flexibleContent?.layouts || [])];
+                              layouts[lIdx] = { ...layouts[lIdx], layout: 'table' };
+                              updateConfig(index, 'flexibleContent.layouts', layouts);
+                            }}
+                            className={`px-2 py-0.5 rounded text-[10px] ${layout.layout === 'table' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}
+                          >Tabela</button>
+                          <button
+                            onClick={() => {
+                              const layouts = [...(field.config.flexibleContent?.layouts || [])];
+                              layouts[lIdx] = { ...layouts[lIdx], layout: 'row' };
+                              updateConfig(index, 'flexibleContent.layouts', layouts);
+                            }}
+                            className={`px-2 py-0.5 rounded text-[10px] ${layout.layout === 'row' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}
+                          >Linha</button>
+                        </div>
+                      </div>
+                    ))}
+                    <button onClick={() => {
+                      const layouts = [...(field.config.flexibleContent?.layouts || []), { name: '', label: '', fields: [] }];
+                      updateConfig(index, 'flexibleContent.layouts', layouts);
+                    }} className="w-full py-2 border border-dashed border-border-default rounded text-xs text-text-muted hover:text-action hover:border-action">
+                      + Adicionar Layout
+                    </button>
+                  </div>
                 )}
               </div>
             );

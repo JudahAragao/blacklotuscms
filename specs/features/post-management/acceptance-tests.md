@@ -142,3 +142,40 @@ feature: "post-management"
 - **THEN** os itens são exibidos em formato de tabela com colunas
 - **AND** layout "Block" exibe como cards e "Row" exibe em linha
 - **Referencia:** FR06
+
+## AT-22: Drag Field to Repeater (Root → Sub-field)
+- **GIVEN** um FieldGroup com campo-raiz "Text" e campo Repeater com sub-campos
+- **WHEN** usuario arrasta o campo "Text" para a zona de drop dentro do Repeater
+- **THEN** o campo "Text" é removido da lista de campos-raiz
+- **AND** o campo "Text" é adicionado como sub-campo do Repeater
+- **AND** toda configuração do campo (tipo, validação, etc.) é preservada
+- **Referencia:** REQ-03a
+
+## AT-23: Drag Sub-field to Root (Sub-field → Root)
+- **GIVEN** um Repeater com sub-campo "Email"
+- **WHEN** usuario arrasta o sub-campo "Email" para a lista de campos-raiz
+- **THEN** o sub-campo "Email" é removido do Repeater
+- **AND** o campo "Email" é adicionado como campo-raiz
+- **AND** toda configuração do campo é preservada
+- **Referencia:** REQ-03a
+
+## AT-24: Drag Between Repeaters
+- **GIVEN** dois Repeaters: "Repeater A" com sub-campo "Name" e "Repeater B"
+- **WHEN** usuario arrasta "Name" de "Repeater A" para "Repeater B"
+- **THEN** o sub-campo "Name" é removido de "Repeater A"
+- **AND** o sub-campo "Name" é adicionado em "Repeater B"
+- **Referencia:** REQ-03a
+
+## AT-25: Drag to Flexible Content Layout
+- **GIVEN** um campo Flexible Content com layout "Hero" e campo-raiz "Image"
+- **WHEN** usuario arrasta "Image" para a zona de drop dentro do layout "Hero"
+- **THEN** o campo "Image" é removido da lista de campos-raiz
+- **AND** o campo "Image" é adicionado como sub-campo do layout "Hero"
+- **Referencia:** REQ-03a
+
+## AT-26: Drop Zone Visual Feedback
+- **GIVEN** um Repeater ou Flexible Content Layout
+- **WHEN** usuario arrasta um campo sobre a zona de drop
+- **THEN** a zona de drop exibe feedback visual (borda tracejada azul, texto "Soltar aqui")
+- **AND** ao soltar, o campo é movido para o destino correto
+- **Referencia:** REQ-03a

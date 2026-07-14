@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-13"
+spec_version: "1.3"
+last_updated: "2026-07-14"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "post-management"
@@ -15,6 +15,8 @@ Sistema completo de gerenciamento de conteudo com Custom Post Types, MetaFields,
 - **REQ-01:** CRUD completo de posts com validacao Zod
 - **REQ-02:** Suporte a Custom Post Types configuraveis
 - **REQ-03:** Fields customizeds (MetaFields) via FieldGroups independentes com location rules (post types, taxonomias, posts específicos, templates, status), incluindo tipos organizadores Tab e Section, com deduplicação automática de anchors
+- **REQ-03a:** Campos e subcampos são unificados - campos-raiz podem se tornar subcampos de repeater/flexible_content via drag and drop, e subcampos podem se tornar campos-raiz
+- **REQ-03b:** Toda configuração de campo (tipo, validação, lógica condicional, opções) é preservada ao mover entre níveis
 - **REQ-04:** Taxonomys hierarquicas e flat
 - **REQ-05:** SEO metadata (title, description, ogImage, noIndex)
 - **REQ-06:** Status de publicacao (draft, published, private)
