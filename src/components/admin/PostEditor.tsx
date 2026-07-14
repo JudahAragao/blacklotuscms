@@ -63,6 +63,11 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
       }
     }
     tabs.push(currentTab);
+
+    // Remove the empty default first tab when explicit tabs exist
+    if (tabs.length > 1 && !tabs[0].label && tabs[0].sections.flatMap(s => s.fields).length === 0) {
+      return tabs.slice(1);
+    }
     return tabs;
   }, [fieldGroups]);
 
@@ -680,8 +685,6 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                 {/* Barra de navegação das abas */}
                 <div className="flex gap-1 mb-5 pb-3 border-b border-border-default overflow-x-auto">
                   {groupedFields.map((tab, tabIdx) => {
-                    const tabFields = tab.sections.flatMap(s => s.fields);
-                    if (tabIdx === 0 && !tab.label && tabFields.length === 0) return null;
                     return (
                       <button
                         key={tabIdx}
@@ -701,8 +704,6 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                 {/* Conteúdo da aba ativa */}
                 {groupedFields.map((tab, tabIdx) => {
                   if (activeTab !== tabIdx) return null;
-                  const tabFields = tab.sections.flatMap(s => s.fields);
-                  if (tabIdx === 0 && !tab.label && tabFields.length === 0) return null;
 
                   return (
                     <div key={tabIdx} className="flex flex-wrap -mx-2">
