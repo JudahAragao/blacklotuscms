@@ -613,7 +613,6 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                         </div>
                       )}
                     </div>
-                  </div>
                 )}
               </div>
             );
