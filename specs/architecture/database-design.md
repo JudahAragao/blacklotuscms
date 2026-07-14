@@ -99,7 +99,12 @@ erDiagram
 - `name`: String - chave interna (ex: "telefone_contato")
 - `label`: String - nome exibido
 - `type`: String - text, image, repeater, tab, section, etc. (tab/section are visual organizers, no MetaValue)
-- `config`: JSON - min/max, required, etc.
+- `config`: JSON - configurações do campo:
+  - Para campos simples: `{ width, required, validation: { min, max }, conditionalLogic: { status, rules }, instructions }`
+  - Para Repeater: `{ repeater: { fields: [...], layout: 'block'|'table'|'row', minItems, maxItems } }`
+  - Para Flexible Content: `{ flexibleContent: { layouts: [{ name, label, fields: [...], layout }], minItems, maxItems } }`
+  - Para Select: `{ options: [{ label, value }] }`
+  - Sub-campos são armazenados no config como array de objetos com mesma estrutura de Field
 
 ### MetaValue
 - `id`: UUID (PK)

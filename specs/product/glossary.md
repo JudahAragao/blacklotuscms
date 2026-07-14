@@ -28,6 +28,8 @@ status: approved
 - **G17 Stable Proxy:** Padrão onde cada Service exporta tanto métodos de instância quanto métodos estáticos proxy.
 - **G18 Tab (Field Type):** Campo organizador visual que cria abas navegáveis no editor de posts. Campos abaixo de uma Tab (até a próxima Tab) ficam agrupados nessa aba. Não armazena dados.
 - **G19 Section (Field Type):** Campo organizador visual que cria divisores/títulos de seção dentro de uma aba no editor de posts. Não quebra o agrupamento da aba pai. Não armazena dados.
+- **G20 Sub-field:** Campo filho armazenado dentro de um Repeater ou Flexible Content. Pode ser criado via drag-and-drop (movendo um campo-raiz para dentro do container) ou via clique na zona de drop. Mantém todas as configurações (tipo, validação, lógica condicional) ao mudar de nível.
+- **G21 Unified Field System:** Sistema onde campos-raiz e sub-compartilham a mesma estrutura e podem se mover livremente entre níveis via drag-and-drop, similar ao ACF (Advanced Custom Fields).
 
 ## Relacionamentos
 

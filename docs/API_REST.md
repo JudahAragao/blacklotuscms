@@ -60,6 +60,8 @@ POST /api/v1/posts/:type
 
 **Note:** Field types include data fields (text, image, repeater, etc.) and organizer fields (tab, section). Tab/Section fields are visual-only and do not generate metaFields. metaFields are validated against FieldGroups with matching location rules (post type, taxonomy, etc.).
 
+**Sub-fields:** Repeater and Flexible Content fields store their sub-fields in `config.repeater.fields[]` or `config.flexibleContent.layouts[].fields[]`. Sub-fields follow the same structure as root fields (name, label, type, config) and can be moved between levels via drag-and-drop in the admin UI.
+
 ### Get Post by ID
 ```
 GET /api/v1/posts/:type/:id

@@ -129,11 +129,12 @@ feature: "post-management"
 - **AND** usuario pode adicionar múltiplos blocos em qualquer ordem
 - **Referencia:** FR06
 
-## AT-20: Sub-Fields Table Layout
-- **GIVEN** um Repeater com layout "Tabela" configurado
+## AT-20: Sub-Fields Inline Layout
+- **GIVEN** um Repeater com sub-campos configurados
 - **WHEN** usuario visualiza os sub-campos no editor de field groups
-- **THEN** sub-campos aparecem em formato de tabela com colunas #, Label, Name, Type
-- **AND** cada sub-campo pode ser expandido para configuração completa
+- **THEN** sub-campos aparecem em formato inline com #, Rótulo, Nome (âncora), Tipo
+- **AND** cada sub-campo tem botões de configuração (engrenagem) e remoção (lixeira)
+- **AND** ao clicar na engrenagem, painel com abas (Geral, Validação, Lógica Condicional) é expandido
 - **Referencia:** FR06
 
 ## AT-21: Repeater Layout Modes
@@ -179,3 +180,41 @@ feature: "post-management"
 - **THEN** a zona de drop exibe feedback visual (borda tracejada azul, texto "Soltar aqui")
 - **AND** ao soltar, o campo é movido para o destino correto
 - **Referencia:** REQ-03a
+
+## AT-27: Sub-Field Config Tabs
+- **GIVEN** um sub-campo expandido no editor de field groups
+- **WHEN** usuario clica na engrenagem do sub-campo
+- **THEN** painel de configuração é expandido com abas: Geral, Validação, Lógica Condicional
+- **AND** aba Geral mostra: Tipo (FieldTypeSelector), Largura, Instruções, Obrigatório
+- **AND** aba Validação mostra: Min, Max
+- **AND** aba Lógica Condicional mostra: Status (Ativo/Inativo) e regras
+- **Referencia:** REQ-03
+
+## AT-28: FieldTypeSelector for Sub-Fields
+- **GIVEN** um sub-campo com aba Geral expandida
+- **WHEN** usuario clica no seletor de tipo
+- **THEN** dropdown aberto com ícones, categorias e busca
+- **AND** mesmo comportamento do seletor de campos-raiz
+- **Referencia:** REQ-03
+
+## AT-29: Click to Add Sub-Field
+- **GIVEN** um Repeater ou Flexible Content Layout
+- **WHEN** usuario clica na zona de drop "Arraste ou clique para adicionar sub-campo"
+- **THEN** um novo sub-campo é adicionado ao repeater/layout
+- **AND** sub-campo é criado com tipo "text" e configurações padrão
+- **Referencia:** REQ-03
+
+## AT-30: Save Button Stays on Page
+- **GIVEN** um FieldGroup sendo editado
+- **WHEN** usuario clica em "Salvar Configuração"
+- **THEN** mensagem de sucesso é exibida
+- **AND** usuario permanece na mesma página de edição (não redireciona para lista)
+- **Referencia:** REQ-03
+
+## AT-31: Sub-Field Name Auto-Generation
+- **GIVEN** um sub-campo com rótulo "Telefone Comercial"
+- **WHEN** usuario digita o rótulo
+- **THEN** nome âncora é gerado automaticamente como "telefone_comercial"
+- **AND** nome âncora é atualizado sempre que o rótulo muda
+- **AND** campo de nome âncora é editável para personalização manual
+- **Referencia:** REQ-03

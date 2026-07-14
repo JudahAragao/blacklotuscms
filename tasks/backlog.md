@@ -94,11 +94,11 @@ status: approved
 - [x] **TASK-070:** Visual field type selector with icons and categories (ACF-style) | est: 2h | depends: [] | feature: ux
 - [x] **TASK-071:** Redesign SubFieldEditor with table layout + full config inputs | est: 3h | depends: [TASK-068] | feature: post-management
 - [x] **TASK-072:** Repeater layout modes (table/block/row) with PostEditor rendering | est: 2h | depends: [TASK-071] | feature: post-management
-- [ ] **TASK-073:** Unified drag-and-drop: fields can become sub-fields and vice-versa (ACF-style) | est: 6h | depends: [TASK-072] | feature: post-management
+- [x] **TASK-073:** Unified drag-and-drop: fields can become sub-fields and vice-versa (ACF-style) | est: 6h | depends: [TASK-072] | feature: post-management
 
 ## Métricas
 - Total de tasks: 73
-- Concluídas: 72
-- Pendentes: 1
+- Concluídas: 73
+- Pendentes: 0
 - Bloqueadas: 0
-- Estimativa restante: 6h
+- Estimativa restante: 0h
