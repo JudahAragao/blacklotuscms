@@ -35,7 +35,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
   const [locations, setLocations] = useState(fieldGroup.locations || []);
   const [fields, setFields] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [expandedField, setExpandedField] = useState<number | null>(null);
+  const [expandedField, setExpandedField] = useState<number | string | null>(null);
   const [activeFieldTab, setActiveFieldTab] = useState<{ [key: number]: string }>({});
   const [dragSource, setDragSource] = useState<DragSource>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget>(null);
@@ -439,13 +439,23 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
 
   // ===== RENDER SUB-FIELD =====
 
-  const renderSubField = (sub: any, idx: number, source: DragSource, onDragStartFn: (s: DragSource) => void, onRemove: () => void) => {
+  const renderSubField = (sub: any, idx: number, source: DragSource, onDragStartFn: (s: DragSource) => void, onRemove: () => void, onUpdateLabel: (newLabel: string) => void, onUpdateName: (newName: string) => void) => {
     const org = isOrganizer(sub.type);
     const isDragging = dragSource?.type === source?.type && dragSource?.fieldIndex === idx && dragSource?.parentFieldIndex === source?.parentFieldIndex && dragSource?.layoutIndex === source?.layoutIndex;
+    const subKey = `${source?.type}-${source?.parentFieldIndex}-${source?.layoutIndex ?? ''}-${idx}`;
+    const isExpanded = expandedField === subKey;
+
+    // Get the actual current value from state
+    let currentSub = sub;
+    if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
+      currentSub = fields[source.parentFieldIndex]?.config?.repeater?.fields?.[idx] || sub;
+    } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
+      currentSub = fields[source.parentFieldIndex]?.config?.flexibleContent?.layouts?.[source.layoutIndex]?.fields?.[idx] || sub;
+    }
 
     return (
       <div
-        key={sub.id || idx}
+        key={currentSub.id || subKey}
         draggable
         onDragStart={(e) => {
           e.stopPropagation();
@@ -453,8 +463,9 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
         }}
         onDragEnd={onDragEnd}
         className={`border rounded overflow-hidden transition-all ${
-          org ? 'border-action/30 bg-action-light/50' : 'border-border-default'
-        } ${isDragging ? 'opacity-50 scale-[0.98]' : ''}`}
+          org ? 'border-action/30 bg-action-light/50' :
+          isDragging ? 'opacity-50 scale-[0.98]' : 'border-border-default'
+        }`}
       >
         <div className={`flex items-center gap-2 p-2 ${org ? 'bg-action-light/50' : 'bg-surface-muted'}`}>
           <div className="cursor-grab text-text-muted hover:text-action">
@@ -463,53 +474,151 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
           <div className="flex-1 flex items-center gap-2">
             <span className="text-[10px] text-text-muted w-5">{idx + 1}.</span>
             <input
-              value={sub.label}
-              onChange={(e) => {
-                const newLabel = e.target.value;
-                const newFieldsCopy = [...fields];
-                let subFields: any[];
-                if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
-                  const parentField = newFieldsCopy[source.parentFieldIndex];
-                  subFields = [...(parentField.config.repeater?.fields || [])];
-                  subFields[idx] = { ...subFields[idx], label: newLabel };
-                  if (!sub.name) {
-                    subFields[idx].name = newLabel
-                      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-                      .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
-                  }
-                  newFieldsCopy[source.parentFieldIndex] = {
-                    ...parentField,
-                    config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
-                  };
-                } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
-                  const parentField = newFieldsCopy[source.parentFieldIndex];
-                  const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
-                  subFields = [...(layouts[source.layoutIndex].fields || [])];
-                  subFields[idx] = { ...subFields[idx], label: newLabel };
-                  if (!sub.name) {
-                    subFields[idx].name = newLabel
-                      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-                      .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
-                  }
-                  layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: subFields };
-                  newFieldsCopy[source.parentFieldIndex] = {
-                    ...parentField,
-                    config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
-                  };
-                }
-                setFields(newFieldsCopy);
-              }}
+              value={currentSub.label}
+              onChange={(e) => onUpdateLabel(e.target.value)}
               onClick={(e) => e.stopPropagation()}
               className="bg-transparent border-none outline-none font-medium text-xs text-text-heading flex-1"
               placeholder="Rótulo"
             />
-            <span className="text-[9px] font-mono text-text-muted truncate max-w-[80px]">{sub.name || '...'}</span>
-            <span className="text-[9px] font-mono text-action/60">{sub.type}</span>
+            <input
+              value={currentSub.name}
+              onChange={(e) => onUpdateName(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-transparent border-none outline-none font-mono text-[9px] text-text-muted w-20"
+              placeholder="nome_ancora"
+            />
+            <span className="text-[9px] font-mono text-action/60">{currentSub.type}</span>
           </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpandedField(isExpanded ? null : subKey);
+            }}
+            className={`p-1 rounded transition-colors ${isExpanded ? 'bg-action-light text-action' : 'text-text-muted hover:text-text-heading'}`}
+          >
+            <Settings size={12} />
+          </button>
           <button onClick={(e) => { e.stopPropagation(); onRemove(); }} className="p-1 text-text-muted hover:text-status-trash">
             <Trash2 size={12} />
           </button>
         </div>
+
+        {/* Sub-field config panel */}
+        {isExpanded && (
+          <div className="bg-surface-muted/50 border-t border-border-default p-3 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted text-[10px]">Tipo do Campo</label>
+                <select
+                  value={currentSub.type}
+                  onChange={(e) => {
+                    const newFieldsCopy = [...fields];
+                    if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
+                      const parentField = newFieldsCopy[source.parentFieldIndex];
+                      const subFields = [...(parentField.config.repeater?.fields || [])];
+                      subFields[idx] = { ...subFields[idx], type: e.target.value };
+                      newFieldsCopy[source.parentFieldIndex] = {
+                        ...parentField,
+                        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+                      };
+                    } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
+                      const parentField = newFieldsCopy[source.parentFieldIndex];
+                      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+                      const layoutFields = [...(layouts[source.layoutIndex].fields || [])];
+                      layoutFields[idx] = { ...layoutFields[idx], type: e.target.value };
+                      layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: layoutFields };
+                      newFieldsCopy[source.parentFieldIndex] = {
+                        ...parentField,
+                        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+                      };
+                    }
+                    setFields(newFieldsCopy);
+                  }}
+                  className="field-select text-[10px]"
+                >
+                  <option value="text">Texto</option>
+                  <option value="textarea">Texto Longo</option>
+                  <option value="number">Numero</option>
+                  <option value="email">Email</option>
+                  <option value="url">URL</option>
+                  <option value="image">Imagem</option>
+                  <option value="gallery">Galeria</option>
+                  <option value="file">Arquivo</option>
+                  <option value="wysiwyg">Editor Rico</option>
+                  <option value="select">Select</option>
+                  <option value="checkbox">Checkbox</option>
+                  <option value="radio">Radio</option>
+                  <option value="boolean">Booleano</option>
+                  <option value="color">Cor</option>
+                  <option value="date">Data</option>
+                  <option value="json">JSON</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted text-[10px]">Largura (%)</label>
+                <input
+                  type="number"
+                  value={currentSub.config?.width || 100}
+                  onChange={(e) => {
+                    const newFieldsCopy = [...fields];
+                    if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
+                      const parentField = newFieldsCopy[source.parentFieldIndex];
+                      const subFields = [...(parentField.config.repeater?.fields || [])];
+                      subFields[idx] = { ...subFields[idx], config: { ...subFields[idx].config, width: Number(e.target.value) } };
+                      newFieldsCopy[source.parentFieldIndex] = {
+                        ...parentField,
+                        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+                      };
+                    } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
+                      const parentField = newFieldsCopy[source.parentFieldIndex];
+                      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+                      const layoutFields = [...(layouts[source.layoutIndex].fields || [])];
+                      layoutFields[idx] = { ...layoutFields[idx], config: { ...layoutFields[idx].config, width: Number(e.target.value) } };
+                      layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: layoutFields };
+                      newFieldsCopy[source.parentFieldIndex] = {
+                        ...parentField,
+                        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+                      };
+                    }
+                    setFields(newFieldsCopy);
+                  }}
+                  className="field-input text-[10px]"
+                />
+              </div>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={currentSub.config?.required || false}
+                onChange={(e) => {
+                  const newFieldsCopy = [...fields];
+                  if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
+                    const parentField = newFieldsCopy[source.parentFieldIndex];
+                    const subFields = [...(parentField.config.repeater?.fields || [])];
+                    subFields[idx] = { ...subFields[idx], config: { ...subFields[idx].config, required: e.target.checked } };
+                    newFieldsCopy[source.parentFieldIndex] = {
+                      ...parentField,
+                      config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+                    };
+                  } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
+                    const parentField = newFieldsCopy[source.parentFieldIndex];
+                    const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+                    const layoutFields = [...(layouts[source.layoutIndex].fields || [])];
+                    layoutFields[idx] = { ...layoutFields[idx], config: { ...layoutFields[idx].config, required: e.target.checked } };
+                    layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: layoutFields };
+                    newFieldsCopy[source.parentFieldIndex] = {
+                      ...parentField,
+                      config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+                    };
+                  }
+                  setFields(newFieldsCopy);
+                }}
+                className="check-field"
+              />
+              <span className="text-[10px] text-text-body">Obrigatorio</span>
+            </label>
+          </div>
+        )}
       </div>
     );
   };
@@ -984,7 +1093,33 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                           subIdx,
                           subSource,
                           onSubDragStart,
-                          () => removeSubField(index, subIdx)
+                          () => removeSubField(index, subIdx),
+                          (newLabel) => {
+                            const newFieldsCopy = [...fields];
+                            const parentField = newFieldsCopy[index];
+                            const subFields = [...(parentField.config.repeater?.fields || [])];
+                            subFields[subIdx] = { ...subFields[subIdx], label: newLabel };
+                            // Always generate name from label
+                            subFields[subIdx].name = newLabel
+                              .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+                              .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                            newFieldsCopy[index] = {
+                              ...parentField,
+                              config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+                            };
+                            setFields(newFieldsCopy);
+                          },
+                          (newName) => {
+                            const newFieldsCopy = [...fields];
+                            const parentField = newFieldsCopy[index];
+                            const subFields = [...(parentField.config.repeater?.fields || [])];
+                            subFields[subIdx] = { ...subFields[subIdx], name: newName };
+                            newFieldsCopy[index] = {
+                              ...parentField,
+                              config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+                            };
+                            setFields(newFieldsCopy);
+                          }
                         );
                       })}
                     </div>
@@ -1061,7 +1196,37 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                               subIdx,
                               subSource,
                               onSubDragStart,
-                              () => removeFlexLayoutSubField(index, lIdx, subIdx)
+                              () => removeFlexLayoutSubField(index, lIdx, subIdx),
+                              (newLabel) => {
+                                const newFieldsCopy = [...fields];
+                                const parentField = newFieldsCopy[index];
+                                const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+                                const layoutFields = [...(layouts[lIdx].fields || [])];
+                                layoutFields[subIdx] = { ...layoutFields[subIdx], label: newLabel };
+                                // Always generate name from label
+                                layoutFields[subIdx].name = newLabel
+                                  .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+                                  .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                                layouts[lIdx] = { ...layouts[lIdx], fields: layoutFields };
+                                newFieldsCopy[index] = {
+                                  ...parentField,
+                                  config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+                                };
+                                setFields(newFieldsCopy);
+                              },
+                              (newName) => {
+                                const newFieldsCopy = [...fields];
+                                const parentField = newFieldsCopy[index];
+                                const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+                                const layoutFields = [...(layouts[lIdx].fields || [])];
+                                layoutFields[subIdx] = { ...layoutFields[subIdx], name: newName };
+                                layouts[lIdx] = { ...layouts[lIdx], fields: layoutFields };
+                                newFieldsCopy[index] = {
+                                  ...parentField,
+                                  config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+                                };
+                                setFields(newFieldsCopy);
+                              }
                             );
                           })}
                         </div>
