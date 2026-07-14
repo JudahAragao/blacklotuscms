@@ -261,6 +261,14 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
             )}
           </div>
         );
+      case 'file':
+        return (
+          <MediaPicker
+            currentValue={value}
+            onSelect={(media) => { if (!readOnly) onChange(media.url); }}
+            disabled={readOnly}
+          />
+        );
       case 'textarea':
         return (
           <textarea
