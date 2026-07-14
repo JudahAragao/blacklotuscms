@@ -91,10 +91,11 @@ status: approved
 - [x] **TASK-067:** Flexible Content field type with layout selection and sub-fields | est: 4h | depends: [TASK-061] | feature: post-management
 - [x] **TASK-068:** Repeater sub-fields management UI in FieldGroupEditor | est: 3h | depends: [TASK-061] | feature: post-management
 - [x] **TASK-069:** Field order column for drag-drop persistence | est: 1h | depends: [TASK-061] | feature: post-management
+- [x] **TASK-070:** Visual field type selector with icons and categories (ACF-style) | est: 2h | depends: [] | feature: ux
 
 ## Métricas
-- Total de tasks: 69
-- Concluídas: 69
+- Total de tasks: 70
+- Concluídas: 70
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
+import FieldTypeSelector from './FieldTypeSelector';
 
 interface SubFieldEditorProps {
   fields: any[];
@@ -144,21 +145,11 @@ export default function SubFieldEditor({ fields, onChange, readOnly }: SubFieldE
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1">
                       <label className="label-field-muted text-[10px]">Tipo</label>
-                      <select value={field.type} onChange={(e) => updateField(idx, 'type', e.target.value)} className="field-select text-xs">
-                        <option value="text">Texto</option>
-                        <option value="textarea">Área de Texto</option>
-                        <option value="number">Número</option>
-                        <option value="email">Email</option>
-                        <option value="select">Seleção</option>
-                        <option value="image">Imagem</option>
-                        <option value="gallery">Galeria</option>
-                        <option value="file">Arquivo</option>
-                        <option value="boolean">Booleano</option>
-                        <option value="wysiwyg">Editor Rico</option>
-                        <option value="json">JSON</option>
-                        <option value="tab">Aba</option>
-                        <option value="section">Seção</option>
-                      </select>
+                      <FieldTypeSelector
+                        value={field.type}
+                        onChange={(type) => updateField(idx, 'type', type)}
+                        compact
+                      />
                     </div>
                     <div className="flex flex-col gap-1">
                       <label className="label-field-muted text-[10px]">Largura (%)</label>
