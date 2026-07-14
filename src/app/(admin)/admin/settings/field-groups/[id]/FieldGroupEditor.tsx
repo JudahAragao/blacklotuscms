@@ -37,6 +37,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
   const [isSaving, setIsSaving] = useState(false);
   const [expandedField, setExpandedField] = useState<number | string | null>(null);
   const [activeFieldTab, setActiveFieldTab] = useState<{ [key: number]: string }>({});
+  const [activeSubFieldTab, setActiveSubFieldTab] = useState<{ [key: string]: string }>({});
   const [dragSource, setDragSource] = useState<DragSource>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget>(null);
   const [postSearchQuery, setPostSearchQuery] = useState('');
@@ -437,6 +438,76 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
     setFields(newFields);
   };
 
+  // Helper to update sub-field config
+  const updateSubFieldConfig = (source: DragSource, subIdx: number, configKey: string, value: any) => {
+    const newFieldsCopy = [...fields];
+    const keys = configKey.split('.');
+
+    if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
+      const parentField = newFieldsCopy[source.parentFieldIndex];
+      const subFields = [...(parentField.config.repeater?.fields || [])];
+      const subField = { ...subFields[subIdx] };
+      const config = { ...subField.config };
+      let current: any = config;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]]) current[keys[i]] = {};
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+      subField.config = config;
+      subFields[subIdx] = subField;
+      newFieldsCopy[source.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+      };
+    } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
+      const parentField = newFieldsCopy[source.parentFieldIndex];
+      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+      const layoutFields = [...(layouts[source.layoutIndex].fields || [])];
+      const subField = { ...layoutFields[subIdx] };
+      const config = { ...subField.config };
+      let current: any = config;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]]) current[keys[i]] = {};
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+      subField.config = config;
+      layoutFields[subIdx] = subField;
+      layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: layoutFields };
+      newFieldsCopy[source.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+      };
+    }
+    setFields(newFieldsCopy);
+  };
+
+  // Helper to update sub-field type
+  const updateSubFieldType = (source: DragSource, subIdx: number, newType: string) => {
+    const newFieldsCopy = [...fields];
+    if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
+      const parentField = newFieldsCopy[source.parentFieldIndex];
+      const subFields = [...(parentField.config.repeater?.fields || [])];
+      subFields[subIdx] = { ...subFields[subIdx], type: newType };
+      newFieldsCopy[source.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+      };
+    } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
+      const parentField = newFieldsCopy[source.parentFieldIndex];
+      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+      const layoutFields = [...(layouts[source.layoutIndex].fields || [])];
+      layoutFields[subIdx] = { ...layoutFields[subIdx], type: newType };
+      layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: layoutFields };
+      newFieldsCopy[source.parentFieldIndex] = {
+        ...parentField,
+        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+      };
+    }
+    setFields(newFieldsCopy);
+  };
+
   // ===== RENDER SUB-FIELD =====
 
   const renderSubField = (sub: any, idx: number, source: DragSource, onDragStartFn: (s: DragSource) => void, onRemove: () => void, onUpdateLabel: (newLabel: string) => void, onUpdateName: (newName: string) => void) => {
@@ -503,120 +574,236 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
           </button>
         </div>
 
-        {/* Sub-field config panel */}
+        {/* Sub-field config panel with tabs */}
         {isExpanded && (
-          <div className="bg-surface-muted/50 border-t border-border-default p-3 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1">
-                <label className="label-field-muted text-[10px]">Tipo do Campo</label>
-                <select
-                  value={currentSub.type}
-                  onChange={(e) => {
-                    const newFieldsCopy = [...fields];
-                    if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
-                      const parentField = newFieldsCopy[source.parentFieldIndex];
-                      const subFields = [...(parentField.config.repeater?.fields || [])];
-                      subFields[idx] = { ...subFields[idx], type: e.target.value };
-                      newFieldsCopy[source.parentFieldIndex] = {
-                        ...parentField,
-                        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
-                      };
-                    } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
-                      const parentField = newFieldsCopy[source.parentFieldIndex];
-                      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
-                      const layoutFields = [...(layouts[source.layoutIndex].fields || [])];
-                      layoutFields[idx] = { ...layoutFields[idx], type: e.target.value };
-                      layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: layoutFields };
-                      newFieldsCopy[source.parentFieldIndex] = {
-                        ...parentField,
-                        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
-                      };
-                    }
-                    setFields(newFieldsCopy);
-                  }}
-                  className="field-select text-[10px]"
+          <div className="bg-surface-muted/50 border-t border-border-default">
+            {/* Tabs */}
+            <div className="flex border-b border-border-default">
+              <button
+                onClick={(e) => { e.stopPropagation(); setActiveSubFieldTab({ ...activeSubFieldTab, [subKey]: 'general' }); }}
+                className={`px-3 py-1.5 text-[10px] font-medium transition-colors ${(activeSubFieldTab[subKey] || 'general') === 'general' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+              >
+                <Layout size={10} className="inline mr-1" /> Geral
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setActiveSubFieldTab({ ...activeSubFieldTab, [subKey]: 'validation' }); }}
+                className={`px-3 py-1.5 text-[10px] font-medium transition-colors ${activeSubFieldTab[subKey] === 'validation' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+              >
+                <ShieldCheck size={10} className="inline mr-1" /> Validação
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setActiveSubFieldTab({ ...activeSubFieldTab, [subKey]: 'conditional' }); }}
+                className={`px-3 py-1.5 text-[10px] font-medium transition-colors ${activeSubFieldTab[subKey] === 'conditional' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+              >
+                <Eye size={10} className="inline mr-1" /> Lógica Condicional
+              </button>
+              {currentSub.type === 'select' && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setActiveSubFieldTab({ ...activeSubFieldTab, [subKey]: 'options' }); }}
+                  className={`px-3 py-1.5 text-[10px] font-medium transition-colors ${activeSubFieldTab[subKey] === 'options' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
                 >
-                  <option value="text">Texto</option>
-                  <option value="textarea">Texto Longo</option>
-                  <option value="number">Numero</option>
-                  <option value="email">Email</option>
-                  <option value="url">URL</option>
-                  <option value="image">Imagem</option>
-                  <option value="gallery">Galeria</option>
-                  <option value="file">Arquivo</option>
-                  <option value="wysiwyg">Editor Rico</option>
-                  <option value="select">Select</option>
-                  <option value="checkbox">Checkbox</option>
-                  <option value="radio">Radio</option>
-                  <option value="boolean">Booleano</option>
-                  <option value="color">Cor</option>
-                  <option value="date">Data</option>
-                  <option value="json">JSON</option>
-                </select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="label-field-muted text-[10px]">Largura (%)</label>
-                <input
-                  type="number"
-                  value={currentSub.config?.width || 100}
-                  onChange={(e) => {
-                    const newFieldsCopy = [...fields];
-                    if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
-                      const parentField = newFieldsCopy[source.parentFieldIndex];
-                      const subFields = [...(parentField.config.repeater?.fields || [])];
-                      subFields[idx] = { ...subFields[idx], config: { ...subFields[idx].config, width: Number(e.target.value) } };
-                      newFieldsCopy[source.parentFieldIndex] = {
-                        ...parentField,
-                        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
-                      };
-                    } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
-                      const parentField = newFieldsCopy[source.parentFieldIndex];
-                      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
-                      const layoutFields = [...(layouts[source.layoutIndex].fields || [])];
-                      layoutFields[idx] = { ...layoutFields[idx], config: { ...layoutFields[idx].config, width: Number(e.target.value) } };
-                      layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: layoutFields };
-                      newFieldsCopy[source.parentFieldIndex] = {
-                        ...parentField,
-                        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
-                      };
-                    }
-                    setFields(newFieldsCopy);
-                  }}
-                  className="field-input text-[10px]"
-                />
-              </div>
+                  <List size={10} className="inline mr-1" /> Opções
+                </button>
+              )}
             </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={currentSub.config?.required || false}
-                onChange={(e) => {
-                  const newFieldsCopy = [...fields];
-                  if (source?.type === 'repeater' && source.parentFieldIndex !== undefined) {
-                    const parentField = newFieldsCopy[source.parentFieldIndex];
-                    const subFields = [...(parentField.config.repeater?.fields || [])];
-                    subFields[idx] = { ...subFields[idx], config: { ...subFields[idx].config, required: e.target.checked } };
-                    newFieldsCopy[source.parentFieldIndex] = {
-                      ...parentField,
-                      config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
-                    };
-                  } else if (source?.type === 'flexible_layout' && source.parentFieldIndex !== undefined && source.layoutIndex !== undefined) {
-                    const parentField = newFieldsCopy[source.parentFieldIndex];
-                    const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
-                    const layoutFields = [...(layouts[source.layoutIndex].fields || [])];
-                    layoutFields[idx] = { ...layoutFields[idx], config: { ...layoutFields[idx].config, required: e.target.checked } };
-                    layouts[source.layoutIndex] = { ...layouts[source.layoutIndex], fields: layoutFields };
-                    newFieldsCopy[source.parentFieldIndex] = {
-                      ...parentField,
-                      config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
-                    };
-                  }
-                  setFields(newFieldsCopy);
-                }}
-                className="check-field"
-              />
-              <span className="text-[10px] text-text-body">Obrigatorio</span>
-            </label>
+
+            {/* Tab Content */}
+            <div className="p-3" onClick={(e) => e.stopPropagation()}>
+              {/* General Tab */}
+              {(activeSubFieldTab[subKey] || 'general') === 'general' && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="label-field-muted text-[10px]">Tipo do Campo</label>
+                      <select
+                        value={currentSub.type}
+                        onChange={(e) => updateSubFieldType(source, idx, e.target.value)}
+                        className="field-select text-[10px]"
+                      >
+                        <option value="text">Texto</option>
+                        <option value="textarea">Texto Longo</option>
+                        <option value="number">Numero</option>
+                        <option value="email">Email</option>
+                        <option value="url">URL</option>
+                        <option value="image">Imagem</option>
+                        <option value="gallery">Galeria</option>
+                        <option value="file">Arquivo</option>
+                        <option value="wysiwyg">Editor Rico</option>
+                        <option value="select">Select</option>
+                        <option value="checkbox">Checkbox</option>
+                        <option value="radio">Radio</option>
+                        <option value="boolean">Booleano</option>
+                        <option value="color">Cor</option>
+                        <option value="date">Data</option>
+                        <option value="json">JSON</option>
+                      </select>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="label-field-muted text-[10px]">Largura (%)</label>
+                      <input
+                        type="number"
+                        value={currentSub.config?.width || 100}
+                        onChange={(e) => updateSubFieldConfig(source, idx, 'width', Number(e.target.value))}
+                        className="field-input text-[10px]"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="label-field-muted text-[10px]">Instruções</label>
+                    <input
+                      value={currentSub.config?.instructions || ''}
+                      onChange={(e) => updateSubFieldConfig(source, idx, 'instructions', e.target.value)}
+                      className="field-input text-[10px]"
+                      placeholder="Aparece abaixo do campo"
+                    />
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={currentSub.config?.required || false}
+                      onChange={(e) => updateSubFieldConfig(source, idx, 'required', e.target.checked)}
+                      className="check-field"
+                    />
+                    <span className="text-[10px] text-text-body">Obrigatorio</span>
+                  </label>
+                </div>
+              )}
+
+              {/* Validation Tab */}
+              {activeSubFieldTab[subKey] === 'validation' && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="label-field-muted text-[10px]">Min</label>
+                      <input
+                        type="number"
+                        value={currentSub.config?.validation?.min ?? ''}
+                        onChange={(e) => updateSubFieldConfig(source, idx, 'validation.min', Number(e.target.value))}
+                        className="field-input text-[10px]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="label-field-muted text-[10px]">Max</label>
+                      <input
+                        type="number"
+                        value={currentSub.config?.validation?.max ?? ''}
+                        onChange={(e) => updateSubFieldConfig(source, idx, 'validation.max', Number(e.target.value))}
+                        className="field-input text-[10px]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Conditional Logic Tab */}
+              {activeSubFieldTab[subKey] === 'conditional' && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-text-muted">Status:</span>
+                    <button
+                      onClick={() => updateSubFieldConfig(source, idx, 'conditionalLogic.status', !currentSub.config?.conditionalLogic?.status)}
+                      className={`px-2 py-0.5 rounded text-[10px] font-semibold ${currentSub.config?.conditionalLogic?.status ? 'bg-status-published/10 text-status-published' : 'bg-surface-muted text-text-muted'}`}
+                    >
+                      {currentSub.config?.conditionalLogic?.status ? 'Ativo' : 'Inativo'}
+                    </button>
+                  </div>
+                  {currentSub.config?.conditionalLogic?.status && (
+                    <div className="space-y-2 p-2 bg-surface-card rounded border border-border-default">
+                      {currentSub.config?.conditionalLogic?.rules?.map((rule: any, rIdx: number) => (
+                        <div key={rIdx} className="flex gap-2 items-center">
+                          <input
+                            value={rule.field}
+                            onChange={(e) => {
+                              const newRules = [...(currentSub.config?.conditionalLogic?.rules || [])];
+                              newRules[rIdx] = { ...newRules[rIdx], field: e.target.value };
+                              updateSubFieldConfig(source, idx, 'conditionalLogic.rules', newRules);
+                            }}
+                            className="field-input text-[10px] flex-1"
+                            placeholder="Campo"
+                          />
+                          <input
+                            value={rule.value}
+                            onChange={(e) => {
+                              const newRules = [...(currentSub.config?.conditionalLogic?.rules || [])];
+                              newRules[rIdx] = { ...newRules[rIdx], value: e.target.value };
+                              updateSubFieldConfig(source, idx, 'conditionalLogic.rules', newRules);
+                            }}
+                            className="field-input text-[10px] flex-1"
+                            placeholder="Valor"
+                          />
+                          <button
+                            onClick={() => {
+                              const newRules = (currentSub.config?.conditionalLogic?.rules || []).filter((_: any, i: number) => i !== rIdx);
+                              updateSubFieldConfig(source, idx, 'conditionalLogic.rules', newRules);
+                            }}
+                            className="p-1 text-text-muted hover:text-status-trash"
+                          >
+                            <Trash2 size={10} />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => {
+                          const newRules = [...(currentSub.config?.conditionalLogic?.rules || []), { field: '', value: '' }];
+                          updateSubFieldConfig(source, idx, 'conditionalLogic.rules', newRules);
+                        }}
+                        className="w-full py-1 border border-dashed border-border-default rounded text-[10px] text-text-muted hover:text-action"
+                      >
+                        + Regra
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Options Tab */}
+              {activeSubFieldTab[subKey] === 'options' && currentSub.type === 'select' && (
+                <div className="space-y-2">
+                  {currentSub.config?.options?.map((opt: any, oIdx: number) => (
+                    <div key={oIdx} className="flex gap-2">
+                      <input
+                        placeholder="Label"
+                        value={opt.label}
+                        onChange={(e) => {
+                          const newOptions = [...(currentSub.config?.options || [])];
+                          newOptions[oIdx] = { ...newOptions[oIdx], label: e.target.value };
+                          updateSubFieldConfig(source, idx, 'options', newOptions);
+                        }}
+                        className="field-input text-[10px] flex-1"
+                      />
+                      <input
+                        placeholder="Valor"
+                        value={opt.value}
+                        onChange={(e) => {
+                          const newOptions = [...(currentSub.config?.options || [])];
+                          newOptions[oIdx] = { ...newOptions[oIdx], value: e.target.value };
+                          updateSubFieldConfig(source, idx, 'options', newOptions);
+                        }}
+                        className="field-input text-[10px] font-mono flex-1"
+                      />
+                      <button
+                        onClick={() => {
+                          const newOptions = (currentSub.config?.options || []).filter((_: any, i: number) => i !== oIdx);
+                          updateSubFieldConfig(source, idx, 'options', newOptions);
+                        }}
+                        className="p-1 text-text-muted hover:text-status-trash"
+                      >
+                        <Trash2 size={10} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      const newOptions = [...(currentSub.config?.options || []), { label: '', value: '' }];
+                      updateSubFieldConfig(source, idx, 'options', newOptions);
+                    }}
+                    className="w-full py-1 border border-dashed border-border-default rounded text-[10px] text-text-muted hover:text-action"
+                  >
+                    + Opção
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
