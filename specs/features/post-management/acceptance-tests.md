@@ -128,3 +128,17 @@ feature: "post-management"
 - **THEN** um novo bloco é adicionado com os sub-campos daquele layout
 - **AND** usuario pode adicionar múltiplos blocos em qualquer ordem
 - **Referencia:** FR06
+
+## AT-20: Sub-Fields Table Layout
+- **GIVEN** um Repeater com layout "Tabela" configurado
+- **WHEN** usuario visualiza os sub-campos no editor de field groups
+- **THEN** sub-campos aparecem em formato de tabela com colunas #, Label, Name, Type
+- **AND** cada sub-campo pode ser expandido para configuração completa
+- **Referencia:** FR06
+
+## AT-21: Repeater Layout Modes
+- **GIVEN** um campo Repeater com layout "Table" selecionado
+- **WHEN** usuario visualiza o repeater na página de edição do post
+- **THEN** os itens são exibidos em formato de tabela com colunas
+- **AND** layout "Block" exibe como cards e "Row" exibe em linha
+- **Referencia:** FR06

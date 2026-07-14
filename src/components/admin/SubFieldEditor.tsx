@@ -1,28 +1,52 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import FieldTypeSelector from './FieldTypeSelector';
 
 interface SubFieldEditorProps {
   fields: any[];
   onChange: (fields: any[]) => void;
   readOnly?: boolean;
+  layout?: 'table' | 'block' | 'row';
+  onLayoutChange?: (layout: 'table' | 'block' | 'row') => void;
 }
 
-export default function SubFieldEditor({ fields, onChange, readOnly }: SubFieldEditorProps) {
+export default function SubFieldEditor({ fields, onChange, readOnly, layout = 'block', onLayoutChange }: SubFieldEditorProps) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
+  const generateName = (label: string, idx: number): string => {
+    const baseName = label
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[.,]+/g, '_')
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_]/g, '')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
+
+    let candidate = baseName;
+    let counter = 2;
+    while (fields.some((f, i) => i !== idx && f.name === candidate)) {
+      candidate = `${baseName}_${counter}`;
+      counter++;
+    }
+    return candidate;
+  };
+
   const addField = () => {
-    onChange([...fields, {
+    const newIdx = fields.length;
+    const newField = {
       name: '',
       label: '',
       type: 'text',
       config: { width: 100, required: false }
-    }]);
-    setExpandedIdx(fields.length);
+    };
+    onChange([...fields, newField]);
+    setExpandedIdx(newIdx);
   };
 
   const removeField = (idx: number) => {
@@ -35,23 +59,7 @@ export default function SubFieldEditor({ fields, onChange, readOnly }: SubFieldE
     updated[idx] = { ...updated[idx], [key]: value };
 
     if (key === 'label') {
-      const baseName = value
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/[.,]+/g, '_')
-        .replace(/\s+/g, '_')
-        .replace(/[^a-z0-9_]/g, '')
-        .replace(/_+/g, '_')
-        .replace(/^_|_$/g, '');
-
-      let candidate = baseName;
-      let counter = 2;
-      while (fields.some((f, i) => i !== idx && f.name === candidate)) {
-        candidate = `${baseName}_${counter}`;
-        counter++;
-      }
-      updated[idx].name = candidate;
+      updated[idx].name = generateName(value, idx);
     }
     onChange(updated);
   };
@@ -87,16 +95,170 @@ export default function SubFieldEditor({ fields, onChange, readOnly }: SubFieldE
 
   if (readOnly) return null;
 
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <label className="label-field-muted text-xs">Sub-campos</label>
-        <button onClick={addField} className="text-xs text-action hover:text-action/80">+ Adicionar</button>
+  const renderFieldConfig = (field: any, idx: number) => (
+    <div className="p-3 bg-surface-muted/50 border-t border-border-default space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1">
+          <label className="label-field-muted text-[10px]">Rótulo do Campo</label>
+          <input
+            value={field.label}
+            onChange={(e) => updateField(idx, 'label', e.target.value)}
+            className="field-input text-xs"
+            placeholder="Ex: Nome do Item"
+          />
+          <span className="text-[9px] text-text-muted">Aparece na página de edição</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="label-field-muted text-[10px]">Nome (Âncora)</label>
+          <input
+            value={field.name}
+            onChange={(e) => updateField(idx, 'name', e.target.value)}
+            className="field-input text-xs font-mono"
+            placeholder="nome_do_item"
+          />
+          <span className="text-[9px] text-text-muted">Usado no código: get_field('{field.name || '...'}')</span>
+        </div>
       </div>
 
-      {fields.length === 0 && (
-        <p className="text-xs text-text-muted italic">Nenhum sub-campo definido. Clique em "+ Adicionar" para começar.</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1">
+          <label className="label-field-muted text-[10px]">Tipo do Campo</label>
+          <FieldTypeSelector
+            value={field.type}
+            onChange={(type) => updateField(idx, 'type', type)}
+            compact
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="label-field-muted text-[10px]">Largura (%)</label>
+          <input type="number" value={field.config?.width || 100} onChange={(e) => updateConfig(idx, 'width', Number(e.target.value))} className="field-input text-xs" />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" checked={field.config?.required || false} onChange={(e) => updateConfig(idx, 'required', e.target.checked)} className="check-field" />
+          <span className="text-[10px] text-text-body">Obrigatório</span>
+        </label>
+        {field.config?.instructions !== undefined && (
+          <div className="flex-1 flex flex-col gap-1">
+            <input
+              value={field.config?.instructions || ''}
+              onChange={(e) => updateConfig(idx, 'instructions', e.target.value)}
+              className="field-input text-[10px]"
+              placeholder="Instruções (opcional)"
+            />
+          </div>
+        )}
+      </div>
+
+      {field.type === 'select' && (
+        <div className="space-y-2">
+          <label className="label-field-muted text-[10px]">Opções</label>
+          {field.config?.options?.map((opt: any, oIdx: number) => (
+            <div key={oIdx} className="flex gap-2">
+              <input placeholder="Label" value={opt.label} onChange={(e) => {
+                const no = [...(field.config?.options || [])];
+                no[oIdx] = { ...no[oIdx], label: e.target.value };
+                updateConfig(idx, 'options', no);
+              }} className="field-input text-xs flex-1" />
+              <input placeholder="Valor" value={opt.value} onChange={(e) => {
+                const no = [...(field.config?.options || [])];
+                no[oIdx] = { ...no[oIdx], value: e.target.value };
+                updateConfig(idx, 'options', no);
+              }} className="field-input text-xs font-mono flex-1" />
+            </div>
+          ))}
+          <button onClick={() => {
+            const no = [...(field.config?.options || []), { label: '', value: '' }];
+            updateConfig(idx, 'options', no);
+          }} className="w-full py-1 border border-dashed border-border-default rounded text-[10px] text-text-muted hover:text-action">+ Opção</button>
+        </div>
       )}
+    </div>
+  );
+
+  // Table layout
+  if (layout === 'table') {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between mb-2">
+          <label className="label-field-muted text-xs">Sub-campos</label>
+          {onLayoutChange && (
+            <div className="flex items-center gap-1 text-[10px]">
+              <span className="text-text-muted">Layout:</span>
+              <button onClick={() => onLayoutChange('table')} className={`px-1.5 py-0.5 rounded ${layout === 'table' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Tabela</button>
+              <button onClick={() => onLayoutChange('block')} className={`px-1.5 py-0.5 rounded ${layout === 'block' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Bloco</button>
+              <button onClick={() => onLayoutChange('row')} className={`px-1.5 py-0.5 rounded ${layout === 'row' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Linha</button>
+            </div>
+          )}
+        </div>
+
+        <div className="border border-border-default rounded overflow-hidden">
+          <div className="grid grid-cols-[32px_1fr_1fr_100px_40px] gap-2 px-3 py-2 bg-surface-muted text-[10px] font-semibold text-text-muted uppercase tracking-wider border-b border-border-default">
+            <span>#</span>
+            <span>Label</span>
+            <span>Name</span>
+            <span>Type</span>
+            <span></span>
+          </div>
+
+          {fields.map((field, idx) => (
+            <div
+              key={idx}
+              draggable
+              onDragStart={() => onDragStart(idx)}
+              onDragEnd={onDragEnd}
+              onDragOver={(e) => onDragOver(e, idx)}
+              onDrop={() => onDrop(idx)}
+              className={`border-b border-border-default last:border-b-0 transition-all ${
+                dragOverIdx === idx ? 'bg-action-light/20' : 'hover:bg-surface-muted/50'
+              } ${draggedItem === idx ? 'opacity-50' : ''}`}
+            >
+              <div className="grid grid-cols-[32px_1fr_1fr_100px_40px] gap-2 items-center px-3 py-2">
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-text-muted">{idx + 1}</span>
+                  <GripVertical size={12} className="cursor-grab text-text-muted hover:text-action" />
+                </div>
+                <button
+                  onClick={() => setExpandedIdx(expandedIdx === idx ? null : idx)}
+                  className="text-left text-xs font-medium text-action hover:text-action/80"
+                >
+                  {field.label || 'Sem rótulo'}
+                </button>
+                <span className="text-[10px] font-mono text-text-muted truncate">{field.name || '...'}</span>
+                <span className="text-[10px] text-text-muted">{field.type}</span>
+                <button onClick={() => removeField(idx)} className="p-1 text-text-muted hover:text-status-trash">
+                  <Trash2 size={12} />
+                </button>
+              </div>
+
+              {expandedIdx === idx && renderFieldConfig(field, idx)}
+            </div>
+          ))}
+        </div>
+
+        <button onClick={addField} className="w-full py-2 border border-dashed border-border-default hover:border-action hover:bg-action-light transition-all rounded flex items-center justify-center gap-2 text-xs text-text-muted hover:text-action">
+          <Plus size={12} /> Adicionar Sub-campo
+        </button>
+      </div>
+    );
+  }
+
+  // Block/Row layout (default)
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between mb-2">
+        <label className="label-field-muted text-xs">Sub-campos</label>
+        {onLayoutChange && (
+          <div className="flex items-center gap-1 text-[10px]">
+            <span className="text-text-muted">Layout:</span>
+            <button onClick={() => onLayoutChange('table')} className={`px-1.5 py-0.5 rounded ${layout === 'table' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Tabela</button>
+            <button onClick={() => onLayoutChange('block')} className={`px-1.5 py-0.5 rounded ${layout === 'block' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Bloco</button>
+            <button onClick={() => onLayoutChange('row')} className={`px-1.5 py-0.5 rounded ${layout === 'row' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Linha</button>
+          </div>
+        )}
+      </div>
 
       <div className="space-y-2">
         {fields.map((field, idx) => {
@@ -123,6 +285,7 @@ export default function SubFieldEditor({ fields, onChange, readOnly }: SubFieldE
                 </div>
 
                 <div className="flex-1 flex items-center gap-2">
+                  <span className="text-[10px] text-text-muted w-5">{idx + 1}.</span>
                   <input
                     value={field.label}
                     onChange={(e) => updateField(idx, 'label', e.target.value)}
@@ -130,6 +293,7 @@ export default function SubFieldEditor({ fields, onChange, readOnly }: SubFieldE
                     className="bg-transparent border-none outline-none font-medium text-xs text-text-heading flex-1"
                     placeholder="Rótulo"
                   />
+                  <span className="text-[9px] font-mono text-text-muted truncate max-w-[100px]">{field.name || '...'}</span>
                   <span className="text-[9px] font-mono text-action/60">{field.type}</span>
                 </div>
 
@@ -140,56 +304,15 @@ export default function SubFieldEditor({ fields, onChange, readOnly }: SubFieldE
                 {expandedIdx === idx ? <ChevronUp size={12} className="text-text-muted" /> : <ChevronDown size={12} className="text-text-muted" />}
               </div>
 
-              {expandedIdx === idx && (
-                <div className="p-3 bg-surface-muted/50 border-t border-border-default space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-1">
-                      <label className="label-field-muted text-[10px]">Tipo</label>
-                      <FieldTypeSelector
-                        value={field.type}
-                        onChange={(type) => updateField(idx, 'type', type)}
-                        compact
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="label-field-muted text-[10px]">Largura (%)</label>
-                      <input type="number" value={field.config?.width || 100} onChange={(e) => updateConfig(idx, 'width', Number(e.target.value))} className="field-input text-xs" />
-                    </div>
-                  </div>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={field.config?.required || false} onChange={(e) => updateConfig(idx, 'required', e.target.checked)} className="check-field" />
-                    <span className="text-[10px] text-text-body">Obrigatório</span>
-                  </label>
-
-                  {field.type === 'select' && (
-                    <div className="space-y-2">
-                      <label className="label-field-muted text-[10px]">Opções</label>
-                      {field.config?.options?.map((opt: any, oIdx: number) => (
-                        <div key={oIdx} className="flex gap-2">
-                          <input placeholder="Label" value={opt.label} onChange={(e) => {
-                            const no = [...(field.config?.options || [])];
-                            no[oIdx] = { ...no[oIdx], label: e.target.value };
-                            updateConfig(idx, 'options', no);
-                          }} className="field-input text-xs flex-1" />
-                          <input placeholder="Valor" value={opt.value} onChange={(e) => {
-                            const no = [...(field.config?.options || [])];
-                            no[oIdx] = { ...no[oIdx], value: e.target.value };
-                            updateConfig(idx, 'options', no);
-                          }} className="field-input text-xs font-mono flex-1" />
-                        </div>
-                      ))}
-                      <button onClick={() => {
-                        const no = [...(field.config?.options || []), { label: '', value: '' }];
-                        updateConfig(idx, 'options', no);
-                      }} className="w-full py-1 border border-dashed border-border-default rounded text-[10px] text-text-muted hover:text-action">+ Opção</button>
-                    </div>
-                  )}
-                </div>
-              )}
+              {expandedIdx === idx && renderFieldConfig(field, idx)}
             </div>
           );
         })}
       </div>
+
+      <button onClick={addField} className="w-full py-2 border border-dashed border-border-default hover:border-action hover:bg-action-light transition-all rounded flex items-center justify-center gap-2 text-xs text-text-muted hover:text-action">
+        <Plus size={12} /> Adicionar Sub-campo
+      </button>
     </div>
   );
 }

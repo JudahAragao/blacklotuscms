@@ -306,6 +306,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
         const rows = Array.isArray(value) ? value : [];
         const minItems = config.repeater?.minItems || 0;
         const maxItems = config.repeater?.maxItems || 999;
+        const repeaterLayout = config.repeater?.layout || 'block';
 
         const addRow = () => {
           if (rows.length >= maxItems) return;
@@ -327,6 +328,82 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
           onChange(newRows);
         };
 
+        const renderSubField = (sub: any, row: any, idx: number) => (
+          <div key={sub.name} className="flex flex-col gap-1.5" style={{ width: `${sub.config?.width || 100}%` }}>
+            <label className="label-field-muted">{sub.label}</label>
+            {renderFieldInput(sub, row[sub.name], (val) => updateRowField(idx, sub.name, val))}
+          </div>
+        );
+
+        // Table layout
+        if (repeaterLayout === 'table') {
+          return (
+            <div className="space-y-4 w-full">
+              <div className="border border-border-default rounded overflow-hidden">
+                <div className="grid gap-2 px-3 py-2 bg-surface-muted text-[10px] font-semibold text-text-muted uppercase tracking-wider border-b border-border-default" style={{ gridTemplateColumns: `40px repeat(${subFields.length}, 1fr) 40px` }}>
+                  <span>#</span>
+                  {subFields.map((sub: any) => (
+                    <span key={sub.name}>{sub.label}</span>
+                  ))}
+                  <span></span>
+                </div>
+                {rows.map((row, idx) => (
+                  <div key={idx} className="grid gap-2 items-center px-3 py-2 border-b border-border-default last:border-b-0 hover:bg-surface-muted/50" style={{ gridTemplateColumns: `40px repeat(${subFields.length}, 1fr) 40px` }}>
+                    <span className="text-[10px] text-text-muted">{idx + 1}</span>
+                    {subFields.map((sub: any) => (
+                      <div key={sub.name}>
+                        {renderFieldInput(sub, row[sub.name], (val) => updateRowField(idx, sub.name, val))}
+                      </div>
+                    ))}
+                    {!readOnly && rows.length > minItems && (
+                      <button type="button" onClick={() => removeRow(idx)} className="p-1 text-text-muted hover:text-status-trash">
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {!readOnly && rows.length < maxItems && (
+                <button type="button" onClick={addRow} className="w-full py-2 border border-dashed border-border-default hover:border-action hover:bg-action-light transition-all rounded flex items-center justify-center gap-2 text-xs text-text-muted hover:text-action">
+                  <Plus size={12} /> {config.repeater?.buttonLabel || 'Adicionar item'}
+                </button>
+              )}
+            </div>
+          );
+        }
+
+        // Row layout
+        if (repeaterLayout === 'row') {
+          return (
+            <div className="space-y-4 w-full">
+              <div className="space-y-2">
+                {rows.map((row, idx) => (
+                  <div key={idx} className="flex items-end gap-3 p-3 bg-surface-muted border border-border-default rounded relative group">
+                    <span className="text-[10px] text-text-muted self-center">{idx + 1}.</span>
+                    {subFields.map((sub: any) => (
+                      <div key={sub.name} className="flex-1 flex flex-col gap-1">
+                        <label className="label-field-muted text-[10px]">{sub.label}</label>
+                        {renderFieldInput(sub, row[sub.name], (val) => updateRowField(idx, sub.name, val))}
+                      </div>
+                    ))}
+                    {!readOnly && rows.length > minItems && (
+                      <button type="button" onClick={() => removeRow(idx)} className="p-1 text-text-muted hover:text-status-trash self-center">
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {!readOnly && rows.length < maxItems && (
+                <button type="button" onClick={addRow} className="w-full py-2 border border-dashed border-border-default hover:border-action hover:bg-action-light transition-all rounded flex items-center justify-center gap-2 text-xs text-text-muted hover:text-action">
+                  <Plus size={12} /> {config.repeater?.buttonLabel || 'Adicionar item'}
+                </button>
+              )}
+            </div>
+          );
+        }
+
+        // Block layout (default)
         return (
           <div className="space-y-4 w-full">
             <div className="space-y-3">
@@ -341,13 +418,8 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                       <Trash2 size={12} />
                     </button>
                   )}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {subFields.map((sub: any) => (
-                      <div key={sub.name} className="flex flex-col gap-1.5">
-                        <label className="label-field-muted">{sub.label}</label>
-                        {renderFieldInput(sub, row[sub.name], (val) => updateRowField(idx, sub.name, val))}
-                      </div>
-                    ))}
+                  <div className="flex flex-wrap -mx-2">
+                    {subFields.map((sub: any) => renderSubField(sub, row, idx))}
                   </div>
                 </div>
               ))}

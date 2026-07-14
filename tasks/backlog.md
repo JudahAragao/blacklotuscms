@@ -92,10 +92,12 @@ status: approved
 - [x] **TASK-068:** Repeater sub-fields management UI in FieldGroupEditor | est: 3h | depends: [TASK-061] | feature: post-management
 - [x] **TASK-069:** Field order column for drag-drop persistence | est: 1h | depends: [TASK-061] | feature: post-management
 - [x] **TASK-070:** Visual field type selector with icons and categories (ACF-style) | est: 2h | depends: [] | feature: ux
+- [x] **TASK-071:** Redesign SubFieldEditor with table layout + full config inputs | est: 3h | depends: [TASK-068] | feature: post-management
+- [x] **TASK-072:** Repeater layout modes (table/block/row) with PostEditor rendering | est: 2h | depends: [TASK-071] | feature: post-management
 
 ## Métricas
-- Total de tasks: 70
-- Concluídas: 70
+- Total de tasks: 72
+- Concluídas: 72
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

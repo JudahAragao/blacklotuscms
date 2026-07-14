@@ -538,6 +538,8 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                           <SubFieldEditor
                             fields={field.config.repeater?.fields || []}
                             onChange={(subFields) => updateConfig(index, 'repeater.fields', subFields)}
+                            layout={field.config.repeater?.layout || 'block'}
+                            onLayoutChange={(layout) => updateConfig(index, 'repeater.layout', layout)}
                           />
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex flex-col gap-1">
