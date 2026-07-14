@@ -605,8 +605,9 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
               value={currentSub.name}
               onChange={(e) => onUpdateName(e.target.value)}
               onClick={(e) => e.stopPropagation()}
-              className="bg-transparent border-none outline-none font-mono text-[9px] text-text-muted w-20"
+              className="bg-transparent border-none outline-none font-mono text-[9px] text-text-muted min-w-[120px] max-w-[200px] truncate"
               placeholder="nome_ancora"
+              title={currentSub.name}
             />
             <span className="text-[9px] font-mono text-action/60">{currentSub.type}</span>
           </div>
