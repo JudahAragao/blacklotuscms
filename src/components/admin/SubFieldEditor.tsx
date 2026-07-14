@@ -93,6 +93,17 @@ export default function SubFieldEditor({ fields, onChange, readOnly, layout = 'b
 
   const isOrganizer = (type: string) => type === 'tab' || type === 'section';
 
+  const renderLayoutSelector = (currentLayout: string) => (
+    onLayoutChange ? (
+      <div className="flex items-center gap-1 text-[10px]">
+        <span className="text-text-muted">Layout:</span>
+        <button onClick={() => onLayoutChange('table')} className={`px-1.5 py-0.5 rounded ${currentLayout === 'table' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Tabela</button>
+        <button onClick={() => onLayoutChange('block')} className={`px-1.5 py-0.5 rounded ${currentLayout === 'block' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Bloco</button>
+        <button onClick={() => onLayoutChange('row')} className={`px-1.5 py-0.5 rounded ${currentLayout === 'row' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Linha</button>
+      </div>
+    ) : null
+  );
+
   if (readOnly) return null;
 
   const renderFieldConfig = (field: any, idx: number) => (
@@ -184,14 +195,7 @@ export default function SubFieldEditor({ fields, onChange, readOnly, layout = 'b
       <div className="space-y-2">
         <div className="flex items-center justify-between mb-2">
           <label className="label-field-muted text-xs">Sub-campos</label>
-          {onLayoutChange && (
-            <div className="flex items-center gap-1 text-[10px]">
-              <span className="text-text-muted">Layout:</span>
-              <button onClick={() => onLayoutChange('table')} className={`px-1.5 py-0.5 rounded ${layout === 'table' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Tabela</button>
-              <button onClick={() => onLayoutChange('block')} className={`px-1.5 py-0.5 rounded ${layout === 'block' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Bloco</button>
-              <button onClick={() => onLayoutChange('row')} className={`px-1.5 py-0.5 rounded ${layout === 'row' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Linha</button>
-            </div>
-          )}
+          {renderLayoutSelector(layout)}
         </div>
 
         <div className="border border-border-default rounded overflow-hidden">
@@ -250,14 +254,7 @@ export default function SubFieldEditor({ fields, onChange, readOnly, layout = 'b
     <div className="space-y-2">
       <div className="flex items-center justify-between mb-2">
         <label className="label-field-muted text-xs">Sub-campos</label>
-        {onLayoutChange && (
-          <div className="flex items-center gap-1 text-[10px]">
-            <span className="text-text-muted">Layout:</span>
-            <button onClick={() => onLayoutChange('table')} className={`px-1.5 py-0.5 rounded ${layout === 'table' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Tabela</button>
-            <button onClick={() => onLayoutChange('block')} className={`px-1.5 py-0.5 rounded ${layout === 'block' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Bloco</button>
-            <button onClick={() => onLayoutChange('row')} className={`px-1.5 py-0.5 rounded ${layout === 'row' ? 'bg-action text-white' : 'text-text-muted hover:text-text-heading'}`}>Linha</button>
-          </div>
-        )}
+        {renderLayoutSelector(layout)}
       </div>
 
       <div className="space-y-2">
