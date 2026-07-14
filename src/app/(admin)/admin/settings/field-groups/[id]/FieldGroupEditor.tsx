@@ -533,7 +533,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                       )}
 
                       {field.type === 'repeater' && (
-                        <div className="space-y-3">
+                        <div className="space-y-3 md:col-span-2">
                           <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Sub-campos do Repetidor</h5>
                           <SubFieldEditor
                             fields={field.config.repeater?.fields || []}
@@ -555,7 +555,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                       )}
 
                       {field.type === 'flexible_content' && (
-                        <div className="space-y-4">
+                        <div className="space-y-4 md:col-span-2">
                           <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Layouts</h5>
                           {(field.config.flexibleContent?.layouts || []).map((layout: any, lIdx: number) => (
                             <div key={lIdx} className="border border-border-default rounded p-3 space-y-3">
