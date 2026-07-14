@@ -118,7 +118,8 @@ export default function FieldGroupsList({ initialFieldGroups, postTypes, taxonom
         const tax = taxonomies.find(t => t.id === loc.locationValue || t.slug === loc.locationValue);
         return `Taxonomia: ${tax?.label || loc.locationValue}${loc.locationParam ? ` (${loc.locationParam})` : ''}`;
       case 'post':
-        return `Post: ${loc.locationValue}`;
+        const post = posts.find(p => p.id === loc.locationValue);
+        return `Post: ${post ? `${post.title} - ${post.slug}` : loc.locationValue}`;
       case 'template':
         return `Template: ${loc.locationValue}`;
       case 'post_status':

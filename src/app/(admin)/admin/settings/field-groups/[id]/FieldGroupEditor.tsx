@@ -220,7 +220,8 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
         const tax = taxonomies.find(t => t.id === (loc.locationValue || loc.value));
         return `Taxonomia: ${tax?.label || (loc.locationValue || loc.value)}${loc.locationParam || loc.param ? ` (${loc.locationParam || loc.param})` : ''}`;
       case 'post':
-        return `Post: ${loc.locationValue || loc.value}`;
+        const post = posts.find(p => p.id === (loc.locationValue || loc.value));
+        return `Post: ${post ? `${post.title} - ${post.slug}` : (loc.locationValue || loc.value)}`;
       case 'template':
         return `Template: ${loc.locationValue || loc.value}`;
       case 'post_status':
