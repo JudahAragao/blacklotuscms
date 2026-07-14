@@ -22,7 +22,7 @@ export class FieldService {
     postStatus?: string;
   }): Promise<any[]> {
     const allLocations = await this.db.fieldGroupLocation.findMany({
-      include: { fieldGroup: { include: { fields: true } } }
+      include: { fieldGroup: { include: { fields: { orderBy: { order: 'asc' } } } } }
     });
 
     const matchedGroupIds = new Set<string>();
@@ -96,7 +96,7 @@ export class FieldService {
     return await this.db.fieldGroup.findMany({
       include: {
         locations: true,
-        fields: true,
+        fields: { orderBy: { order: 'asc' } },
       },
       orderBy: { title: 'asc' }
     });
@@ -120,7 +120,7 @@ export class FieldService {
       where,
       include: {
         locations: true,
-        fields: true,
+        fields: { orderBy: { order: 'asc' } },
       }
     });
   }
@@ -133,7 +133,7 @@ export class FieldService {
       where: { id },
       include: {
         locations: true,
-        fields: true,
+        fields: { orderBy: { order: 'asc' } },
       }
     });
   }
@@ -164,7 +164,7 @@ export class FieldService {
       },
       include: {
         locations: true,
-        fields: true,
+        fields: { orderBy: { order: 'asc' } },
       }
     });
 
@@ -201,7 +201,7 @@ export class FieldService {
       },
       include: {
         locations: true,
-        fields: true,
+        fields: { orderBy: { order: 'asc' } },
       }
     });
 
@@ -232,8 +232,9 @@ export class FieldService {
       }
     });
 
-    // Upsert dos fields
-    for (const f of fieldData) {
+    // Upsert dos fields com ordem
+    for (let i = 0; i < fieldData.length; i++) {
+      const f = fieldData[i];
       if (f.id) {
         await this.db.field.update({
           where: { id: f.id },
@@ -241,7 +242,8 @@ export class FieldService {
             label: f.label,
             name: f.name,
             type: f.type,
-            config: f.config || {}
+            config: f.config || {},
+            order: i
           }
         });
       } else {
@@ -251,7 +253,8 @@ export class FieldService {
             label: f.label,
             name: f.name,
             type: f.type,
-            config: f.config || {}
+            config: f.config || {},
+            order: i
           }
         });
       }

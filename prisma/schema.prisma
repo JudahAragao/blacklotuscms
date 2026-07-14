@@ -124,6 +124,7 @@ model Field {
   label         String      // Nome exibido (ex: "Telefone de Contato")
   type          String      // text, image, repeater, etc
   config        Json        // Configurações como min/max, required
+  order         Int         @default(0) // Posição do campo no grupo
   metaValues    MetaValue[]
 }
 
