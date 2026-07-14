@@ -509,7 +509,18 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
 
                       <div className="space-y-4">
                         <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><ShieldCheck size={12} /> Validação</h5>
-                        {field.type !== 'repeater' && field.type !== 'flexible_content' && (
+                        {(field.type === 'repeater' || field.type === 'flexible_content') ? (
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted">Mín. Itens</label>
+                              <input type="number" value={field.config.repeater?.minItems ?? field.config.flexibleContent?.minItems ?? ''} onChange={(e) => updateConfig(index, field.type === 'repeater' ? 'repeater.minItems' : 'flexibleContent.minItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted">Máx. Itens</label>
+                              <input type="number" value={field.config.repeater?.maxItems ?? field.config.flexibleContent?.maxItems ?? ''} onChange={(e) => updateConfig(index, field.type === 'repeater' ? 'repeater.maxItems' : 'flexibleContent.maxItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
+                            </div>
+                          </div>
+                        ) : (
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex flex-col gap-1">
                               <label className="label-field-muted">Min</label>
@@ -564,16 +575,6 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                             layout={field.config.repeater?.layout || 'block'}
                             onLayoutChange={(layout) => updateConfig(index, 'repeater.layout', layout)}
                           />
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col gap-1">
-                              <label className="label-field-muted text-[10px]">Mín. Itens</label>
-                              <input type="number" value={field.config.repeater?.minItems ?? ''} onChange={(e) => updateConfig(index, 'repeater.minItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              <label className="label-field-muted text-[10px]">Máx. Itens</label>
-                              <input type="number" value={field.config.repeater?.maxItems ?? ''} onChange={(e) => updateConfig(index, 'repeater.maxItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
-                            </div>
-                          </div>
                         </div>
                       )}
 
