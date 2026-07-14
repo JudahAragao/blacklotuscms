@@ -56,7 +56,6 @@ COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
 # Prisma + pg packages for database connectivity (not bundled by standalone)
 COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=deps /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=deps /app/node_modules/pg ./node_modules/pg
 COPY --from=deps /app/node_modules/pg-hstore ./node_modules/pg-hstore
 COPY --from=deps /app/node_modules/pg-query-stream ./node_modules/pg-query-stream
