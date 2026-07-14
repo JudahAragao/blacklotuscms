@@ -1475,8 +1475,13 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
           })}
         </div>
 
-        {/* Drop zone for sub-fields to become root fields */}
+        {/* Drop zone for sub-fields to become root fields + Add new field */}
         <div
+          onClick={() => {
+            if (!dragSource) {
+              addField();
+            }
+          }}
           onDragOver={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1491,7 +1496,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
               onDropRoot(e, fields.length);
             }
           }}
-          className={`w-full py-4 border-2 border-dashed rounded flex items-center justify-center gap-2 text-sm transition-all ${
+          className={`w-full py-4 border-2 border-dashed rounded flex items-center justify-center gap-2 text-sm transition-all cursor-pointer ${
             dropTarget?.type === 'root' && dropTarget.fieldIndex === fields.length
               ? 'border-action bg-action-light/30 text-action'
               : dragSource && (dragSource.type === 'repeater' || dragSource.type === 'flexible_layout')
