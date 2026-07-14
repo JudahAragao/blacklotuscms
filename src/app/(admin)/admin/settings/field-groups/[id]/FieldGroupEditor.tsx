@@ -438,6 +438,56 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
     setFields(newFields);
   };
 
+  // Helper to add a new sub-field to a repeater
+  const addSubFieldToRepeater = (parentIndex: number) => {
+    const newFields = [...fields];
+    const parentField = newFields[parentIndex];
+    const subFields = [...(parentField.config.repeater?.fields || [])];
+    subFields.push({
+      label: '',
+      name: '',
+      type: 'text',
+      config: {
+        width: 100,
+        required: false,
+        validation: {},
+        conditionalLogic: { status: false, rules: [], relation: 'and' },
+        options: []
+      }
+    });
+    newFields[parentIndex] = {
+      ...parentField,
+      config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+    };
+    setFields(newFields);
+  };
+
+  // Helper to add a new sub-field to a flexible content layout
+  const addSubFieldToFlexLayout = (parentIndex: number, layoutIndex: number) => {
+    const newFields = [...fields];
+    const parentField = newFields[parentIndex];
+    const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+    const layoutFields = [...(layouts[layoutIndex].fields || [])];
+    layoutFields.push({
+      label: '',
+      name: '',
+      type: 'text',
+      config: {
+        width: 100,
+        required: false,
+        validation: {},
+        conditionalLogic: { status: false, rules: [], relation: 'and' },
+        options: []
+      }
+    });
+    layouts[layoutIndex] = { ...layouts[layoutIndex], fields: layoutFields };
+    newFields[parentIndex] = {
+      ...parentField,
+      config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+    };
+    setFields(newFields);
+  };
+
   // Helper to update sub-field config
   const updateSubFieldConfig = (source: DragSource, subIdx: number, configKey: string, value: any) => {
     const newFieldsCopy = [...fields];
@@ -1313,16 +1363,21 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
 
                     {/* Drop zone for repeater */}
                     <div
+                      onClick={() => {
+                        if (!dragSource) {
+                          addSubFieldToRepeater(index);
+                        }
+                      }}
                       onDragOver={(e) => onDragOverRepeaterDropZone(e, index)}
                       onDrop={(e) => onDropInRepeater(e, index)}
-                      className={`w-full py-3 border-2 border-dashed rounded flex items-center justify-center gap-2 text-xs transition-all ${
+                      className={`w-full py-3 border-2 border-dashed rounded flex items-center justify-center gap-2 text-xs transition-all cursor-pointer ${
                         isDragOverRepeater(index)
                           ? 'border-action bg-action-light/30 text-action'
                           : 'border-border-default text-text-muted hover:border-action hover:text-action'
                       }`}
                     >
                       <Plus size={12} />
-                      {isDragOverRepeater(index) ? 'Soltar aqui para adicionar como sub-campo' : 'Arraste um campo aqui para adicionar como sub-campo'}
+                      {isDragOverRepeater(index) ? 'Soltar aqui para adicionar como sub-campo' : 'Arraste ou clique para adicionar sub-campo'}
                     </div>
 
                     {/* Layout selector */}
@@ -1420,16 +1475,21 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
 
                         {/* Drop zone for flexible layout */}
                         <div
+                          onClick={() => {
+                            if (!dragSource) {
+                              addSubFieldToFlexLayout(index, lIdx);
+                            }
+                          }}
                           onDragOver={(e) => onDragOverFlexibleLayoutDropZone(e, index, lIdx)}
                           onDrop={(e) => onDropInFlexibleLayout(e, index, lIdx)}
-                          className={`w-full py-2 border-2 border-dashed rounded flex items-center justify-center gap-2 text-[10px] transition-all ${
+                          className={`w-full py-2 border-2 border-dashed rounded flex items-center justify-center gap-2 text-[10px] transition-all cursor-pointer ${
                             isDragOverFlexibleLayout(index, lIdx)
                               ? 'border-action bg-action-light/30 text-action'
                               : 'border-border-default text-text-muted hover:border-action hover:text-action'
                           }`}
                         >
                           <Plus size={10} />
-                          {isDragOverFlexibleLayout(index, lIdx) ? 'Soltar aqui' : 'Arraste campo aqui'}
+                          {isDragOverFlexibleLayout(index, lIdx) ? 'Soltar aqui' : 'Arraste ou clique para adicionar sub-campo'}
                         </div>
 
                         {/* Layout selector */}
