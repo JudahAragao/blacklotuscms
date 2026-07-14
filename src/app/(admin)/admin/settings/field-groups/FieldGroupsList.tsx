@@ -215,40 +215,55 @@ export default function FieldGroupsList({ initialFieldGroups, postTypes, taxonom
 
                 {loc.type === 'post' && (
                   <div className="flex-1 relative">
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex-1">
-                        <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted" />
-                        <input
-                          value={activePostSearchIdx === idx ? postSearchQuery : (loc.value ? posts.find((p: any) => p.id === loc.value)?.title || '' : '')}
-                          onChange={(e) => {
-                            setPostSearchQuery(e.target.value);
-                            setActivePostSearchIdx(idx);
-                          }}
-                          onFocus={() => {
-                            setActivePostSearchIdx(idx);
-                            if (loc.value) {
-                              const post = posts.find((p: any) => p.id === loc.value);
-                              if (post) setPostSearchQuery(post.title);
-                            }
-                          }}
-                          onBlur={() => {
-                            setTimeout(() => {
-                              setActivePostSearchIdx(null);
-                              setPostSearchResults([]);
-                            }, 200);
-                          }}
-                          className="field-input text-xs pl-7 w-full"
-                          placeholder="Buscar post por título..."
-                        />
+                    {loc.value && !activePostSearchIdx ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 px-3 py-2 bg-action-light/50 border border-action/20 rounded text-xs text-text-heading">
+                          <span className="font-medium">{posts.find((p: any) => p.id === loc.value)?.title || 'Post'}</span>
+                        </div>
+                        <button
+                          onClick={() => updateLocation(idx, 'value', '')}
+                          className="p-1 text-text-muted hover:text-status-trash text-xs"
+                          title="Limpar seleção"
+                        >
+                          ×
+                        </button>
                       </div>
-                      <button
-                        onClick={() => updateLocation(idx, 'value', '')}
-                        className="p-1 text-text-muted hover:text-status-trash text-xs"
-                        title="Limpar seleção"
-                      >
-                        ×
-                      </button>
-                    </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted" />
+                          <input
+                            value={activePostSearchIdx === idx ? postSearchQuery : (loc.value ? posts.find((p: any) => p.id === loc.value)?.title || '' : '')}
+                            onChange={(e) => {
+                              setPostSearchQuery(e.target.value);
+                              setActivePostSearchIdx(idx);
+                            }}
+                            onFocus={() => {
+                              setActivePostSearchIdx(idx);
+                              if (loc.value) {
+                                const post = posts.find((p: any) => p.id === loc.value);
+                                if (post) setPostSearchQuery(post.title);
+                              }
+                            }}
+                            onBlur={() => {
+                              setTimeout(() => {
+                                setActivePostSearchIdx(null);
+                                setPostSearchResults([]);
+                              }, 200);
+                            }}
+                            className="field-input text-xs pl-7 w-full"
+                            placeholder="Buscar post por título..."
+                          />
+                        </div>
+                        <button
+                          onClick={() => updateLocation(idx, 'value', '')}
+                          className="p-1 text-text-muted hover:text-status-trash text-xs"
+                          title="Limpar seleção"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
                     {activePostSearchIdx === idx && postSearchResults.length > 0 && (
                       <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-surface-card border border-border-default rounded shadow-lg max-h-48 overflow-y-auto">
                         {postSearchResults.map((post: any) => (
