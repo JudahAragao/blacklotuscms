@@ -14,6 +14,7 @@ interface SubFieldEditorProps {
 
 export default function SubFieldEditor({ fields, onChange, readOnly, layout = 'block', onLayoutChange }: SubFieldEditorProps) {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [activeSubFieldTab, setActiveSubFieldTab] = useState<{ [key: number]: string }>({});
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
@@ -107,85 +108,139 @@ export default function SubFieldEditor({ fields, onChange, readOnly, layout = 'b
   if (readOnly) return null;
 
   const renderFieldConfig = (field: any, idx: number) => (
-    <div className="p-3 bg-surface-muted/50 border-t border-border-default space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1">
-          <label className="label-field-muted text-[10px]">Rótulo do Campo</label>
-          <input
-            value={field.label}
-            onChange={(e) => updateField(idx, 'label', e.target.value)}
-            className="field-input text-xs"
-            placeholder="Ex: Nome do Item"
-          />
-          <span className="text-[9px] text-text-muted">Aparece na página de edição</span>
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="label-field-muted text-[10px]">Nome (Âncora)</label>
-          <input
-            value={field.name}
-            onChange={(e) => updateField(idx, 'name', e.target.value)}
-            className="field-input text-xs font-mono"
-            placeholder="nome_do_item"
-          />
-          <span className="text-[9px] text-text-muted">Usado no código: get_field('{field.name || '...'}')</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1">
-          <label className="label-field-muted text-[10px]">Tipo do Campo</label>
-          <FieldTypeSelector
-            value={field.type}
-            onChange={(type) => updateField(idx, 'type', type)}
-            compact
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="label-field-muted text-[10px]">Largura (%)</label>
-          <input type="number" value={field.config?.width || 100} onChange={(e) => updateConfig(idx, 'width', Number(e.target.value))} className="field-input text-xs" />
-        </div>
-      </div>
-
-      <div className="flex items-center gap-4">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={field.config?.required || false} onChange={(e) => updateConfig(idx, 'required', e.target.checked)} className="check-field" />
-          <span className="text-[10px] text-text-body">Obrigatório</span>
-        </label>
-        {field.config?.instructions !== undefined && (
-          <div className="flex-1 flex flex-col gap-1">
-            <input
-              value={field.config?.instructions || ''}
-              onChange={(e) => updateConfig(idx, 'instructions', e.target.value)}
-              className="field-input text-[10px]"
-              placeholder="Instruções (opcional)"
-            />
-          </div>
+    <div className="bg-surface-muted/50 border-t border-border-default">
+      {/* Tabs */}
+      <div className="flex border-b border-border-default">
+        <button
+          onClick={() => setActiveSubFieldTab({ ...activeSubFieldTab, [idx]: 'general' })}
+          className={`px-3 py-1.5 text-[10px] font-medium transition-colors ${(activeSubFieldTab[idx] || 'general') === 'general' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+        >
+          Geral
+        </button>
+        <button
+          onClick={() => setActiveSubFieldTab({ ...activeSubFieldTab, [idx]: 'validation' })}
+          className={`px-3 py-1.5 text-[10px] font-medium transition-colors ${activeSubFieldTab[idx] === 'validation' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+        >
+          Validação
+        </button>
+        {field.type === 'select' && (
+          <button
+            onClick={() => setActiveSubFieldTab({ ...activeSubFieldTab, [idx]: 'options' })}
+            className={`px-3 py-1.5 text-[10px] font-medium transition-colors ${activeSubFieldTab[idx] === 'options' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+          >
+            Opções
+          </button>
         )}
       </div>
 
-      {field.type === 'select' && (
-        <div className="space-y-2">
-          <label className="label-field-muted text-[10px]">Opções</label>
-          {field.config?.options?.map((opt: any, oIdx: number) => (
-            <div key={oIdx} className="flex gap-2">
-              <input placeholder="Label" value={opt.label} onChange={(e) => {
-                const no = [...(field.config?.options || [])];
-                no[oIdx] = { ...no[oIdx], label: e.target.value };
-                updateConfig(idx, 'options', no);
-              }} className="field-input text-xs flex-1" />
-              <input placeholder="Valor" value={opt.value} onChange={(e) => {
-                const no = [...(field.config?.options || [])];
-                no[oIdx] = { ...no[oIdx], value: e.target.value };
-                updateConfig(idx, 'options', no);
-              }} className="field-input text-xs font-mono flex-1" />
+      {/* Tab Content */}
+      <div className="p-3">
+        {/* General Tab */}
+        {(activeSubFieldTab[idx] || 'general') === 'general' && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted text-[10px]">Rótulo do Campo</label>
+                <input
+                  value={field.label}
+                  onChange={(e) => updateField(idx, 'label', e.target.value)}
+                  className="field-input text-xs"
+                  placeholder="Ex: Nome do Item"
+                />
+                <span className="text-[9px] text-text-muted">Aparece na página de edição</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted text-[10px]">Nome (Âncora)</label>
+                <input
+                  value={field.name}
+                  onChange={(e) => updateField(idx, 'name', e.target.value)}
+                  className="field-input text-xs font-mono"
+                  placeholder="nome_do_item"
+                />
+                <span className="text-[9px] text-text-muted">Usado no código: get_field('{field.name || '...'}')</span>
+              </div>
             </div>
-          ))}
-          <button onClick={() => {
-            const no = [...(field.config?.options || []), { label: '', value: '' }];
-            updateConfig(idx, 'options', no);
-          }} className="w-full py-1 border border-dashed border-border-default rounded text-[10px] text-text-muted hover:text-action">+ Opção</button>
-        </div>
-      )}
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted text-[10px]">Tipo do Campo</label>
+                <FieldTypeSelector
+                  value={field.type}
+                  onChange={(type) => updateField(idx, 'type', type)}
+                  compact
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted text-[10px]">Largura (%)</label>
+                <input type="number" value={field.config?.width || 100} onChange={(e) => updateConfig(idx, 'width', Number(e.target.value))} className="field-input text-xs" />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={field.config?.required || false} onChange={(e) => updateConfig(idx, 'required', e.target.checked)} className="check-field" />
+                <span className="text-[10px] text-text-body">Obrigatório</span>
+              </label>
+              {field.config?.instructions !== undefined && (
+                <div className="flex-1 flex flex-col gap-1">
+                  <input
+                    value={field.config?.instructions || ''}
+                    onChange={(e) => updateConfig(idx, 'instructions', e.target.value)}
+                    className="field-input text-[10px]"
+                    placeholder="Instruções (opcional)"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Validation Tab */}
+        {activeSubFieldTab[idx] === 'validation' && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted text-[10px]">Min</label>
+                <input type="number" value={field.config?.validation?.min ?? ''} onChange={(e) => updateConfig(idx, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted text-[10px]">Max</label>
+                <input type="number" value={field.config?.validation?.max ?? ''} onChange={(e) => updateConfig(idx, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Options Tab */}
+        {activeSubFieldTab[idx] === 'options' && field.type === 'select' && (
+          <div className="space-y-2">
+            {field.config?.options?.map((opt: any, oIdx: number) => (
+              <div key={oIdx} className="flex gap-2">
+                <input placeholder="Label" value={opt.label} onChange={(e) => {
+                  const no = [...(field.config?.options || [])];
+                  no[oIdx] = { ...no[oIdx], label: e.target.value };
+                  updateConfig(idx, 'options', no);
+                }} className="field-input text-xs flex-1" />
+                <input placeholder="Valor" value={opt.value} onChange={(e) => {
+                  const no = [...(field.config?.options || [])];
+                  no[oIdx] = { ...no[oIdx], value: e.target.value };
+                  updateConfig(idx, 'options', no);
+                }} className="field-input text-xs font-mono flex-1" />
+                <button onClick={() => {
+                  const no = (field.config?.options || []).filter((_: any, i: number) => i !== oIdx);
+                  updateConfig(idx, 'options', no);
+                }} className="p-1 text-text-muted hover:text-status-trash">
+                  <Trash2 size={10} />
+                </button>
+              </div>
+            ))}
+            <button onClick={() => {
+              const no = [...(field.config?.options || []), { label: '', value: '' }];
+              updateConfig(idx, 'options', no);
+            }} className="w-full py-1 border border-dashed border-border-default rounded text-[10px] text-text-muted hover:text-action">+ Opção</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 

@@ -22,6 +22,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
   const [fields, setFields] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedField, setExpandedField] = useState<number | null>(null);
+  const [activeFieldTab, setActiveFieldTab] = useState<{ [key: number]: string }>({});
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [postSearchQuery, setPostSearchQuery] = useState('');
@@ -479,90 +480,142 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                 </div>
 
                 {expandedField === index && !org && (
-                  <div className="p-4 bg-surface-muted/50 border-t border-border-default space-y-4">
-                    {/* Grid 2 colunas: Geral + Validação/Lógica */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-4">
-                        <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layout size={12} /> Geral</h5>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-1">
-                            <label className="label-field-muted">Tipo</label>
-                            <FieldTypeSelector
-                              value={field.type}
-                              onChange={(type) => updateField(index, 'type', type)}
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <label className="label-field-muted">Largura (%)</label>
-                            <input type="number" value={field.config.width} onChange={(e) => updateConfig(index, 'width', Number(e.target.value))} className="field-input text-xs" />
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label className="label-field-muted">Instruções</label>
-                          <input value={field.config.instructions || ''} onChange={(e) => updateConfig(index, 'instructions', e.target.value)} className="field-input text-xs" placeholder="Aparece abaixo do campo" />
-                        </div>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={field.config.required} onChange={(e) => updateConfig(index, 'required', e.target.checked)} className="check-field" />
-                          <span className="text-xs text-text-body">Obrigatório</span>
-                        </label>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><ShieldCheck size={12} /> Validação</h5>
-                        {(field.type === 'repeater' || field.type === 'flexible_content') ? (
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col gap-1">
-                              <label className="label-field-muted">Mín. Itens</label>
-                              <input type="number" value={field.config.repeater?.minItems ?? field.config.flexibleContent?.minItems ?? ''} onChange={(e) => updateConfig(index, field.type === 'repeater' ? 'repeater.minItems' : 'flexibleContent.minItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              <label className="label-field-muted">Máx. Itens</label>
-                              <input type="number" value={field.config.repeater?.maxItems ?? field.config.flexibleContent?.maxItems ?? ''} onChange={(e) => updateConfig(index, field.type === 'repeater' ? 'repeater.maxItems' : 'flexibleContent.maxItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col gap-1">
-                              <label className="label-field-muted">Min</label>
-                              <input type="number" value={field.config.validation?.min ?? ''} onChange={(e) => updateConfig(index, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              <label className="label-field-muted">Max</label>
-                              <input type="number" value={field.config.validation?.max ?? ''} onChange={(e) => updateConfig(index, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
-                            </div>
-                          </div>
-                        )}
-
-                        <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Eye size={12} /> Lógica Condicional</h5>
-                        <button onClick={() => updateConfig(index, 'conditionalLogic.status', !field.config.conditionalLogic?.status)} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${field.config.conditionalLogic?.status ? 'bg-status-published/10 text-status-published' : 'bg-surface-muted text-text-muted'}`}>
-                          {field.config.conditionalLogic?.status ? 'Ativo' : 'Inativo'}
+                  <div className="bg-surface-muted/50 border-t border-border-default">
+                    {/* Tabs */}
+                    <div className="flex border-b border-border-default">
+                      <button
+                        onClick={() => setActiveFieldTab({ ...activeFieldTab, [index]: 'general' })}
+                        className={`px-4 py-2 text-xs font-medium transition-colors ${(activeFieldTab[index] || 'general') === 'general' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+                      >
+                        <Layout size={12} className="inline mr-1" /> Geral
+                      </button>
+                      <button
+                        onClick={() => setActiveFieldTab({ ...activeFieldTab, [index]: 'validation' })}
+                        className={`px-4 py-2 text-xs font-medium transition-colors ${activeFieldTab[index] === 'validation' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+                      >
+                        <ShieldCheck size={12} className="inline mr-1" /> Validação
+                      </button>
+                      <button
+                        onClick={() => setActiveFieldTab({ ...activeFieldTab, [index]: 'conditional' })}
+                        className={`px-4 py-2 text-xs font-medium transition-colors ${activeFieldTab[index] === 'conditional' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+                      >
+                        <Eye size={12} className="inline mr-1" /> Lógica Condicional
+                      </button>
+                      {field.type === 'select' && (
+                        <button
+                          onClick={() => setActiveFieldTab({ ...activeFieldTab, [index]: 'options' })}
+                          className={`px-4 py-2 text-xs font-medium transition-colors ${activeFieldTab[index] === 'options' ? 'text-action border-b-2 border-action' : 'text-text-muted hover:text-text-heading'}`}
+                        >
+                          <List size={12} className="inline mr-1" /> Opções
                         </button>
-                      {field.config.conditionalLogic?.status && (
-                        <div className="space-y-2 p-2 bg-surface-card rounded border border-border-default">
-                          {field.config.conditionalLogic.rules?.map((rule: any, rIdx: number) => (
-                            <div key={rIdx} className="flex gap-2 items-center">
-                              <select value={rule.field} onChange={(e) => { const nr = [...field.config.conditionalLogic.rules]; nr[rIdx].field = e.target.value; updateConfig(index, 'conditionalLogic.rules', nr); }} className="field-select text-xs flex-1">
-                                <option value="">Campo...</option>
-                                {fields.filter((_, i) => i !== index).map(f => <option key={f.name} value={f.name}>{f.label}</option>)}
-                              </select>
-                              <input value={rule.value} onChange={(e) => { const nr = [...field.config.conditionalLogic.rules]; nr[rIdx].value = e.target.value; updateConfig(index, 'conditionalLogic.rules', nr); }} className="field-input text-xs flex-1" placeholder="Valor" />
+                      )}
+                    </div>
+
+                    {/* Tab Content */}
+                    <div className="p-4">
+                      {/* General Tab */}
+                      {(activeFieldTab[index] || 'general') === 'general' && (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted">Tipo</label>
+                              <FieldTypeSelector
+                                value={field.type}
+                                onChange={(type) => updateField(index, 'type', type)}
+                              />
                             </div>
-                          ))}
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted">Largura (%)</label>
+                              <input type="number" value={field.config.width} onChange={(e) => updateConfig(index, 'width', Number(e.target.value))} className="field-input text-xs" />
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="label-field-muted">Instruções</label>
+                            <input value={field.config.instructions || ''} onChange={(e) => updateConfig(index, 'instructions', e.target.value)} className="field-input text-xs" placeholder="Aparece abaixo do campo" />
+                          </div>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" checked={field.config.required} onChange={(e) => updateConfig(index, 'required', e.target.checked)} className="check-field" />
+                            <span className="text-xs text-text-body">Obrigatório</span>
+                          </label>
                         </div>
                       )}
 
-                      {field.type === 'select' && (
+                      {/* Validation Tab */}
+                      {activeFieldTab[index] === 'validation' && (
+                        <div className="space-y-4">
+                          {(field.type === 'repeater' || field.type === 'flexible_content') ? (
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="flex flex-col gap-1">
+                                <label className="label-field-muted">Mín. Itens</label>
+                                <input type="number" value={field.config.repeater?.minItems ?? field.config.flexibleContent?.minItems ?? ''} onChange={(e) => updateConfig(index, field.type === 'repeater' ? 'repeater.minItems' : 'flexibleContent.minItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <label className="label-field-muted">Máx. Itens</label>
+                                <input type="number" value={field.config.repeater?.maxItems ?? field.config.flexibleContent?.maxItems ?? ''} onChange={(e) => updateConfig(index, field.type === 'repeater' ? 'repeater.maxItems' : 'flexibleContent.maxItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="flex flex-col gap-1">
+                                <label className="label-field-muted">Min</label>
+                                <input type="number" value={field.config.validation?.min ?? ''} onChange={(e) => updateConfig(index, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <label className="label-field-muted">Max</label>
+                                <input type="number" value={field.config.validation?.max ?? ''} onChange={(e) => updateConfig(index, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Conditional Logic Tab */}
+                      {activeFieldTab[index] === 'conditional' && (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-text-muted">Status:</span>
+                            <button onClick={() => updateConfig(index, 'conditionalLogic.status', !field.config.conditionalLogic?.status)} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${field.config.conditionalLogic?.status ? 'bg-status-published/10 text-status-published' : 'bg-surface-muted text-text-muted'}`}>
+                              {field.config.conditionalLogic?.status ? 'Ativo' : 'Inativo'}
+                            </button>
+                          </div>
+                          {field.config.conditionalLogic?.status && (
+                            <div className="space-y-2 p-2 bg-surface-card rounded border border-border-default">
+                              {field.config.conditionalLogic.rules?.map((rule: any, rIdx: number) => (
+                                <div key={rIdx} className="flex gap-2 items-center">
+                                  <select value={rule.field} onChange={(e) => { const nr = [...field.config.conditionalLogic.rules]; nr[rIdx].field = e.target.value; updateConfig(index, 'conditionalLogic.rules', nr); }} className="field-select text-xs flex-1">
+                                    <option value="">Campo...</option>
+                                    {fields.filter((_, i) => i !== index).map(f => <option key={f.name} value={f.name}>{f.label}</option>)}
+                                  </select>
+                                  <input value={rule.value} onChange={(e) => { const nr = [...field.config.conditionalLogic.rules]; nr[rIdx].value = e.target.value; updateConfig(index, 'conditionalLogic.rules', nr); }} className="field-input text-xs flex-1" placeholder="Valor" />
+                                </div>
+                              ))}
+                              <button onClick={() => {
+                                const nr = [...(field.config.conditionalLogic?.rules || []), { field: '', value: '' }];
+                                updateConfig(index, 'conditionalLogic.rules', nr);
+                              }} className="w-full py-1.5 border border-dashed border-border-default rounded text-xs text-text-muted hover:text-action">+ Regra</button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Options Tab */}
+                      {activeFieldTab[index] === 'options' && field.type === 'select' && (
                         <div className="space-y-2">
-                          <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><List size={12} /> Opções</h5>
                           {field.config.options?.map((opt: any, oIdx: number) => (
                             <div key={oIdx} className="flex gap-2">
                               <input placeholder="Label" value={opt.label} onChange={(e) => { const no = [...field.config.options]; no[oIdx].label = e.target.value; updateConfig(index, 'options', no); }} className="field-input text-xs flex-1" />
                               <input placeholder="Valor" value={opt.value} onChange={(e) => { const no = [...field.config.options]; no[oIdx].value = e.target.value; updateConfig(index, 'options', no); }} className="field-input text-xs font-mono flex-1" />
+                              <button onClick={() => { const no = field.config.options.filter((_: any, i: number) => i !== oIdx); updateConfig(index, 'options', no); }} className="p-1 text-text-muted hover:text-status-trash">
+                                <Trash2 size={12} />
+                              </button>
                             </div>
                           ))}
+                          <button onClick={() => {
+                            const no = [...(field.config.options || []), { label: '', value: '' }];
+                            updateConfig(index, 'options', no);
+                          }} className="w-full py-1.5 border border-dashed border-border-default rounded text-xs text-text-muted hover:text-action">+ Opção</button>
                         </div>
                       )}
-                      </div>
                     </div>
 
                     {/* Repetidor - full width abaixo do grid */}
