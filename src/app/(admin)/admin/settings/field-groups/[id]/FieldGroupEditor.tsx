@@ -1288,9 +1288,37 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
           })}
         </div>
 
-        <button onClick={addField} className="w-full py-3 border border-dashed border-border-default hover:border-action hover:bg-action-light transition-all rounded flex items-center justify-center gap-2 text-sm text-text-muted hover:text-action">
-          <Plus size={14} /> Novo Campo
-        </button>
+        {/* Drop zone for sub-fields to become root fields */}
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (dragSource && (dragSource.type === 'repeater' || dragSource.type === 'flexible_layout')) {
+              setDropTarget({ type: 'root', fieldIndex: fields.length, position: 'after' });
+            }
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (dragSource && (dragSource.type === 'repeater' || dragSource.type === 'flexible_layout')) {
+              onDropRoot(e, fields.length);
+            }
+          }}
+          className={`w-full py-4 border-2 border-dashed rounded flex items-center justify-center gap-2 text-sm transition-all ${
+            dropTarget?.type === 'root' && dropTarget.fieldIndex === fields.length
+              ? 'border-action bg-action-light/30 text-action'
+              : dragSource && (dragSource.type === 'repeater' || dragSource.type === 'flexible_layout')
+                ? 'border-action/50 text-action/70 hover:border-action hover:text-action'
+                : 'border-border-default text-text-muted hover:border-action hover:text-action'
+          }`}
+        >
+          <Plus size={14} />
+          {dropTarget?.type === 'root' && dropTarget.fieldIndex === fields.length
+            ? 'Soltar aqui para tornar campo-raiz'
+            : dragSource && (dragSource.type === 'repeater' || dragSource.type === 'flexible_layout')
+              ? 'Arraste aqui para tornar campo-raiz'
+              : 'Novo Campo'}
+        </div>
       </div>
 
       {/* Botão Salvar */}
