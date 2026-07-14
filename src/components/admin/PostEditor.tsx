@@ -358,6 +358,81 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
             )}
           </div>
         );
+      case 'flexible_content':
+        const layouts = config.flexibleContent?.layouts || [];
+        const flexRows = Array.isArray(value) ? value : [];
+
+        const addFlexRow = (layoutName: string) => {
+          const layout = layouts.find((l: any) => l.name === layoutName);
+          if (!layout) return;
+          const newRow: any = { _layout: layoutName };
+          (layout.fields || []).forEach((sub: any) => {
+            newRow[sub.name] = sub.type === 'boolean' ? false : '';
+          });
+          onChange([...flexRows, newRow]);
+        };
+
+        const removeFlexRow = (idx: number) => {
+          onChange(flexRows.filter((_: any, i: number) => i !== idx));
+        };
+
+        const updateFlexRowField = (idx: number, subName: string, subValue: any) => {
+          const newRows = [...flexRows];
+          newRows[idx] = { ...newRows[idx], [subName]: subValue };
+          onChange(newRows);
+        };
+
+        return (
+          <div className="space-y-4 w-full">
+            <div className="space-y-3">
+              {flexRows.map((row: any, idx: number) => {
+                const layout = layouts.find((l: any) => l.name === row._layout);
+                const layoutFields = layout?.fields || [];
+                return (
+                  <div key={idx} className="content-card p-4 relative group">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold text-action">{layout?.label || row._layout}</span>
+                      {!readOnly && (
+                        <button
+                          type="button"
+                          onClick={() => removeFlexRow(idx)}
+                          className="p-1 text-text-muted hover:text-status-trash opacity-0 group-hover:opacity-100 transition-all"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {layoutFields.map((sub: any) => (
+                        <div key={sub.name} className="flex flex-col gap-1.5">
+                          <label className="label-field-muted">{sub.label}</label>
+                          {renderFieldInput(sub, row[sub.name], (val: any) => updateFlexRowField(idx, sub.name, val))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {!readOnly && layouts.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {layouts.map((layout: any) => (
+                  <button
+                    key={layout.name}
+                    type="button"
+                    onClick={() => addFlexRow(layout.name)}
+                    className="px-3 py-1.5 border border-dashed border-border-default hover:border-action hover:bg-action-light transition-all rounded text-xs text-text-muted hover:text-action"
+                  >
+                    + {layout.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {layouts.length === 0 && !readOnly && (
+              <p className="text-xs text-status-draft text-center italic">Nenhum layout definido no campo.</p>
+            )}
+          </div>
+        );
       default:
         return (
           <input

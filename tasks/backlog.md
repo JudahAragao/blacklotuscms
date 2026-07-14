@@ -88,10 +88,13 @@ status: approved
 - [x] **TASK-064:** Add taxonomy MetaValue support (termId nullable in MetaValue) | est: 2h | depends: [TASK-061] | feature: post-management
 - [x] **TASK-065:** Rename "Tipos de Conteúdo" → "Tipos de Posts" + add "Campos Customizados" button | est: 1h | depends: [] | feature: ux
 - [x] **TASK-066:** Searchable post select for location rules (debounced search by title/slug) | est: 2h | depends: [TASK-061] | feature: post-management
+- [x] **TASK-067:** Flexible Content field type with layout selection and sub-fields | est: 4h | depends: [TASK-061] | feature: post-management
+- [x] **TASK-068:** Repeater sub-fields management UI in FieldGroupEditor | est: 3h | depends: [TASK-061] | feature: post-management
+- [x] **TASK-069:** Field order column for drag-drop persistence | est: 1h | depends: [TASK-061] | feature: post-management
 
 ## Métricas
-- Total de tasks: 66
-- Concluídas: 66
+- Total de tasks: 69
+- Concluídas: 69
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

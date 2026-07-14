@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const FieldTypeEnum = z.enum([
-  'text', 'number', 'textarea', 'email', 'image', 'gallery', 'file', 'boolean', 'select', 'repeater', 'json', 'wysiwyg', 'tab', 'section'
+  'text', 'number', 'textarea', 'email', 'image', 'gallery', 'file', 'boolean', 'select', 'repeater', 'json', 'wysiwyg', 'tab', 'section', 'flexible_content'
 ]);
 
 export const ConditionalOperatorEnum = z.enum([
@@ -50,6 +50,16 @@ export const FieldConfigSchema = z.object({
     layout: z.enum(['table', 'block']).optional().default('block'),
     buttonLabel: z.string().optional().default('Adicionar Item'),
     fields: z.array(z.lazy(() => CreateFieldSchema)).optional(), // Campos internos do repetidor
+  }).optional(),
+
+  // Específicos para Flexible Content
+  flexibleContent: z.object({
+    layouts: z.array(z.object({
+      name: z.string().min(2).regex(/^[a-z0-9_]+$/, "Nome do layout deve ser snake_case."),
+      label: z.string().min(2),
+      fields: z.array(z.lazy(() => CreateFieldSchema)).optional(),
+    })).optional().default([]),
+    buttonLabel: z.string().optional().default('Adicionar Layout'),
   }).optional(),
 });
 

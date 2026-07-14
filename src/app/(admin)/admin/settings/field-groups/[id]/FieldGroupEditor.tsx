@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { updateFieldGroupAction, syncFieldsAction, searchPostsAction } from '../actions';
+import SubFieldEditor from '@/components/admin/SubFieldEditor';
 
 interface FieldGroupEditorProps {
   fieldGroup: any;
@@ -485,6 +486,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                             <option value="wysiwyg">Editor Rico</option>
                             <option value="json">JSON</option>
                             <option value="repeater">Repetidor</option>
+                            <option value="flexible_content">Conteúdo Flexível</option>
                             <option value="tab">Aba</option>
                             <option value="section">Seção</option>
                           </select>
@@ -544,6 +546,73 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                               <input placeholder="Valor" value={opt.value} onChange={(e) => { const no = [...field.config.options]; no[oIdx].value = e.target.value; updateConfig(index, 'options', no); }} className="field-input text-xs font-mono flex-1" />
                             </div>
                           ))}
+                        </div>
+                      )}
+
+                      {field.type === 'repeater' && (
+                        <div className="space-y-3">
+                          <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Sub-campos do Repetidor</h5>
+                          <SubFieldEditor
+                            fields={field.config.repeater?.fields || []}
+                            onChange={(subFields) => updateConfig(index, 'repeater.fields', subFields)}
+                          />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted text-[10px]">Mín. Itens</label>
+                              <input type="number" value={field.config.repeater?.minItems ?? ''} onChange={(e) => updateConfig(index, 'repeater.minItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted text-[10px]">Máx. Itens</label>
+                              <input type="number" value={field.config.repeater?.maxItems ?? ''} onChange={(e) => updateConfig(index, 'repeater.maxItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {field.type === 'flexible_content' && (
+                        <div className="space-y-4">
+                          <h5 className="text-xs font-semibold text-action flex items-center gap-1.5"><Layers size={12} /> Layouts</h5>
+                          {(field.config.flexibleContent?.layouts || []).map((layout: any, lIdx: number) => (
+                            <div key={lIdx} className="border border-border-default rounded p-3 space-y-3">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  value={layout.label}
+                                  onChange={(e) => {
+                                    const layouts = [...(field.config.flexibleContent?.layouts || [])];
+                                    layouts[lIdx] = { ...layouts[lIdx], label: e.target.value };
+                                    if (!layout.name) {
+                                      layouts[lIdx].name = e.target.value
+                                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+                                        .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                                    }
+                                    updateConfig(index, 'flexibleContent.layouts', layouts);
+                                  }}
+                                  className="field-input text-xs flex-1 font-medium"
+                                  placeholder="Nome do Layout"
+                                />
+                                <button onClick={() => {
+                                  const layouts = (field.config.flexibleContent?.layouts || []).filter((_: any, i: number) => i !== lIdx);
+                                  updateConfig(index, 'flexibleContent.layouts', layouts);
+                                }} className="p-1 text-text-muted hover:text-status-trash">
+                                  <Trash2 size={12} />
+                                </button>
+                              </div>
+                              <SubFieldEditor
+                                fields={layout.fields || []}
+                                onChange={(subFields) => {
+                                  const layouts = [...(field.config.flexibleContent?.layouts || [])];
+                                  layouts[lIdx] = { ...layouts[lIdx], fields: subFields };
+                                  updateConfig(index, 'flexibleContent.layouts', layouts);
+                                }}
+                              />
+                            </div>
+                          ))}
+                          <button onClick={() => {
+                            const layouts = [...(field.config.flexibleContent?.layouts || []), { name: '', label: '', fields: [] }];
+                            updateConfig(index, 'flexibleContent.layouts', layouts);
+                          }} className="w-full py-2 border border-dashed border-border-default rounded text-xs text-text-muted hover:text-action hover:border-action">
+                            + Adicionar Layout
+                          </button>
                         </div>
                       )}
                     </div>

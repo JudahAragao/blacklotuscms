@@ -114,3 +114,17 @@ feature: "post-management"
 - **WHEN** acessa /admin/settings/field-groups
 - **THEN** pode listar, criar, editar e excluir FieldGroups com locations
 - **Referencia:** FR06
+
+## AT-18: Repeater Sub-Fields
+- **GIVEN** um FieldGroup com campo Repeater contendo sub-campos (text, image)
+- **WHEN** usuario adiciona itens no repeater
+- **THEN** cada linha exibe os sub-campos configurados
+- **AND** dados são salvos como array de objetos
+- **Referencia:** FR06
+
+## AT-19: Flexible Content Layouts
+- **GIVEN** um FieldGroup com campo Flexible Content com 2 layouts (Hero, Texto)
+- **WHEN** usuario clica em "+ Hero" ou "+ Texto"
+- **THEN** um novo bloco é adicionado com os sub-campos daquele layout
+- **AND** usuario pode adicionar múltiplos blocos em qualquer ordem
+- **Referencia:** FR06
