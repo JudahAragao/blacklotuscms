@@ -17,6 +17,7 @@ export class FieldService {
   async evaluateLocations(context: {
     postTypeId?: string;
     taxonomySlug?: string;
+    postId?: string;
     postSlug?: string;
     postTemplate?: string;
     postStatus?: string;
@@ -38,7 +39,7 @@ export class FieldService {
           matches = loc.locationValue === context.taxonomySlug;
           break;
         case 'post':
-          matches = loc.locationValue === context.postSlug;
+          matches = loc.locationValue === context.postId;
           break;
         case 'template':
           matches = loc.locationValue === context.postTemplate;
@@ -77,6 +78,7 @@ export class FieldService {
 
     return this.evaluateLocations({
       postTypeId: post.postTypeId,
+      postId: postId,
       postSlug: post.slug,
       postStatus: post.status,
     });

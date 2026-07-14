@@ -54,6 +54,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
   // Buscar fieldGroups via evaluateLocations
   const fieldGroups = await FieldService.evaluateLocations({
     postTypeId: post.postTypeId,
+    postId: post.id,
     postSlug: post.slug,
     postStatus: post.status,
   });
