@@ -40,6 +40,7 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
   const [activeSubFieldTab, setActiveSubFieldTab] = useState<{ [key: string]: string }>({});
   const [dragSource, setDragSource] = useState<DragSource>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget>(null);
+  const [subFieldDragTarget, setSubFieldDragTarget] = useState<{ parentIndex: number; subIndex: number; layoutIndex?: number; position: 'before' | 'after' } | null>(null);
   const [postSearchQuery, setPostSearchQuery] = useState('');
   const [postSearchResults, setPostSearchResults] = useState<any[]>([]);
   const [postSearchLoading, setPostSearchLoading] = useState(false);
@@ -438,6 +439,40 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
     setFields(newFields);
   };
 
+  // Helper to reorder sub-fields within the same container
+  const reorderSubField = (sourceIdx: number, targetIdx: number, parentIndex: number, layoutIndex?: number) => {
+    if (sourceIdx === targetIdx) return;
+
+    const newFields = [...fields];
+    const parentField = newFields[parentIndex];
+
+    if (layoutIndex !== undefined) {
+      // Flexible content layout
+      const layouts = [...(parentField.config.flexibleContent?.layouts || [])];
+      const layoutFields = [...(layouts[layoutIndex].fields || [])];
+      const [movedItem] = layoutFields.splice(sourceIdx, 1);
+      const insertIdx = sourceIdx < targetIdx ? targetIdx - 1 : targetIdx;
+      layoutFields.splice(insertIdx, 0, movedItem);
+      layouts[layoutIndex] = { ...layouts[layoutIndex], fields: layoutFields };
+      newFields[parentIndex] = {
+        ...parentField,
+        config: { ...parentField.config, flexibleContent: { ...parentField.config.flexibleContent, layouts } }
+      };
+    } else {
+      // Repeater
+      const subFields = [...(parentField.config.repeater?.fields || [])];
+      const [movedItem] = subFields.splice(sourceIdx, 1);
+      const insertIdx = sourceIdx < targetIdx ? targetIdx - 1 : targetIdx;
+      subFields.splice(insertIdx, 0, movedItem);
+      newFields[parentIndex] = {
+        ...parentField,
+        config: { ...parentField.config, repeater: { ...parentField.config.repeater, fields: subFields } }
+      };
+    }
+
+    setFields(newFields);
+  };
+
   // Helper to add a new sub-field to a repeater
   const addSubFieldToRepeater = (parentIndex: number) => {
     const newFields = [...fields];
@@ -574,6 +609,15 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
       currentSub = fields[source.parentFieldIndex]?.config?.flexibleContent?.layouts?.[source.layoutIndex]?.fields?.[idx] || sub;
     }
 
+    // Check if this sub-field is being dragged over
+    const isDragOver = subFieldDragTarget &&
+      subFieldDragTarget.parentIndex === source?.parentFieldIndex &&
+      subFieldDragTarget.subIndex === idx &&
+      subFieldDragTarget.layoutIndex === source?.layoutIndex;
+
+    const isDragOverBefore = isDragOver && subFieldDragTarget?.position === 'before';
+    const isDragOverAfter = isDragOver && subFieldDragTarget?.position === 'after';
+
     return (
       <div
         key={currentSub.id || subKey}
@@ -582,10 +626,52 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
           e.stopPropagation();
           onDragStartFn(source);
         }}
-        onDragEnd={onDragEnd}
+        onDragEnd={() => {
+          onDragEnd();
+          setSubFieldDragTarget(null);
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (dragSource && source?.parentFieldIndex !== undefined) {
+            // Only allow reorder within the same container
+            const isSameContainer = dragSource.parentFieldIndex === source.parentFieldIndex &&
+              (dragSource.type === source.type) &&
+              (dragSource.layoutIndex === source.layoutIndex);
+
+            if (isSameContainer && dragSource.fieldIndex !== idx) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const midY = rect.top + rect.height / 2;
+              const position = e.clientY < midY ? 'before' : 'after';
+              setSubFieldDragTarget({
+                parentIndex: source.parentFieldIndex,
+                subIndex: idx,
+                layoutIndex: source.layoutIndex,
+                position
+              });
+            }
+          }
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (dragSource && subFieldDragTarget && source?.parentFieldIndex !== undefined) {
+            const isSameContainer = dragSource.parentFieldIndex === source.parentFieldIndex &&
+              (dragSource.type === source.type) &&
+              (dragSource.layoutIndex === source.layoutIndex);
+
+            if (isSameContainer && dragSource.fieldIndex !== idx) {
+              reorderSubField(dragSource.fieldIndex, idx, source.parentFieldIndex, source.layoutIndex);
+            }
+          }
+          setSubFieldDragTarget(null);
+        }}
         className={`border rounded overflow-hidden transition-all ${
           org ? 'border-action/30 bg-action-light/50' :
-          isDragging ? 'opacity-50 scale-[0.98]' : 'border-border-default'
+          isDragging ? 'opacity-50 scale-[0.98]' :
+          isDragOverBefore ? 'border-t-2 border-t-action' :
+          isDragOverAfter ? 'border-b-2 border-b-action' :
+          'border-border-default'
         }`}
       >
         <div className={`flex items-center gap-2 p-2 ${org ? 'bg-action-light/50' : 'bg-surface-muted'}`}>
