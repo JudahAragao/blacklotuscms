@@ -31,6 +31,8 @@ const FIELD_TYPES: FieldTypeInfo[] = [
   { type: 'image', label: 'Imagem', icon: <Image size={16} />, category: 'Mídia', description: 'Upload de imagem' },
   { type: 'gallery', label: 'Galeria', icon: <FileImage size={16} />, category: 'Mídia', description: 'Múltiplas imagens' },
   { type: 'file', label: 'Arquivo', icon: <File size={16} />, category: 'Mídia', description: 'Upload de arquivo' },
+  // Visual
+  { type: 'icon', label: 'Ícone', icon: <LayoutGrid size={16} />, category: 'Visual', description: 'Seletor de ícones (lib ou SVG customizado)' },
   // Organização
   { type: 'tab', label: 'Aba', icon: <Columns size={16} />, category: 'Organização', description: 'Separador em abas' },
   { type: 'section', label: 'Seção', icon: <Minus size={16} />, category: 'Organização', description: 'Divisor visual' },

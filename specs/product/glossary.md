@@ -30,6 +30,7 @@ status: approved
 - **G19 Section (Field Type):** Campo organizador visual que cria divisores/títulos de seção dentro de uma aba no editor de posts. Não quebra o agrupamento da aba pai. Não armazena dados.
 - **G20 Sub-field:** Campo filho armazenado dentro de um Repeater ou Flexible Content. Pode ser criado via drag-and-drop (movendo um campo-raiz para dentro do container) ou via clique na zona de drop. Mantém todas as configurações (tipo, validação, lógica condicional) ao mudar de nível.
 - **G21 Unified Field System:** Sistema onde campos-raiz e sub-compartilham a mesma estrutura e podem se mover livremente entre níveis via drag-and-drop, similar ao ACF (Advanced Custom Fields).
+- **G22 Icon (Field Type):** Campo que permite selecionar ícones de duas fontes: lib lucide-react (1000+ ícones SVG vetoriais) ou SVG customizado com sanitização de segurança. Armazenado como objeto { iconSource, iconName, iconSvg, iconColor, iconSize }.
 
 ## Relacionamentos
 

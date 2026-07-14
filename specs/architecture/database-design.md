@@ -104,6 +104,7 @@ erDiagram
   - Para Repeater: `{ repeater: { fields: [...], layout: 'block'|'table'|'row', minItems, maxItems } }`
   - Para Flexible Content: `{ flexibleContent: { layouts: [{ name, label, fields: [...], layout }], minItems, maxItems } }`
   - Para Select: `{ options: [{ label, value }] }`
+  - Para Icon: `{ iconSource: 'lucide'|'custom', iconName: string, iconSvg: string, iconColor: string, iconSize: number }`
   - Sub-campos são armazenados no config como array de objetos com mesma estrutura de Field
 
 ### MetaValue

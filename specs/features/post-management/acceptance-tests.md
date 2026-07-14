@@ -218,3 +218,33 @@ feature: "post-management"
 - **AND** nome âncora é atualizado sempre que o rótulo muda
 - **AND** campo de nome âncora é editável para personalização manual
 - **Referencia:** REQ-03
+
+## AT-32: Icon Field with Lucide Library
+- **GIVEN** um FieldGroup com campo do tipo "Ícone" configurado com source "lib de ícones"
+- **WHEN** usuario clica no seletor de ícone
+- **THEN** dropdown aberto com busca e categorias de ícones
+- **AND** usuario pode buscar ícone por nome (ex: "star", "heart", "home")
+- **AND** ícone selecionado é salvo como objeto { iconSource: 'lucide', iconName: 'star' }
+- **Referencia:** REQ-10
+
+## AT-33: Icon Field with Custom SVG
+- **GIVEN** um FieldGroup com campo do tipo "Ícone" configurado com source "SVG Customizado"
+- **WHEN** usuario cola um SVG válido no textarea
+- **THEN** preview do ícone é exibido abaixo do textarea
+- **AND** SVG é sanitizado (script tags, event handlers removidos)
+- **AND** ícone é salvo como objeto { iconSource: 'custom', iconSvg: '<svg>...</svg>' }
+- **Referencia:** REQ-10
+
+## AT-34: SVG Sanitization Security
+- **GIVEN** um SVG com conteúdo malicioso (script tag, onclick handler, javascript: protocol)
+- **WHEN** usuario tenta salvar o SVG customizado
+- **THEN** conteúdo malicioso é removido
+- **AND** SVG sanitizado é salvo sem comprometer segurança
+- **Referencia:** REQ-10
+
+## AT-35: Icon Field in Theme Rendering
+- **GIVEN** um post com campo de ícone preenchido
+- **WHEN** tema renderiza o post usando renderIcon()
+- **THEN** ícone é renderizado com segurança (lucide-react ou SVG sanitizado)
+- **AND** ícone respeita cor e tamanho configurados
+- **Referencia:** REQ-10

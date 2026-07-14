@@ -63,6 +63,13 @@ export function validateField(field: any, value: any): string | null {
     return 'This field is required.';
   }
 
+  // Icon field validation
+  if (field.type === 'icon' && config.required) {
+    if (!value || (!value.iconName && !value.iconSvg)) {
+      return 'Please select an icon.';
+    }
+  }
+
   if (field.type === 'number') {
     const val = Number(value);
     if (config.validation?.min !== undefined && val < config.validation.min) {

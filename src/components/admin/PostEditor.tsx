@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import MediaPicker from './MediaPicker';
 import RichTextEditor from './RichTextEditor';
+import IconPicker from './IconPicker';
 import { Plus, Trash2, Save, Send, Eye, Calendar, User, Tag, ChevronDown, ChevronUp, AlertCircle, X } from 'lucide-react';
 import { shouldShowField, validateField } from '@/lib/field-utils';
 import { toast } from 'sonner';
@@ -300,6 +301,17 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
             />
             <span className="text-sm text-text-body">{value ? 'Sim' : 'Nao'}</span>
           </div>
+        );
+      case 'icon':
+        return (
+          <IconPicker
+            value={value?.iconName || ''}
+            onChange={(iconName) => onChange({ ...value, iconName, iconSource: 'lucide' })}
+            source={value?.iconSource || 'lucide'}
+            onSourceChange={(source) => onChange({ ...value, iconSource: source })}
+            customSvg={value?.iconSvg || ''}
+            onCustomSvgChange={(svg) => onChange({ ...value, iconSvg: svg })}
+          />
         );
       case 'repeater':
         const subFields = config.repeater?.fields || config.subFields || [];

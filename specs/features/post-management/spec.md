@@ -1,5 +1,5 @@
 ---
-spec_version: "1.3"
+spec_version: "1.4"
 last_updated: "2026-07-14"
 author: "BlackLotusCMS Team"
 status: approved
@@ -23,6 +23,7 @@ Sistema completo de gerenciamento de conteudo com Custom Post Types, MetaFields,
 - **REQ-07:** Data de publicacao e expiracao
 - **REQ-08:** Cache com revalidation tags
 - **REQ-09:** Hooks para extensibilidade (post.created, post.updated, post.deleted)
+- **REQ-10:** Campo de Ícone com suporte a lib lucide-react (1000+ ícones) e SVG customizado com sanitização
 
 ## User Roles
 - **Administrador:** Pode criar, editar, deletar e publicar qualquer post
