@@ -468,27 +468,85 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
               {flexRows.map((row: any, idx: number) => {
                 const layout = layouts.find((l: any) => l.name === row._layout);
                 const layoutFields = layout?.fields || [];
+                const layoutMode = layout?.layout || 'block';
+
+                const renderSubFieldFlex = (sub: any) => (
+                  <div key={sub.name} className="flex flex-col gap-1.5" style={{ width: `${sub.config?.width || 100}%` }}>
+                    <label className="label-field-muted">{sub.label}</label>
+                    {renderFieldInput(sub, row[sub.name], (val: any) => updateFlexRowField(idx, sub.name, val))}
+                  </div>
+                );
+
+                // Table layout
+                if (layoutMode === 'table') {
+                  return (
+                    <div key={idx} className="content-card p-4 relative group">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-semibold text-action">{layout?.label || row._layout}</span>
+                        {!readOnly && (
+                          <button type="button" onClick={() => removeFlexRow(idx)} className="p-1 text-text-muted hover:text-status-trash opacity-0 group-hover:opacity-100 transition-all">
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                      <div className="border border-border-default rounded overflow-hidden">
+                        <div className="grid gap-2 px-3 py-2 bg-surface-muted text-[10px] font-semibold text-text-muted uppercase tracking-wider border-b border-border-default" style={{ gridTemplateColumns: `40px repeat(${layoutFields.length}, 1fr)` }}>
+                          <span>#</span>
+                          {layoutFields.map((sub: any) => (
+                            <span key={sub.name}>{sub.label}</span>
+                          ))}
+                        </div>
+                        <div className="grid gap-2 items-center px-3 py-2" style={{ gridTemplateColumns: `40px repeat(${layoutFields.length}, 1fr)` }}>
+                          <span className="text-[10px] text-text-muted">{idx + 1}</span>
+                          {layoutFields.map((sub: any) => (
+                            <div key={sub.name}>
+                              {renderFieldInput(sub, row[sub.name], (val: any) => updateFlexRowField(idx, sub.name, val))}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Row layout
+                if (layoutMode === 'row') {
+                  return (
+                    <div key={idx} className="content-card p-4 relative group">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-semibold text-action">{layout?.label || row._layout}</span>
+                        {!readOnly && (
+                          <button type="button" onClick={() => removeFlexRow(idx)} className="p-1 text-text-muted hover:text-status-trash opacity-0 group-hover:opacity-100 transition-all">
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-end gap-3">
+                        <span className="text-[10px] text-text-muted self-center">{idx + 1}.</span>
+                        {layoutFields.map((sub: any) => (
+                          <div key={sub.name} className="flex-1 flex flex-col gap-1">
+                            <label className="label-field-muted text-[10px]">{sub.label}</label>
+                            {renderFieldInput(sub, row[sub.name], (val: any) => updateFlexRowField(idx, sub.name, val))}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Block layout (default)
                 return (
                   <div key={idx} className="content-card p-4 relative group">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-xs font-semibold text-action">{layout?.label || row._layout}</span>
                       {!readOnly && (
-                        <button
-                          type="button"
-                          onClick={() => removeFlexRow(idx)}
-                          className="p-1 text-text-muted hover:text-status-trash opacity-0 group-hover:opacity-100 transition-all"
-                        >
+                        <button type="button" onClick={() => removeFlexRow(idx)} className="p-1 text-text-muted hover:text-status-trash opacity-0 group-hover:opacity-100 transition-all">
                           <Trash2 size={12} />
                         </button>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {layoutFields.map((sub: any) => (
-                        <div key={sub.name} className="flex flex-col gap-1.5">
-                          <label className="label-field-muted">{sub.label}</label>
-                          {renderFieldInput(sub, row[sub.name], (val: any) => updateFlexRowField(idx, sub.name, val))}
-                        </div>
-                      ))}
+                    <div className="flex flex-wrap -mx-2">
+                      {layoutFields.map((sub: any) => renderSubFieldFlex(sub))}
                     </div>
                   </div>
                 );

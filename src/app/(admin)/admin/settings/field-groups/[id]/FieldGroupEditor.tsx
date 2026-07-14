@@ -589,6 +589,12 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                                   layouts[lIdx] = { ...layouts[lIdx], fields: subFields };
                                   updateConfig(index, 'flexibleContent.layouts', layouts);
                                 }}
+                                layout={layout.layout || 'block'}
+                                onLayoutChange={(layoutMode) => {
+                                  const layouts = [...(field.config.flexibleContent?.layouts || [])];
+                                  layouts[lIdx] = { ...layouts[lIdx], layout: layoutMode };
+                                  updateConfig(index, 'flexibleContent.layouts', layouts);
+                                }}
                               />
                             </div>
                           ))}
