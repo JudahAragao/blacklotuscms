@@ -666,28 +666,11 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1">
                       <label className="label-field-muted text-[10px]">Tipo do Campo</label>
-                      <select
+                      <FieldTypeSelector
                         value={currentSub.type}
-                        onChange={(e) => updateSubFieldType(source, idx, e.target.value)}
-                        className="field-select text-[10px]"
-                      >
-                        <option value="text">Texto</option>
-                        <option value="textarea">Texto Longo</option>
-                        <option value="number">Numero</option>
-                        <option value="email">Email</option>
-                        <option value="url">URL</option>
-                        <option value="image">Imagem</option>
-                        <option value="gallery">Galeria</option>
-                        <option value="file">Arquivo</option>
-                        <option value="wysiwyg">Editor Rico</option>
-                        <option value="select">Select</option>
-                        <option value="checkbox">Checkbox</option>
-                        <option value="radio">Radio</option>
-                        <option value="boolean">Booleano</option>
-                        <option value="color">Cor</option>
-                        <option value="date">Data</option>
-                        <option value="json">JSON</option>
-                      </select>
+                        onChange={(type) => updateSubFieldType(source, idx, type)}
+                        compact
+                      />
                     </div>
                     <div className="flex flex-col gap-1">
                       <label className="label-field-muted text-[10px]">Largura (%)</label>
@@ -903,7 +886,6 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
 
     if ('success' in syncResult && syncResult.success) {
       toast.success('Grupo salvo com sucesso!');
-      router.push('/admin/settings/field-groups');
     } else {
       toast.error('Erro ao salvar campos: ' + ('error' in syncResult ? syncResult.error : 'Desconhecido'));
     }
