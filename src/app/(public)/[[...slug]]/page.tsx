@@ -1,6 +1,7 @@
 import React from 'react';
 export const runtime = 'nodejs'
-import { notFound, redirect, headers } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import ThemeRenderer from '@/components/ThemeRenderer';
 import { SearchService } from '@/core/services/SearchService';
 import { PostService } from '@/core/services/PostService';
