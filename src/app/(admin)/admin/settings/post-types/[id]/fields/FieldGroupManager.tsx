@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Save, Settings, Layout, ShieldCheck, List, Code, GripVertical, Eye, Layers } from 'lucide-react';
+import { Plus, Trash2, Save, Settings, Layout, ShieldCheck, List, Code, Eye, Layers } from 'lucide-react';
 import { saveFieldsAction } from './actions';
 import { toast } from 'sonner';
 
@@ -11,8 +11,6 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
   const [hierarchical, setHierarchical] = useState(postType.hierarchical);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedField, setExpandedField] = useState<number | null>(null);
-  const [draggedItem, setDraggedItem] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   useEffect(() => {
     // 1. Inicializar Campos do Sistema
@@ -150,39 +148,6 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
     setFields(newFields);
   };
 
-  const onDragStart = (index: number) => {
-    if (fields[index].isSystem) return;
-    setDraggedItem(index);
-  };
-
-  const onDragEnd = () => {
-    setDraggedItem(null);
-    setDragOverIndex(null);
-  };
-
-  const onDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (draggedItem !== null && draggedItem !== index && !fields[index].isSystem) {
-      setDragOverIndex(index);
-    }
-  };
-
-  const onDrop = (index: number) => {
-    if (draggedItem === null || draggedItem === index || fields[index].isSystem) {
-      setDraggedItem(null);
-      setDragOverIndex(null);
-      return;
-    }
-
-    const newFields = [...fields];
-    const item = newFields.splice(draggedItem, 1)[0];
-    newFields.splice(index, 0, item);
-
-    setFields(newFields);
-    setDraggedItem(null);
-    setDragOverIndex(null);
-  };
-
   const handleSave = async () => {
     setIsSaving(true);
     
@@ -261,25 +226,16 @@ export default function FieldGroupManager({ postTypeId, postType, initialFieldGr
           return (
           <div
             key={field.id || index}
-            draggable={!field.isSystem}
-            onDragStart={() => onDragStart(index)}
-            onDragEnd={onDragEnd}
-            onDragOver={(e) => onDragOver(e, index)}
-            onDrop={() => onDrop(index)}
             className={`border rounded overflow-hidden transition-all ${
               field.isSystem ? 'border-action/20 bg-action-light/30' :
               isOrganizer ? 'border-action/30 bg-action-light/50' :
-              dragOverIndex === index ? 'border-action border-dashed bg-action-light/20' : 'border-border-default'
-            } ${draggedItem === index ? 'opacity-50 scale-[0.98]' : 'opacity-100'}`}
+              'border-border-default'
+            }`}
           >
             <div className={`flex items-center gap-3 p-3 ${
               field.isSystem ? 'bg-action-light/30' :
               isOrganizer ? 'bg-action-light/50' : 'bg-surface-muted'
             }`}>
-              <div className={`flex-none ${field.isSystem ? 'opacity-20' : 'cursor-grab text-text-muted hover:text-action'}`}>
-                <GripVertical size={14} />
-              </div>
-
               <div className="flex-1 flex items-center gap-3">
                 <div className="flex flex-col flex-1">
                   <input
