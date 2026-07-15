@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { themeStorage } from '@/lib/theme-context';
 import {
-  get_field,
-  the_field,
-  have_rows,
-  get_rows,
-  get_sub_field,
-  the_sub_field,
-  get_row_index,
+  getField,
+  theField,
+  haveRows,
+  getRows,
+  getSubField,
+  theSubField,
+  getRowIndex,
   rowContext,
   clearFieldsCache,
 } from './theme-helpers';
@@ -43,35 +43,35 @@ describe('theme-helpers', () => {
     clearFieldsCache();
   });
 
-  describe('get_field', () => {
+  describe('getField', () => {
     it('returns field value by name', () => {
       withPost(mockPost, () => {
-        expect(get_field('titulo')).toBe('Hello World');
-        expect(get_field('subtitle')).toBe('My subtitle');
+        expect(getField('titulo')).toBe('Hello World');
+        expect(getField('subtitle')).toBe('My subtitle');
       });
     });
 
     it('returns null for non-existent field', () => {
       withPost(mockPost, () => {
-        expect(get_field('nonexistent')).toBeNull();
+        expect(getField('nonexistent')).toBeNull();
       });
     });
 
     it('returns boolean fields', () => {
       withPost(mockPost, () => {
-        expect(get_field('is_featured')).toBe(true);
+        expect(getField('is_featured')).toBe(true);
       });
     });
 
     it('returns array fields (gallery)', () => {
       withPost(mockPost, () => {
-        expect(get_field('gallery')).toEqual(['/uploads/img1.jpg', '/uploads/img2.jpg']);
+        expect(getField('gallery')).toEqual(['/uploads/img1.jpg', '/uploads/img2.jpg']);
       });
     });
 
     it('returns repeater fields (array of objects)', () => {
       withPost(mockPost, () => {
-        const members = get_field('team_members');
+        const members = getField('team_members');
         expect(members).toHaveLength(2);
         expect(members[0].name).toBe('Alice');
         expect(members[1].role).toBe('CTO');
@@ -80,7 +80,7 @@ describe('theme-helpers', () => {
 
     it('returns flexible content fields', () => {
       withPost(mockPost, () => {
-        const sections = get_field('page_sections');
+        const sections = getField('page_sections');
         expect(sections).toHaveLength(2);
         expect(sections[0]._layout).toBe('hero');
         expect(sections[1]._layout).toBe('text_block');
@@ -88,51 +88,50 @@ describe('theme-helpers', () => {
     });
 
     it('returns null when no post context', () => {
-      // No themeStorage.run — no context
-      expect(get_field('titulo')).toBeNull();
+      expect(getField('titulo')).toBeNull();
     });
   });
 
-  describe('the_field', () => {
-    it('is an alias for get_field', () => {
+  describe('theField', () => {
+    it('is an alias for getField', () => {
       withPost(mockPost, () => {
-        expect(the_field('titulo')).toBe(get_field('titulo'));
+        expect(theField('titulo')).toBe(getField('titulo'));
       });
     });
   });
 
-  describe('have_rows', () => {
+  describe('haveRows', () => {
     it('returns true for non-empty array', () => {
       withPost(mockPost, () => {
-        expect(have_rows('team_members')).toBe(true);
-        expect(have_rows('page_sections')).toBe(true);
+        expect(haveRows('team_members')).toBe(true);
+        expect(haveRows('page_sections')).toBe(true);
       });
     });
 
     it('returns false for non-array values', () => {
       withPost(mockPost, () => {
-        expect(have_rows('titulo')).toBe(false);
-        expect(have_rows('is_featured')).toBe(false);
+        expect(haveRows('titulo')).toBe(false);
+        expect(haveRows('is_featured')).toBe(false);
       });
     });
 
     it('returns false for empty arrays', () => {
       withPost({ ...mockPost, meta: { ...mockPost.meta, empty_list: [] } }, () => {
-        expect(have_rows('empty_list')).toBe(false);
+        expect(haveRows('empty_list')).toBe(false);
       });
     });
 
     it('returns false for non-existent fields', () => {
       withPost(mockPost, () => {
-        expect(have_rows('nonexistent')).toBe(false);
+        expect(haveRows('nonexistent')).toBe(false);
       });
     });
   });
 
-  describe('get_rows', () => {
+  describe('getRows', () => {
     it('returns array for repeater fields', () => {
       withPost(mockPost, () => {
-        const rows = get_rows('team_members');
+        const rows = getRows('team_members');
         expect(rows).toHaveLength(2);
         expect(rows[0].name).toBe('Alice');
       });
@@ -140,61 +139,61 @@ describe('theme-helpers', () => {
 
     it('returns empty array for non-array fields', () => {
       withPost(mockPost, () => {
-        expect(get_rows('titulo')).toEqual([]);
+        expect(getRows('titulo')).toEqual([]);
       });
     });
 
     it('returns empty array for non-existent fields', () => {
       withPost(mockPost, () => {
-        expect(get_rows('nonexistent')).toEqual([]);
+        expect(getRows('nonexistent')).toEqual([]);
       });
     });
   });
 
-  describe('rowContext / get_sub_field', () => {
+  describe('rowContext / getSubField', () => {
     it('returns sub-field value from row context', () => {
       const row = { name: 'Alice', role: 'CEO', photo: '/uploads/alice.webp' };
       rowContext.run(row, () => {
-        expect(get_sub_field('name')).toBe('Alice');
-        expect(get_sub_field('role')).toBe('CEO');
+        expect(getSubField('name')).toBe('Alice');
+        expect(getSubField('role')).toBe('CEO');
       });
     });
 
     it('returns null when no row context', () => {
-      expect(get_sub_field('name')).toBeNull();
+      expect(getSubField('name')).toBeNull();
     });
 
-    it('the_sub_field is alias for get_sub_field', () => {
+    it('theSubField is alias for getSubField', () => {
       const row = { name: 'Bob' };
       rowContext.run(row, () => {
-        expect(the_sub_field('name')).toBe(get_sub_field('name'));
+        expect(theSubField('name')).toBe(getSubField('name'));
       });
     });
   });
 
-  describe('get_row_index', () => {
+  describe('getRowIndex', () => {
     it('returns index from row context', () => {
       const row = { __index: 2, name: 'Test' };
       rowContext.run(row, () => {
-        expect(get_row_index()).toBe(2);
+        expect(getRowIndex()).toBe(2);
       });
     });
 
     it('returns 0 when no row context', () => {
-      expect(get_row_index()).toBe(0);
+      expect(getRowIndex()).toBe(0);
     });
   });
 
   describe('repeater iteration pattern', () => {
     it('simulates map with rowContext', () => {
       withPost(mockPost, () => {
-        const rows = get_rows('team_members');
+        const rows = getRows('team_members');
         const results = rows.map((row, i) => {
           return rowContext.run({ ...row, __index: i }, () => {
             return {
-              index: get_row_index(),
-              name: get_sub_field('name'),
-              role: get_sub_field('role'),
+              index: getRowIndex(),
+              name: getSubField('name'),
+              role: getSubField('role'),
             };
           });
         });

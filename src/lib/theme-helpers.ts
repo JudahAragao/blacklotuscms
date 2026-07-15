@@ -40,15 +40,15 @@ function getMeta(): Record<string, any> {
 /**
  * Retorna o valor de um campo específico do post atual.
  */
-export function get_field(name: string): any {
+export function getField(name: string): any {
   return getMeta()[name] ?? null;
 }
 
 /**
- * Alias de get_field — para uso em JSX (React renderiza o valor automaticamente).
+ * Alias de getField — para uso em JSX (React renderiza o valor automaticamente).
  */
-export function the_field(name: string): any {
-  return get_field(name);
+export function theField(name: string): any {
+  return getField(name);
 }
 
 // ─────────────────────────────────────────────
@@ -58,8 +58,8 @@ export function the_field(name: string): any {
 /**
  * Verifica se um repeater/flexible content tem ao menos uma linha.
  */
-export function have_rows(name: string): boolean {
-  const value = get_field(name);
+export function haveRows(name: string): boolean {
+  const value = getField(name);
   return Array.isArray(value) && value.length > 0;
 }
 
@@ -67,8 +67,8 @@ export function have_rows(name: string): boolean {
  * Retorna o array de linhas de um repeater/flexible content.
  * Usar com .map() para iterar.
  */
-export function get_rows(name: string): any[] {
-  const value = get_field(name);
+export function getRows(name: string): any[] {
+  const value = getField(name);
   return Array.isArray(value) ? value : [];
 }
 
@@ -80,29 +80,29 @@ import { AsyncLocalStorage } from 'async_hooks';
 
 /**
  * AsyncLocalStorage para o contexto da row atual durante iteração.
- * Usado internamente por get_sub_field / the_sub_field / get_row_index.
+ * Usado internamente por getSubField / theSubField / getRowIndex.
  */
 export const rowContext = new AsyncLocalStorage<any>();
 
 /**
  * Retorna o valor de um subcampo dentro de uma row de repeater.
  */
-export function get_sub_field(name: string): any {
+export function getSubField(name: string): any {
   const row = rowContext.getStore();
   return row?.[name] ?? null;
 }
 
 /**
- * Alias de get_sub_field — para uso em JSX.
+ * Alias de getSubField — para uso em JSX.
  */
-export function the_sub_field(name: string): any {
-  return get_sub_field(name);
+export function theSubField(name: string): any {
+  return getSubField(name);
 }
 
 /**
  * Retorna o índice da row atual durante iteração.
  */
-export function get_row_index(): number {
+export function getRowIndex(): number {
   const row = rowContext.getStore();
   return row?.__index ?? 0;
 }
@@ -114,7 +114,7 @@ export function get_row_index(): number {
 /**
  * Retorna o objeto completo do campo (name, type, config, value).
  */
-export async function get_field_object(name: string): Promise<any> {
+export async function getFieldObject(name: string): Promise<any> {
   const fields = await getFieldsForCurrentPost();
   const field = fields.find((f: any) => f.name === name);
   if (!field) return null;
@@ -122,14 +122,14 @@ export async function get_field_object(name: string): Promise<any> {
     name: field.name,
     type: field.type,
     config: field.config,
-    value: get_field(name),
+    value: getField(name),
   };
 }
 
 /**
  * Retorna o nome interno do campo.
  */
-export async function get_field_name(name: string): Promise<string | null> {
+export async function getFieldName(name: string): Promise<string | null> {
   const fields = await getFieldsForCurrentPost();
   return fields.find((f: any) => f.name === name)?.name ?? null;
 }
@@ -137,7 +137,7 @@ export async function get_field_name(name: string): Promise<string | null> {
 /**
  * Retorna o tipo do campo (text, image, repeater, etc).
  */
-export async function get_field_type(name: string): Promise<string | null> {
+export async function getFieldType(name: string): Promise<string | null> {
   const fields = await getFieldsForCurrentPost();
   return fields.find((f: any) => f.name === name)?.type ?? null;
 }
@@ -151,7 +151,7 @@ export async function get_field_type(name: string): Promise<string | null> {
  * Requer user com permissão post.manage.
  * Usar em plugins ou server actions, NÃO em layouts de tema.
  */
-export async function acf_add_local_field_group(data: any, user: any): Promise<any> {
+export async function addLocalFieldGroup(data: any, user: any): Promise<any> {
   const { FieldService } = await import('@/core/services/FieldService');
   return FieldService.createFieldGroup(data, user);
 }

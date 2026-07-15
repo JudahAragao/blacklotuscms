@@ -114,35 +114,35 @@ Campos customizados (MetaFields) ficam disponíveis em `data.meta` como um objet
 O módulo `@/lib/theme-helpers` fornece funções helper para acessar campos customizados em layouts de tema, similar ao ACF do WordPress.
 
 ```tsx
-import { get_field, have_rows, get_rows } from '@/lib/theme-helpers';
+import { getField, haveRows, getRows } from '@/lib/theme-helpers';
 ```
 
 ### Funções Disponíveis
 
 | Função | Descrição |
 |--------|-----------|
-| `get_field(name)` | Retorna o valor de um campo |
-| `the_field(name)` | Alias de `get_field` (para JSX) |
-| `have_rows(name)` | Retorna `true` se repeater tem linhas |
-| `get_rows(name)` | Retorna array de linhas do repeater |
-| `get_sub_field(name)` | Retorna valor de subcampo (dentro de rowContext) |
-| `the_sub_field(name)` | Alias de `get_sub_field` |
-| `get_row_index()` | Retorna índice da row atual |
-| `get_field_object(name)` | Retorna `{ name, type, config, value }` |
-| `get_field_name(name)` | Retorna nome do campo |
-| `get_field_type(name)` | Retorna tipo do campo |
+| `getField(name)` | Retorna o valor de um campo |
+| `theField(name)` | Alias de `getField` (para JSX) |
+| `haveRows(name)` | Retorna `true` se repeater tem linhas |
+| `getRows(name)` | Retorna array de linhas do repeater |
+| `getSubField(name)` | Retorna valor de subcampo (dentro de rowContext) |
+| `theSubField(name)` | Alias de `getSubField` |
+| `getRowIndex()` | Retorna índice da row atual |
+| `getFieldObject(name)` | Retorna `{ name, type, config, value }` |
+| `getFieldName(name)` | Retorna nome do campo |
+| `getFieldType(name)` | Retorna tipo do campo |
 
 ### Exemplo: Campos Simples
 
 ```tsx
-import { get_field, the_field } from '@/lib/theme-helpers';
+import { getField, theField } from '@/lib/theme-helpers';
 
 export default async function PostLayout({ data }) {
   return (
     <div>
-      <h1>{get_field('titulo')}</h1>
-      <p>{the_field('subtitulo')}</p>
-      <img src={get_field('hero_image')} alt="" />
+      <h1>{getField('titulo')}</h1>
+      <p>{theField('subtitulo')}</p>
+      <img src={getField('hero_image')} alt="" />
     </div>
   );
 }
@@ -151,14 +151,14 @@ export default async function PostLayout({ data }) {
 ### Exemplo: Repeater
 
 ```tsx
-import { get_rows, get_field } from '@/lib/theme-helpers';
+import { getRows, getField } from '@/lib/theme-helpers';
 
 export default async function ProjetosLayout({ data }) {
-  const projetos = get_rows('projetos');
+  const projetos = getRows('projetos');
 
   return (
     <div>
-      <h1>{get_field('page_title')}</h1>
+      <h1>{getField('page_title')}</h1>
       {projetos.map((projeto, i) => (
         <div key={i}>
           <h2>{projeto.titulo}</h2>
@@ -174,10 +174,10 @@ export default async function ProjetosLayout({ data }) {
 ### Exemplo: Flexible Content
 
 ```tsx
-import { get_rows, get_field } from '@/lib/theme-helpers';
+import { getRows, getField } from '@/lib/theme-helpers';
 
 export default async function PageLayout({ data }) {
-  const sections = get_rows('page_sections');
+  const sections = getRows('page_sections');
 
   return (
     <div>
@@ -195,7 +195,3 @@ export default async function PageLayout({ data }) {
   );
 }
 ```
-
-### Nota sobre `the_row()`
-
-No ACF (PHP), `the_row()` avança o iterador interno. Em React Server Components, o equivalente é usar `get_rows().map()`. A função `the_row()` existe para compatibilidade de sintaxe mas é um no-op.
