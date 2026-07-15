@@ -1,29 +1,27 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import * as LucideIcons from 'lucide-react';
-import { Search, X, Upload, Check } from 'lucide-react';
+import { Search, X } from 'lucide-react';
+
+const PAGE_SIZE = 100;
 
 interface IconPickerProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (iconName: string) => void;
   source?: 'lucide' | 'custom';
   onSourceChange?: (source: 'lucide' | 'custom') => void;
   customSvg?: string;
   onCustomSvgChange?: (svg: string) => void;
-  color?: string;
-  onColorChange?: (color: string) => void;
-  size?: number;
-  onSizeChange?: (size: number) => void;
-  compact?: boolean;
 }
 
 // Get all icon names from lucide-react
-const ICON_NAMES = Object.keys(LucideIcons).filter(
-  (key) => key !== 'default' && key !== 'icons' && typeof (LucideIcons as any)[key] === 'object'
-);
+const ALL_ICONS = Object.keys(LucideIcons)
+  .filter(
+    (key) => key !== 'default' && key !== 'icons' && typeof (LucideIcons as any)[key] === 'object'
+  )
+  .sort();
 
-// Icon categories for better organization
 const ICON_CATEGORIES: Record<string, string[]> = {
   'Arrows': ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ChevronUp', 'ChevronDown', 'ChevronLeft', 'ChevronRight', 'Move', 'RotateCw', 'RefreshCw'],
   'Business': ['Briefcase', 'Building', 'Building2', 'Calculator', 'Calendar', 'ChartBar', 'ChartPie', 'Clipboard', 'Clock', 'Coins', 'DollarSign', 'FileText', 'Folder', 'FolderOpen', 'HardHat', 'Layers', 'LineChart', 'Lock', 'PieChart', 'Presenter', 'StickyNote', 'Target', 'TrendingUp', 'Wallet', 'Workflow'],
@@ -36,18 +34,6 @@ const ICON_CATEGORIES: Record<string, string[]> = {
   'Objects': ['Anchor', 'Award', 'Baby', 'Backpack', 'Balloon', 'Barrel', 'Battery', 'Bike', 'Bomb', 'Book', 'Box', 'Brush', 'Bus', 'Cable', 'Car', 'Castle', 'Chip', 'Circle', 'Coffee', 'Compass', 'Cookie', 'Crown', 'Cube', 'Diamond', 'Disc', 'Feather', 'Flag', 'Flame', 'Gem', 'Gift', 'Glasses', 'Globe', 'GraduationCap', 'Hammer', 'Hat', 'Heart', 'Key', 'Knife', 'Lamp', 'LifeBuoy', 'Lightbulb', 'Lock', 'Luggage', 'Map', 'Medal', 'Megaphone', 'Mic', 'Moon', 'Mountain', 'Mug', 'Music', 'Package', 'Palmtree', 'Paperclip', 'Pencil', 'Pet', 'Pizza', 'Plane', 'Plug', 'Pointer', 'Puzzle', 'Rock', 'Rose', 'Ruler', 'Sailboat', 'Scissors', 'Shirt', 'Shoe', 'Skull', 'Smartphone', 'Snowflake', 'Sofa', 'Spaceship', 'Speaker', 'Speedometer', 'Square', 'Stamp', 'Star', 'Stopwatch', 'Sun', 'Syringe', 'Tent', 'Torch', 'Toy', 'TrafficCone', 'Train', 'Tree', 'Trophy', 'Truck', 'Turtle', 'Umbrella', 'Vase', 'Watch', 'Waves', 'Wheel', 'Wrench'],
 };
 
-// Flatten all icons
-const ALL_ICONS = ICON_NAMES.sort();
-
-interface IconPickerProps {
-  value: string;
-  onChange: (iconName: string) => void;
-  source?: 'lucide' | 'custom';
-  onSourceChange?: (source: 'lucide' | 'custom') => void;
-  customSvg?: string;
-  onCustomSvgChange?: (svg: string) => void;
-}
-
 export default function IconPicker({
   value,
   onChange,
@@ -59,6 +45,13 @@ export default function IconPicker({
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [search, activeCategory]);
 
   const filteredIcons = useMemo(() => {
     if (!search) {
@@ -72,12 +65,29 @@ export default function IconPicker({
     );
   }, [search, activeCategory]);
 
+  const visibleIcons = useMemo(() => {
+    return filteredIcons.slice(0, visibleCount);
+  }, [filteredIcons, visibleCount]);
+
+  const hasMore = filteredIcons.length > visibleCount;
+
+  const loadMore = useCallback(() => {
+    setVisibleCount(prev => prev + PAGE_SIZE);
+  }, []);
+
   const categories = Object.keys(ICON_CATEGORIES);
 
   const renderIconPreview = (iconName: string, size = 20) => {
     const IconComponent = (LucideIcons as any)[iconName];
     if (!IconComponent) return null;
     return <IconComponent size={size} />;
+  };
+
+  const handleOpen = () => {
+    setIsOpen(true);
+    setSearch('');
+    setActiveCategory(null);
+    setVisibleCount(PAGE_SIZE);
   };
 
   return (
@@ -115,7 +125,7 @@ export default function IconPicker({
           {/* Trigger button */}
           <button
             type="button"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => isOpen ? setIsOpen(false) : handleOpen()}
             className="w-full flex items-center gap-2 p-2 border border-border-default rounded bg-surface-card hover:border-action transition-colors"
           >
             {value ? (
@@ -184,9 +194,9 @@ export default function IconPicker({
               </div>
 
               {/* Icons grid */}
-              <div className="p-2 max-h-48 overflow-y-auto">
+              <div ref={scrollRef} className="p-2 max-h-48 overflow-y-auto">
                 <div className="grid grid-cols-8 gap-1">
-                  {filteredIcons.map(iconName => (
+                  {visibleIcons.map(iconName => (
                     <button
                       key={iconName}
                       type="button"
@@ -207,6 +217,15 @@ export default function IconPicker({
                   <p className="text-center text-xs text-text-muted py-4">
                     Nenhum ícone encontrado
                   </p>
+                )}
+                {hasMore && (
+                  <button
+                    type="button"
+                    onClick={loadMore}
+                    className="w-full mt-2 py-1.5 text-[10px] text-text-muted hover:text-text-heading border border-border-default rounded transition-colors"
+                  >
+                    Carregar mais ({filteredIcons.length - visibleCount} restantes)
+                  </button>
                 )}
               </div>
             </div>
