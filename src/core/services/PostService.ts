@@ -131,6 +131,7 @@ export class PostService {
           },
           include: {
             postType: true,
+            metaValues: { include: { field: true } },
           }
         });
 
@@ -150,6 +151,7 @@ export class PostService {
           where: { id: postId, status: 'published' },
           include: {
             postType: true,
+            metaValues: { include: { field: true } },
           }
         });
 
@@ -180,6 +182,7 @@ export class PostService {
           orderBy: { createdAt: 'desc' },
           include: {
             postType: true,
+            metaValues: { include: { field: true } },
           }
         });
 

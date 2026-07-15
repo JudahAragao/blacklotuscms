@@ -100,9 +100,14 @@ status: approved
 ## P8: File Upload & Validation (2026-07-15)
 - [x] **TASK-075:** Upload de arquivos não-imagem + validação de tipos aceitos | est: 6h | depends: [TASK-011, TASK-010] | feature: media-management
 
+## P9: Theme Helpers & Dynamic Layouts (2026-07-15)
+- [x] **TASK-076:** Fix: adicionar metaValues nas queries lean do PostService | est: 1h | depends: [] | feature: theme-engine
+- [x] **TASK-077:** Theme helpers (get_field, have_rows, get_rows, etc.) | est: 4h | depends: [TASK-076] | feature: theme-engine
+- [x] **TASK-078:** Resolução dinâmica de layout por slug | est: 1h | depends: [] | feature: theme-engine
+
 ## Métricas
-- Total de tasks: 75
-- Concluídas: 75
+- Total de tasks: 78
+- Concluídas: 78
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

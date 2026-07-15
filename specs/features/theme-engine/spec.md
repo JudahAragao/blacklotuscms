@@ -1,6 +1,6 @@
 ---
-spec_version: "1.3"
-last_updated: "2026-07-12"
+spec_version: "1.4"
+last_updated: "2026-07-15"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "theme-engine"
@@ -9,7 +9,7 @@ feature: "theme-engine"
 # Theme Engine Specification
 
 ## Description
-Motor de themes baseado em React Server Components com CSS scoping via build-time bundling, static imports gerados, variáveis CSS e sistema de permissions para acesso a data.
+Motor de themes baseado em React Server Components com CSS scoping via build-time bundling, static imports gerados, variáveis CSS, sistema de permissions para acesso a data e helpers estilo ACF para campos customizados.
 
 ## Requirements
 - **REQ-01:** Static import de layouts via `theme-registry.ts` gerado pelo `themes:generate`
@@ -22,6 +22,8 @@ Motor de themes baseado em React Server Components com CSS scoping via build-tim
 - **REQ-08:** `theme.json` como manifest do theme com `themeApiVersion: 1`
 - **REQ-09:** Namespace automático de `@keyframes` com prefixo `bl-<id>-`
 - **REQ-10:** Validação de tokens CSS declarados vs. usados no build
+- **REQ-11:** Theme helpers (get_field, the_field, have_rows, get_rows, get_sub_field, the_sub_field, get_row_index, get_field_object, get_field_name, get_field_type, acf_add_local_field_group)
+- **REQ-12:** Resolução dinâmica de layout por slug (slug bate com layout exportado pelo tema = context automático)
 
 ## User Roles
 - **Administrador:** Gerenciar themes (ativar/desativar via painel)
