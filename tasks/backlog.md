@@ -97,9 +97,12 @@ status: approved
 - [x] **TASK-073:** Unified drag-and-drop: fields can become sub-fields and vice-versa (ACF-style) | est: 6h | depends: [TASK-072] | feature: post-management
 - [x] **TASK-074:** Icon field type with lucide-react library + custom SVG with sanitization | est: 8h | depends: [TASK-070] | feature: post-management
 
+## P8: File Upload & Validation (2026-07-15)
+- [x] **TASK-075:** Upload de arquivos não-imagem + validação de tipos aceitos | est: 6h | depends: [TASK-011, TASK-010] | feature: media-management
+
 ## Métricas
-- Total de tasks: 74
-- Concluídas: 74
+- Total de tasks: 75
+- Concluídas: 75
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

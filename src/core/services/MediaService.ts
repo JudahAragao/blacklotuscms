@@ -14,7 +14,8 @@ export class MediaService {
   ) {}
 
   /**
-   * Processes and saves an image in Storage and Database with advanced optimizations.
+   * Processes and saves a file in Storage and Database.
+   * Images are converted to WebP with thumbnails. Other files are stored as-is.
    */
   async upload(file: File, user: any): Promise<MediaDTO> {
     if (!canPerformAction(user, 'media.upload')) {
@@ -26,46 +27,66 @@ export class MediaService {
       const storage = await getStorageDriver();
       const timestamp = Date.now();
       const safeFilename = sanitizeFilename(file.name);
-      
-      // Get original image metadata
-      const metadata = await sharp(buffer).metadata();
+      const isImage = file.type.startsWith('image/');
 
-      // 1. Convert to WebP (Modern Format)
-      const processedBuffer = await sharp(buffer)
-        .webp({ quality: 80 })
-        .toBuffer();
+      if (isImage) {
+        // Image processing: convert to WebP + generate thumbnail
+        const metadata = await sharp(buffer).metadata();
 
-      const webpFilename = `${timestamp}-${safeFilename.replace(/\.[^/.]+$/, "")}.webp`;
-      const url = await storage.upload(processedBuffer, webpFilename, 'image/webp');
+        const processedBuffer = await sharp(buffer)
+          .webp({ quality: 80 })
+          .toBuffer();
 
-      // 2. Generate Thumbnail (Optimized for Listing)
-      const thumbBuffer = await sharp(buffer)
-        .resize(300, 300, { fit: 'cover' })
-        .webp({ quality: 70 })
-        .toBuffer();
-      
-      const thumbFilename = `thumb-${webpFilename}`;
-      const thumbUrl = await storage.upload(thumbBuffer, thumbFilename, 'image/webp');
+        const webpFilename = `${timestamp}-${safeFilename.replace(/\.[^/.]+$/, "")}.webp`;
+        const url = await storage.upload(processedBuffer, webpFilename, 'image/webp');
 
-      // 3. Persist in Database with Metadata
-      const media = await this.db.media.create({
-        data: {
-          name: safeFilename,
-          url,
-          thumbnail: thumbUrl,
-          mimeType: 'image/webp',
-          size: processedBuffer.length,
-          // Store dimensions if available
-          metadata: {
-            width: metadata.width,
-            height: metadata.height,
-            format: 'webp'
-          } as any
-        }
-      });
+        const thumbBuffer = await sharp(buffer)
+          .resize(300, 300, { fit: 'cover' })
+          .webp({ quality: 70 })
+          .toBuffer();
+        
+        const thumbFilename = `thumb-${webpFilename}`;
+        const thumbUrl = await storage.upload(thumbBuffer, thumbFilename, 'image/webp');
 
-      this.log.info(`Media uploaded: ${safeFilename}`, { id: media.id });
-      return media as MediaDTO;
+        const media = await this.db.media.create({
+          data: {
+            name: safeFilename,
+            url,
+            thumbnail: thumbUrl,
+            mimeType: 'image/webp',
+            size: processedBuffer.length,
+            metadata: {
+              width: metadata.width,
+              height: metadata.height,
+              format: 'webp'
+            } as any
+          }
+        });
+
+        this.log.info(`Image uploaded: ${safeFilename}`, { id: media.id });
+        return media as MediaDTO;
+      } else {
+        // Non-image file: store as-is with original mimeType
+        const ext = safeFilename.includes('.') ? safeFilename.split('.').pop() : '';
+        const storageFilename = `${timestamp}-${safeFilename}`;
+        const url = await storage.upload(buffer, storageFilename, file.type || 'application/octet-stream');
+
+        const media = await this.db.media.create({
+          data: {
+            name: safeFilename,
+            url,
+            thumbnail: null,
+            mimeType: file.type || 'application/octet-stream',
+            size: buffer.length,
+            metadata: {
+              extension: ext
+            } as any
+          }
+        });
+
+        this.log.info(`File uploaded: ${safeFilename}`, { id: media.id });
+        return media as MediaDTO;
+      }
     } catch (error: any) {
       if (error instanceof BlackLotusCMSError) throw error;
       this.log.error('Media upload failed', { 

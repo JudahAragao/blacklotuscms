@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Upload, Loader2, X, Check } from 'lucide-react';
+import { Upload, Loader2, X, Check, FileText } from 'lucide-react';
 
 interface MediaPickerProps {
   onSelect: (media: any | any[]) => void;
@@ -9,9 +9,10 @@ interface MediaPickerProps {
   disabled?: boolean;
   children?: React.ReactNode;
   multiple?: boolean;
+  accept?: string;
 }
 
-export default function MediaPicker({ onSelect, currentValue, disabled, children, multiple = false }: MediaPickerProps) {
+export default function MediaPicker({ onSelect, currentValue, disabled, children, multiple = false, accept }: MediaPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'library' | 'upload'>('library');
   const [mediaList, setMediaList] = useState([]);
@@ -116,7 +117,14 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
       ) : (
         <div className="flex items-center gap-4">
           {!multiple && currentValue && typeof currentValue === 'string' && (
-            <img src={currentValue} className="w-16 h-16 object-cover rounded border border-outline-variant/20" alt="Preview" />
+            /\.(jpe?g|png|gif|webp|svg|bmp|ico)(\?.*)?$/i.test(currentValue) ? (
+              <img src={currentValue} className="w-16 h-16 object-cover rounded border border-outline-variant/20" alt="Preview" />
+            ) : (
+              <div className="w-16 h-16 rounded border border-outline-variant/20 bg-surface-muted flex flex-col items-center justify-center text-text-muted">
+                <FileText size={18} />
+                <span className="text-[8px] mt-0.5 font-mono max-w-[60px] truncate">{currentValue.split('/').pop()}</span>
+              </div>
+            )
           )}
           <button 
             type="button"
@@ -175,7 +183,14 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
                             isSelected ? 'ring-2 ring-action border-action' : 'border-border-default hover:border-action/50'
                           }`}
                         >
-                          <img src={media.thumbnail || media.url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt={media.name} />
+                          {media.mimeType?.startsWith('image/') ? (
+                            <img src={media.thumbnail || media.url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt={media.name} />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-surface-muted text-text-muted">
+                              <FileText size={24} />
+                              <span className="text-[9px] mt-1 font-mono max-w-full truncate px-1">{media.name}</span>
+                            </div>
+                          )}
                           {isSelected && (
                             <div className="absolute top-1 right-1 bg-action text-white rounded-full p-0.5 shadow">
                               <Check size={12} strokeWidth={4} />
@@ -204,7 +219,7 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
                     if (e.dataTransfer.files) handleUpload(e.dataTransfer.files);
                   }}
                 >
-                  <input ref={fileInputRef} type="file" multiple={multiple} className="hidden" onChange={(e) => handleUpload(e.target.files)} accept="image/*" />
+                  <input ref={fileInputRef} type="file" multiple={multiple} className="hidden" onChange={(e) => handleUpload(e.target.files)} accept={accept || '*'} />
                   {isUploading ? (
                     <div className="flex flex-col items-center gap-3">
                       <div className="relative w-14 h-14">

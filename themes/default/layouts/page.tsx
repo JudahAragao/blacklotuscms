@@ -35,6 +35,11 @@ export default async function DefaultPageLayout({ data }: { data: any }) {
                   <div className="text-slate-800">
                     {mv.field.type === 'image' ? (
                       <img src={mv.value} alt={mv.field.label} className="rounded-2xl shadow-2xl ring-1 ring-slate-900/5" />
+                    ) : mv.field.type === 'file' ? (
+                      <a href={mv.value} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary hover:underline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        {mv.value?.split('/').pop() || 'Download'}
+                      </a>
                     ) : (
                       <p className="text-xl font-medium leading-relaxed">{mv.value}</p>
                     )}

@@ -1,12 +1,13 @@
 import React from 'react';
 export const runtime = 'nodejs'
-import { notFound, redirect } from 'next/navigation';
+import { notFound, redirect, headers } from 'next/navigation';
 import ThemeRenderer from '@/components/ThemeRenderer';
 import { SearchService } from '@/core/services/SearchService';
 import { PostService } from '@/core/services/PostService';
 import { themeStorage } from '@/lib/theme-context';
 import { ThemeService } from '@/core/services/ThemeService';
 import { HookService } from '@/core/services/HookService';
+import { resolveMetaUrls } from '@/lib/field-utils';
 
 interface PublicPageProps {
   params: { slug?: string[] };
@@ -16,6 +17,13 @@ interface PublicPageProps {
 import { SecretsService } from '@/lib/secrets';
 
 import { SettingService } from '@/core/services/SettingService';
+
+function getBaseUrl(): string {
+  const h = headers();
+  const host = h.get('host') || 'localhost:3000';
+  const proto = h.get('x-forwarded-proto') || 'http';
+  return `${proto}://${host}`;
+}
 
 export async function generateMetadata({ params, searchParams }: PublicPageProps) {
   try {
@@ -185,7 +193,8 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
         if (readingSettings.show_on_front === 'page' && readingSettings.page_on_front) {
           const homePost = await PostService.getLeanPostById(readingSettings.page_on_front);
           if (homePost) {
-            return <ThemeRenderer context="single" data={homePost} previewTheme={safePreviewTheme} />;
+            const resolvedHome = homePost.meta ? { ...homePost, meta: resolveMetaUrls(homePost.meta, getBaseUrl()) } : homePost;
+            return <ThemeRenderer context="single" data={resolvedHome} previewTheme={safePreviewTheme} />;
           }
         }
         
@@ -198,7 +207,8 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
       const post = await PostService.getLeanPostBySlug(lastSlug);
 
       if (post && post.status === 'published') {
-        return <ThemeRenderer context="single" data={post} previewTheme={safePreviewTheme} />;
+        const resolvedPost = post.meta ? { ...post, meta: resolveMetaUrls(post.meta, getBaseUrl()) } : post;
+        return <ThemeRenderer context="single" data={resolvedPost} previewTheme={safePreviewTheme} />;
       }
 
       // 5. Try to fetch as a Taxonomy Archive (Using Lean Service)

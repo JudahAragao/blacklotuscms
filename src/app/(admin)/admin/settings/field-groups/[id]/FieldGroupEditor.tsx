@@ -1319,6 +1319,18 @@ export default function FieldGroupEditor({ fieldGroup, postTypes, taxonomies }: 
                                 <input type="number" value={field.config.repeater?.maxItems ?? field.config.flexibleContent?.maxItems ?? ''} onChange={(e) => updateConfig(index, field.type === 'repeater' ? 'repeater.maxItems' : 'flexibleContent.maxItems', Number(e.target.value) || undefined)} className="field-input text-xs" />
                               </div>
                             </div>
+                          ) : (field.type === 'file' || field.type === 'image' || field.type === 'gallery') ? (
+                            <div className="flex flex-col gap-1">
+                              <label className="label-field-muted">Tipos aceitos</label>
+                              <input
+                                type="text"
+                                value={field.config.validation?.accept ?? ''}
+                                onChange={(e) => updateConfig(index, 'validation.accept', e.target.value || undefined)}
+                                className="field-input text-xs"
+                                placeholder={field.type === 'file' ? 'pdf, docx, xlsx (vazio = todos)' : 'png, jpg, jfif (vazio = todos)'}
+                              />
+                              <span className="text-[10px] text-text-muted">Separados por vírgula. Deixe vazio para aceitar todos.</span>
+                            </div>
                           ) : (
                             <div className="grid grid-cols-2 gap-3">
                               <div className="flex flex-col gap-1">

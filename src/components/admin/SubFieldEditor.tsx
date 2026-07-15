@@ -198,16 +198,30 @@ export default function SubFieldEditor({ fields, onChange, readOnly, layout = 'b
         {/* Validation Tab */}
         {activeSubFieldTab[idx] === 'validation' && (
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            {(field.type === 'file' || field.type === 'image' || field.type === 'gallery') ? (
               <div className="flex flex-col gap-1">
-                <label className="label-field-muted text-[10px]">Min</label>
-                <input type="number" value={field.config?.validation?.min ?? ''} onChange={(e) => updateConfig(idx, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
+                <label className="label-field-muted text-[10px]">Tipos aceitos</label>
+                <input
+                  type="text"
+                  value={field.config?.validation?.accept ?? ''}
+                  onChange={(e) => updateConfig(idx, 'validation.accept', e.target.value || undefined)}
+                  className="field-input text-[10px]"
+                  placeholder={field.type === 'file' ? 'pdf, docx, xlsx (vazio = todos)' : 'png, jpg, jfif (vazio = todos)'}
+                />
+                <span className="text-[9px] text-text-muted">Separados por vírgula. Deixe vazio para aceitar todos.</span>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="label-field-muted text-[10px]">Max</label>
-                <input type="number" value={field.config?.validation?.max ?? ''} onChange={(e) => updateConfig(idx, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted text-[10px]">Min</label>
+                  <input type="number" value={field.config?.validation?.min ?? ''} onChange={(e) => updateConfig(idx, 'validation.min', Number(e.target.value))} className="field-input text-xs" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted text-[10px]">Max</label>
+                  <input type="number" value={field.config?.validation?.max ?? ''} onChange={(e) => updateConfig(idx, 'validation.max', Number(e.target.value))} className="field-input text-xs" />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 

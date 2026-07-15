@@ -89,3 +89,22 @@ Settings fornecidos por integrações são expostos como `--theme-setting-<chave
 A build falha para manifesto/ID inválido, `themeApiVersion` incompatível, ausência de `default`, uso de `html` ou `body`, e referências a variáveis CSS não declaradas. Essas falhas devem bloquear o deploy.
 
 O painel não edita arquivos de tema: layouts, manifestos e CSS são alterados no repositório e entram na próxima build.
+
+## Acessando dados de campos customizados
+
+Campos customizados (MetaFields) ficam disponíveis em `data.meta` como um objeto key-value:
+
+```tsx
+// Ex: campo "hero_image" do tipo image
+<img src={data.meta.hero_image} alt="Hero" />
+
+// Ex: campo "documentos" do tipo file
+<a href={data.meta.documentos} target="_blank">Download</a>
+
+// Ex: campo "galeria" do tipo gallery
+{data.meta.galeria?.map((url: string) => (
+  <img key={url} src={url} />
+))}
+```
+
+**URLs completas:** Valores de campos `file`, `image` e `gallery` são retornados como URLs absolutas (ex: `https://domain.com/uploads/12345-file.pdf`). Isso garante funcionamento correto em `<img src>`, `<a href>` e contextos externos (RSS, APIs).

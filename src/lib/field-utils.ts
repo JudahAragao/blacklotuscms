@@ -1,5 +1,7 @@
 import { ConditionalRule, FieldConfig } from '@/schemas/field.schema';
 
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'jfif', 'tiff', 'tif'];
+
 /**
  * Evaluates a single conditional rule against current form data.
  */
@@ -118,6 +120,20 @@ export function validateField(field: any, value: any): string | null {
     }
   }
 
+  // File/Image/Gallery type validation
+  if ((field.type === 'file' || field.type === 'image' || field.type === 'gallery') && config.validation?.accept && value) {
+    const acceptTypes = config.validation.accept.split(',').map((t: string) => t.trim().toLowerCase());
+    const urls = Array.isArray(value) ? value : [value];
+
+    for (const url of urls) {
+      if (typeof url !== 'string') continue;
+      const ext = url.split('.').pop()?.split('?')[0]?.toLowerCase() || '';
+      if (acceptTypes.length > 0 && !acceptTypes.includes(ext)) {
+        return `File type ".${ext}" is not allowed. Accepted: ${acceptTypes.join(', ')}.`;
+      }
+    }
+  }
+
   return null;
 }
 
@@ -126,10 +142,30 @@ export function validateField(field: any, value: any): string | null {
  */
 export function flattenMetadata(metaValues: any[]): Record<string, any> {
   if (!metaValues || !Array.isArray(metaValues)) return {};
-  
+
   return metaValues.reduce((acc, curr) => {
     const key = curr.field?.slug || curr.fieldId;
     acc[key] = curr.value;
     return acc;
   }, {} as Record<string, any>);
+}
+
+/**
+ * Resolves relative URLs in meta values to absolute URLs.
+ * Converts "/uploads/file.webp" to "https://domain.com/uploads/file.webp".
+ */
+export function resolveMetaUrls(meta: Record<string, any>, baseUrl: string): Record<string, any> {
+  if (!meta) return meta;
+
+  const resolved: Record<string, any> = {};
+  for (const [key, value] of Object.entries(meta)) {
+    if (Array.isArray(value)) {
+      resolved[key] = value.map((v) => (typeof v === 'string' && v.startsWith('/')) ? `${baseUrl}${v}` : v);
+    } else if (typeof value === 'string' && value.startsWith('/')) {
+      resolved[key] = `${baseUrl}${value}`;
+    } else {
+      resolved[key] = value;
+    }
+  }
+  return resolved;
 }

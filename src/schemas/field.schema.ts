@@ -28,6 +28,7 @@ export const FieldConfigSchema = z.object({
     min: z.number().optional(), // Para números ou limite de caracteres
     max: z.number().optional(),
     pattern: z.string().optional(), // Regex
+    accept: z.string().optional(), // Tipos aceitos para file/image/gallery (ex: "pdf, docx, xlsx" ou "png, jpg, jfif")
   }).optional(),
 
   // Lógica Condicional

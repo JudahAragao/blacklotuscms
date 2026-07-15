@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-06"
+spec_version: "1.3"
+last_updated: "2026-07-15"
 author: "BlackLotusCMS Team"
 status: approved
 module: "media"
@@ -18,7 +18,7 @@ module: "media"
 
 **Response 200:**
 ```json
-[{ "id": "uuid", "name": "string", "url": "string", "thumbnail": "string", "mimeType": "image/webp", "size": 12345 }]
+[{ "id": "uuid", "name": "string", "url": "string", "thumbnail": "string|null", "mimeType": "string", "size": 12345 }]
 ```
 
 **Erros possíveis:**
@@ -32,16 +32,21 @@ module: "media"
 
 **Request:** multipart/form-data com campo "file"
 
-**Response 201:**
+**Response 201 (Imagem):**
 ```json
 { "id": "uuid", "name": "string", "url": "/uploads/12345-image.webp", "thumbnail": "/uploads/thumb-12345-image.webp", "mimeType": "image/webp", "size": 45678 }
+```
+
+**Response 201 (Arquivo generico):**
+```json
+{ "id": "uuid", "name": "string", "url": "/uploads/12345-document.pdf", "thumbnail": null, "mimeType": "application/pdf", "size": 123456 }
 ```
 
 **Erros possíveis:**
 - `400` — File não enviado
 - `401` — AUTH_UNAUTHORIZED
 - `403` — AUTH_FORBIDDEN
-- `500` — Erro no processamento da imagem
+- `500` — Erro no processamento do arquivo
 
 ### EP-03: Delete Media
 - **Method:** Server Action (Admin Panel)

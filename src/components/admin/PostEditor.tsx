@@ -209,6 +209,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
             currentValue={value}
             onSelect={(media) => { if (!readOnly) onChange(media.url); }}
             disabled={readOnly}
+            accept={config.validation?.accept ? config.validation.accept.split(',').map((t: string) => `.${t.trim()}`).join(',') : undefined}
           />
         );
       case 'gallery':
@@ -258,6 +259,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                     const newUrls = mediaList.map(m => m.url);
                     onChange([...galleryImages, ...newUrls]);
                   }}
+                  accept={config.validation?.accept ? config.validation.accept.split(',').map((t: string) => `.${t.trim()}`).join(',') : undefined}
                 >
                   <div className="aspect-square border-2 border-dashed border-border-default rounded flex flex-col items-center justify-center text-text-muted hover:border-action hover:text-action transition-all cursor-pointer bg-surface-card">
                     <Plus size={24} />
@@ -277,6 +279,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
             currentValue={value}
             onSelect={(media) => { if (!readOnly) onChange(media.url); }}
             disabled={readOnly}
+            accept={config.validation?.accept ? config.validation.accept.split(',').map((t: string) => `.${t.trim()}`).join(',') : undefined}
           />
         );
       case 'textarea':

@@ -126,6 +126,40 @@ interface UserDTO { id: string; email: string; image?: string | null; role: { id
 ## Zod Schemas (src/schemas/)
 // source: manual
 
+### FieldConfigSchema (src/schemas/field.schema.ts)
+```typescript
+interface FieldConfig {
+  required?: boolean;
+  placeholder?: string;
+  defaultValue?: any;
+  instructions?: string;
+  width?: number; // 0-100
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: string;
+    accept?: string; // Tipos aceitos para file/image/gallery (ex: "pdf, docx, xlsx")
+  };
+  conditionalLogic?: {
+    status?: boolean;
+    relation?: 'and' | 'or';
+    rules?: ConditionalRule[];
+  };
+  options?: { label: string; value: string }[];
+  repeater?: {
+    minItems?: number;
+    maxItems?: number;
+    layout?: 'table' | 'block';
+    buttonLabel?: string;
+    fields?: CreateFieldSchema[];
+  };
+  flexibleContent?: {
+    layouts?: { name: string; label: string; fields?: CreateFieldSchema[] }[];
+    buttonLabel?: string;
+  };
+}
+```
+
 ### CreatePostSchema (src/schemas/post.schema.ts)
 - postTypeId: UUID
 - title: string (1-255)

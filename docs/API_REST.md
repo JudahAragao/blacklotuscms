@@ -97,6 +97,16 @@ POST /api/v1/media
 **Auth:** Required | **RBAC:** `media.upload`
 **Content-Type:** multipart/form-data
 
+**Response 201 (Imagem):**
+```json
+{ "id": "uuid", "name": "photo.jpg", "url": "/uploads/12345-photo.webp", "thumbnail": "/uploads/thumb-12345-photo.webp", "mimeType": "image/webp", "size": 45678 }
+```
+
+**Response 201 (Arquivo generico):**
+```json
+{ "id": "uuid", "name": "doc.pdf", "url": "/uploads/12345-doc.pdf", "thumbnail": null, "mimeType": "application/pdf", "size": 123456 }
+```
+
 **Note:** Media deletion is managed via Admin panel server actions, not via REST API.
 
 ---
