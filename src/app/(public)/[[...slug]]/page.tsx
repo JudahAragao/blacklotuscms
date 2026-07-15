@@ -19,8 +19,8 @@ import { SecretsService } from '@/lib/secrets';
 
 import { SettingService } from '@/core/services/SettingService';
 
-function getBaseUrl(): string {
-  const h = headers();
+async function getBaseUrl(): Promise<string> {
+  const h = await headers();
   const host = h.get('host') || 'localhost:3000';
   const proto = h.get('x-forwarded-proto') || 'http';
   return `${proto}://${host}`;
@@ -194,7 +194,7 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
         if (readingSettings.show_on_front === 'page' && readingSettings.page_on_front) {
           const homePost = await PostService.getLeanPostById(readingSettings.page_on_front);
           if (homePost) {
-            const resolvedHome = homePost.meta ? { ...homePost, meta: resolveMetaUrls(homePost.meta, getBaseUrl()) } : homePost;
+            const resolvedHome = homePost.meta ? { ...homePost, meta: resolveMetaUrls(homePost.meta, await getBaseUrl()) } : homePost;
             return <ThemeRenderer context="single" data={resolvedHome} previewTheme={safePreviewTheme} />;
           }
         }
@@ -208,7 +208,7 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
       const post = await PostService.getLeanPostBySlug(lastSlug);
 
       if (post && post.status === 'published') {
-        const resolvedPost = post.meta ? { ...post, meta: resolveMetaUrls(post.meta, getBaseUrl()) } : post;
+        const resolvedPost = post.meta ? { ...post, meta: resolveMetaUrls(post.meta, await getBaseUrl()) } : post;
         return <ThemeRenderer context="single" data={resolvedPost} previewTheme={safePreviewTheme} />;
       }
 
