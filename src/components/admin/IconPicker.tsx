@@ -150,7 +150,7 @@ export default function IconPicker({
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Buscar ícone..."
-                    className="w-full pl-6 pr-2 py-1.5 text-xs border border-border-default rounded focus:border-action focus:outline-none"
+                    className="w-full pl-6 pr-2 py-1.5 text-xs text-text-heading border border-border-default rounded focus:border-action focus:outline-none"
                   />
                   {search && (
                     <button
@@ -238,7 +238,7 @@ export default function IconPicker({
             value={customSvg}
             onChange={(e) => onCustomSvgChange?.(e.target.value)}
             placeholder='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>'
-            className="w-full p-2 text-[10px] font-mono border border-border-default rounded bg-surface-card focus:border-action focus:outline-none h-24 resize-none"
+            className="w-full p-2 text-[10px] font-mono text-text-heading border border-border-default rounded bg-surface-card focus:border-action focus:outline-none h-24 resize-none"
           />
           {customSvg && (
             <div className="p-2 border border-border-default rounded bg-surface-muted">
