@@ -46,6 +46,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [touched, setTouched] = useState(false);
 
   // Organiza campos em abas e seções (Tab/Section são organizadores visuais)
   const groupedFields = useMemo(() => {
@@ -117,6 +118,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
       });
     });
     setErrors(newErrors);
+    setTouched(true);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -162,14 +164,16 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
       metaFields: { ...prev.metaFields, [fieldId]: value }
     }));
     
-    // Validação em tempo real
-    const error = validateField(field, value);
-    setErrors(prev => {
-      const newErrs = { ...prev };
-      if (error) newErrs[fieldId] = error;
-      else delete newErrs[fieldId];
-      return newErrs;
-    });
+    // Limpa erro do campo quando o usuário edita (após tentativa de salvar)
+    if (touched) {
+      const error = validateField(field, value);
+      setErrors(prev => {
+        const newErrs = { ...prev };
+        if (error) newErrs[fieldId] = error;
+        else delete newErrs[fieldId];
+        return newErrs;
+      });
+    }
   };
 
   const toggleTerm = (termId: string) => {
@@ -593,7 +597,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
           <input
             type={field.type === 'number' ? 'number' : 'text'}
             readOnly={readOnly}
-            className={`field-input w-full ${errors[field.id] ? 'border-status-trash' : ''}`}
+            className={`field-input w-full ${touched && errors[field.id] ? 'border-status-trash' : ''}`}
             placeholder={config.placeholder || `Digite ${field.label.toLowerCase()}...`}
             value={value || ''}
             min={config.validation?.min}
@@ -662,7 +666,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                           <label className="label-field">
                             {field.label} {field.config?.required && <span className="text-status-trash">*</span>}
                           </label>
-                          {errors[field.id] && (
+                          {touched && errors[field.id] && (
                             <span className="text-status-trash text-xs flex items-center gap-1">
                               <AlertCircle size={12} /> {errors[field.id]}
                             </span>
@@ -729,7 +733,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                                       <label className="label-field">
                                         {field.label} {field.config?.required && <span className="text-status-trash">*</span>}
                                       </label>
-                                      {errors[field.id] && (
+                                      {touched && errors[field.id] && (
                                         <span className="text-status-trash text-xs flex items-center gap-1">
                                           <AlertCircle size={12} /> {errors[field.id]}
                                         </span>
