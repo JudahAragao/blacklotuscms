@@ -195,3 +195,49 @@ export default async function PageLayout({ data }) {
   );
 }
 ```
+
+## Template Hierarchy (Estilo WordPress)
+
+O sistema de temas suporta uma hierarchy de templates similar ao WordPress. Arquivos de layout usam **pontos** no nome para indicar templates especializados por PostType.
+
+### Convenção de Nomenclatura
+
+| Arquivo | Uso |
+|---------|-----|
+| `post.tsx` | Post individual genérico (fallback para qualquer PostType) |
+| `post.blog.tsx` | Post individual do PostType "blog" |
+| `post.projetos.tsx` | Post individual do PostType "projetos" |
+| `page.tsx` | Página genérica (fallback) |
+| `page.blog.tsx` | Listagem/archive do PostType "blog" |
+| `page.projetos.tsx` | Listagem/archive do PostType "projetos" |
+
+### Como Exportar
+
+No `layouts/index.ts`, usar **string export names**:
+
+```ts
+export { default as post } from './post';
+export { default as page } from './page';
+export { default as "post.blog" } from './post.blog';
+export { default as "page.blog" } from './page.blog';
+```
+
+### Fallback Chain
+
+Quando um post individual é acessado, o ThemeRenderer tenta na ordem:
+
+1. `post.{postType.slug}` (ex: `post.blog`)
+2. `post` (genérico)
+3. `default.post` (tema default)
+
+Exemplo: PostType "blog" → tenta `post.blog.tsx` → se não existir, usa `post.tsx`.
+
+### Exemplo Completo
+
+```
+/blog              → page.blog.tsx (listagem)
+/blog/meu-artigo   → post.blog.tsx (individual)
+/projetos          → page.projetos.tsx (listagem)
+/projetos/x        → post.projetos.tsx (individual)
+/sobre             → page.tsx (genérico, PostType "page")
+```

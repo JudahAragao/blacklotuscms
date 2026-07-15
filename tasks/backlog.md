@@ -105,9 +105,12 @@ status: approved
 - [x] **TASK-077:** Theme helpers (get_field, have_rows, get_rows, etc.) | est: 4h | depends: [TASK-076] | feature: theme-engine
 - [x] **TASK-078:** Resolução dinâmica de layout por slug | est: 1h | depends: [] | feature: theme-engine
 
+## P10: WordPress-style Template Hierarchy (2026-07-15)
+- [x] **TASK-079:** Template hierarchy: post.{type} fallback chain no ThemeRenderer | est: 2h | depends: [] | feature: theme-engine
+
 ## Métricas
-- Total de tasks: 78
-- Concluídas: 78
+- Total de tasks: 79
+- Concluídas: 79
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

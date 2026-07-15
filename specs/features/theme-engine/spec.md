@@ -1,5 +1,5 @@
 ---
-spec_version: "1.4"
+spec_version: "1.5"
 last_updated: "2026-07-15"
 author: "BlackLotusCMS Team"
 status: approved
@@ -24,6 +24,7 @@ Motor de themes baseado em React Server Components com CSS scoping via build-tim
 - **REQ-10:** Validação de tokens CSS declarados vs. usados no build
 - **REQ-11:** Theme helpers (get_field, the_field, have_rows, get_rows, get_sub_field, the_sub_field, get_row_index, get_field_object, get_field_name, get_field_type, acf_add_local_field_group)
 - **REQ-12:** Resolução dinâmica de layout por slug (slug bate com layout exportado pelo tema = context automático)
+- **REQ-13:** WordPress-style template hierarchy: post.{type} → post → default.post fallback chain
 
 ## User Roles
 - **Administrador:** Gerenciar themes (ativar/desativar via painel)

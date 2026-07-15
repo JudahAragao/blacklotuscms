@@ -27,15 +27,18 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
   // default theme instead of an unstyled default layout under an unknown id.
   const themeName = themeRegistry[requestedThemeName] ? requestedThemeName : 'default';
 
+  const themeLayouts = themeRegistry[themeName] || themeRegistry.default;
+
   let layoutKey = LAYOUT_MAP[context] || sanitizePath(context);
 
+  // WordPress-style template hierarchy: try post.{type} first, fallback to post
   if (context === 'single') {
-    layoutKey = sanitizePath(data.postType.slug);
+    const postTypeSlug = sanitizePath(data.postType.slug);
+    layoutKey = themeLayouts[`post.${postTypeSlug}`] ? `post.${postTypeSlug}` : 'post';
   }
 
   let safeData = maskSensitiveData(data);
 
-  const themeLayouts = themeRegistry[themeName] || themeRegistry.default;
   const Layout = themeLayouts[layoutKey] || themeLayouts.post || themeRegistry.default.post;
 
   const themeData = await ThemeDataService.listAll(themeName);
