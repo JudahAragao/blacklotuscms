@@ -23,24 +23,21 @@ const LAYOUT_MAP: Record<string, string> = {
 export default async function ThemeRenderer({ context, data, previewTheme }: ThemeRendererProps) {
   const rawThemeName = previewTheme || await ThemeService.getActiveTheme();
   const requestedThemeName = sanitizePath(rawThemeName);
-  // A database setting can outlive a removed source folder. Render a complete
-  // default theme instead of an unstyled default layout under an unknown id.
   const themeName = themeRegistry[requestedThemeName] ? requestedThemeName : 'default';
 
   const themeLayouts = themeRegistry[themeName] || themeRegistry.default;
 
   let layoutKey = LAYOUT_MAP[context] || sanitizePath(context);
 
-  // WordPress-style template hierarchy for single posts:
-  // 1. post.{type} (specialized, ex: post.blog)
-  // 2. {type} (generic for that PostType, ex: page)
-  // 3. post (ultimate fallback)
+  // Single post resolution:
+  // - PostType "page" → page.tsx (or page.{subtype} if exists)
+  // - Any other PostType → post.{type} → post.tsx
   if (context === 'single') {
     const postTypeSlug = sanitizePath(data.postType.slug);
-    if (themeLayouts[`post.${postTypeSlug}`]) {
+    if (postTypeSlug === 'page') {
+      layoutKey = 'page';
+    } else if (themeLayouts[`post.${postTypeSlug}`]) {
       layoutKey = `post.${postTypeSlug}`;
-    } else if (themeLayouts[postTypeSlug]) {
-      layoutKey = postTypeSlug;
     } else {
       layoutKey = 'post';
     }
