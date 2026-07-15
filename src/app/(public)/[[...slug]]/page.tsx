@@ -9,6 +9,7 @@ import { themeStorage } from '@/lib/theme-context';
 import { ThemeService } from '@/core/services/ThemeService';
 import { HookService } from '@/core/services/HookService';
 import { resolveMetaUrls } from '@/lib/field-utils';
+import { themeRegistry } from '@/generated/theme-registry';
 
 interface PublicPageProps {
   params: { slug?: string[] };
@@ -178,6 +179,13 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
       if (fullPath === 'search') {
         const results = q ? await SearchService.globalSearch(q) : [];
         return <ThemeRenderer context="search" data={{ results, query: q || '' }} previewTheme={safePreviewTheme} />;
+      }
+
+      // 2. Dynamic layout resolution: if slug matches a theme layout, use it directly
+      const SYSTEM_LAYOUTS = new Set(['post', 'page', 'archive', 'category', 'search', 'notFound']);
+      const activeThemeLayouts = themeRegistry[themeName] || themeRegistry.default;
+      if (fullPath && !SYSTEM_LAYOUTS.has(fullPath) && activeThemeLayouts[fullPath]) {
+        return <ThemeRenderer context={fullPath} data={{}} previewTheme={safePreviewTheme} />;
       }
 
       // 2. Identify if this is the designated "Posts Page"
