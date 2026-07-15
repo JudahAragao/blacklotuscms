@@ -31,10 +31,19 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
 
   let layoutKey = LAYOUT_MAP[context] || sanitizePath(context);
 
-  // WordPress-style template hierarchy: try post.{type} first, fallback to post
+  // WordPress-style template hierarchy for single posts:
+  // 1. post.{type} (specialized, ex: post.blog)
+  // 2. {type} (generic for that PostType, ex: page)
+  // 3. post (ultimate fallback)
   if (context === 'single') {
     const postTypeSlug = sanitizePath(data.postType.slug);
-    layoutKey = themeLayouts[`post.${postTypeSlug}`] ? `post.${postTypeSlug}` : 'post';
+    if (themeLayouts[`post.${postTypeSlug}`]) {
+      layoutKey = `post.${postTypeSlug}`;
+    } else if (themeLayouts[postTypeSlug]) {
+      layoutKey = postTypeSlug;
+    } else {
+      layoutKey = 'post';
+    }
   }
 
   let safeData = maskSensitiveData(data);
