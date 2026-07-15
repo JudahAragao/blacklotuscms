@@ -692,6 +692,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                     return (
                       <button
                         key={tabIdx}
+                        type="button"
                         onClick={() => setActiveTab(tabIdx)}
                         className={`px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-all ${
                           activeTab === tabIdx
