@@ -47,6 +47,13 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  serverExternalPackages: [
+    'jsdom',
+    'isomorphic-dompurify',
+    'dompurify',
+    'css-tree',
+    '@csstools/css-syntax-patches-for-csstree',
+  ],
   async headers() {
     return [
       {

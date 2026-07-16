@@ -1,5 +1,6 @@
 import React from 'react';
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 import { notFound, redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import ThemeRenderer from '@/components/ThemeRenderer';
