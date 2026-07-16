@@ -34,9 +34,10 @@ export function maskSensitiveData(data: any): any {
 }
 
 /**
- * Sanitizes HTML to prevent XSS. Lazy-loaded to avoid jsdom at import time.
+ * Sanitizes HTML to prevent XSS.
  */
+import { purify } from './dompurify-server';
+
 export async function sanitizeHtml(html: string): Promise<string> {
-  const { default: DOMPurify } = await import('isomorphic-dompurify');
-  return DOMPurify.sanitize(html);
+  return purify(html);
 }

@@ -62,39 +62,6 @@ COPY --from=deps /app/node_modules/pg-query-stream ./node_modules/pg-query-strea
 COPY --from=deps /app/node_modules/protobufjs ./node_modules/protobufjs
 COPY --from=deps /app/node_modules/lossless-json ./node_modules/lossless-json
 
-# jsdom + isomorphic-dompurify runtime deps (serverExternalPackages)
-COPY --from=deps /app/node_modules/jsdom ./node_modules/jsdom
-COPY --from=deps /app/node_modules/isomorphic-dompurify ./node_modules/isomorphic-dompurify
-COPY --from=deps /app/node_modules/dompurify ./node_modules/dompurify
-COPY --from=deps /app/node_modules/css-tree ./node_modules/css-tree
-COPY --from=deps /app/node_modules/mdn-data ./node_modules/mdn-data
-COPY --from=deps /app/node_modules/source-map-js ./node_modules/source-map-js
-COPY --from=deps /app/node_modules/@csstools ./node_modules/@csstools
-COPY --from=deps /app/node_modules/@asamuzakjp ./node_modules/@asamuzakjp
-COPY --from=deps /app/node_modules/@bramus ./node_modules/@bramus
-COPY --from=deps /app/node_modules/@exodus ./node_modules/@exodus
-COPY --from=deps /app/node_modules/bidi-js ./node_modules/bidi-js
-COPY --from=deps /app/node_modules/data-urls ./node_modules/data-urls
-COPY --from=deps /app/node_modules/decimal.js ./node_modules/decimal.js
-COPY --from=deps /app/node_modules/entities ./node_modules/entities
-COPY --from=deps /app/node_modules/html-encoding-sniffer ./node_modules/html-encoding-sniffer
-COPY --from=deps /app/node_modules/is-potential-custom-element-name ./node_modules/is-potential-custom-element-name
-COPY --from=deps /app/node_modules/lru-cache ./node_modules/lru-cache
-COPY --from=deps /app/node_modules/parse5 ./node_modules/parse5
-COPY --from=deps /app/node_modules/saxes ./node_modules/saxes
-COPY --from=deps /app/node_modules/symbol-tree ./node_modules/symbol-tree
-COPY --from=deps /app/node_modules/tough-cookie ./node_modules/tough-cookie
-COPY --from=deps /app/node_modules/tldts ./node_modules/tldts
-COPY --from=deps /app/node_modules/tldts-core ./node_modules/tldts-core
-COPY --from=deps /app/node_modules/tr46 ./node_modules/tr46
-COPY --from=deps /app/node_modules/undici ./node_modules/undici
-COPY --from=deps /app/node_modules/w3c-xmlserializer ./node_modules/w3c-xmlserializer
-COPY --from=deps /app/node_modules/webidl-conversions ./node_modules/webidl-conversions
-COPY --from=deps /app/node_modules/whatwg-mimetype ./node_modules/whatwg-mimetype
-COPY --from=deps /app/node_modules/whatwg-url ./node_modules/whatwg-url
-COPY --from=deps /app/node_modules/xml-name-validator ./node_modules/xml-name-validator
-COPY --from=deps /app/node_modules/xmlchars ./node_modules/xmlchars
-
 USER nextjs
 
 EXPOSE 3000

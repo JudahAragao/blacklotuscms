@@ -92,8 +92,8 @@ export class HookService {
         result = await entry.callback(inputCopy);
 
         if (typeof result === 'string' && this.shouldSanitize(hook)) {
-          const { default: DOMPurify } = await import('isomorphic-dompurify');
-          result = DOMPurify.sanitize(result);
+          const { purify } = await import('@/lib/dompurify-server');
+          result = await purify(result);
         }
       } catch (err) {
         this.log.error(`Error in filter of hook ${hook}`, { source: entry.metadata.source, err });
