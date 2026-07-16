@@ -4,9 +4,9 @@ let cached: any = null;
 
 async function getDOMPurify() {
   if (cached) return cached;
-  const { default: DOMPurify } = await import('dompurify');
+  const DOMPurify = await import('dompurify').then(m => m.default || m);
   const { window } = parseHTML('');
-  cached = DOMPurify.createDOMPurify(window as any);
+  cached = DOMPurify(window as any);
   return cached;
 }
 
