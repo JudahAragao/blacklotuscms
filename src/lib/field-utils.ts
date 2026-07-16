@@ -144,7 +144,7 @@ export function flattenMetadata(metaValues: any[]): Record<string, any> {
   if (!metaValues || !Array.isArray(metaValues)) return {};
 
   return metaValues.reduce((acc, curr) => {
-    const key = curr.field?.slug || curr.fieldId;
+    const key = curr.field?.name || curr.fieldId;
     acc[key] = curr.value;
     return acc;
   }, {} as Record<string, any>);
