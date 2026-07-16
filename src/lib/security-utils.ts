@@ -38,6 +38,14 @@ export function maskSensitiveData(data: any): any {
  */
 import { purify } from './dompurify-server';
 
+const SANITIZE_CONFIG = {
+  ALLOWED_TAGS: [
+    'b', 'i', 'em', 'strong', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li', 'br', 'hr', 'img', 'blockquote', 'code', 'pre', 'span', 'div', 'iframe'
+  ],
+  ALLOWED_ATTR: ['href', 'title', 'target', 'src', 'alt', 'class', 'id', 'width', 'height', 'frameborder', 'allowfullscreen']
+};
+
 export async function sanitizeHtml(html: string): Promise<string> {
-  return purify(html);
+  return purify(html, SANITIZE_CONFIG);
 }
