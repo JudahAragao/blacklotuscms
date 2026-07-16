@@ -2,7 +2,7 @@ import React from 'react';
 import { ThemeService } from '@/core/services/ThemeService';
 import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { sanitizePath, maskSensitiveData } from '@/lib/security-utils';
-import { themeStorage } from '@/lib/theme-context';
+import { themeStorage, getThemeStore } from '@/lib/theme-context';
 
 import { themeRegistry } from '@/generated/theme-registry';
 
@@ -53,6 +53,10 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
       .filter((item) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.key) && ['string', 'number'].includes(typeof item.value))
       .map((item) => [`--theme-setting-${item.key}`, String(item.value)])
   ) as React.CSSProperties;
+
+  const store = getThemeStore();
+  store.themeName = themeName;
+  store.currentPost = safeData;
 
   return (
     <div data-bl-theme={themeName} className="blacklotuscms-theme min-h-screen" style={themeSettings}>
