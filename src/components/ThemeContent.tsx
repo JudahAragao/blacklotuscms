@@ -22,7 +22,7 @@ export default async function ThemeContent({ content }: ThemeContentProps) {
   const parsedContent = await ShortcodeService.parse(finalContent);
   
   // 2. Sanitizar para evitar XSS
-  const safeHtml = sanitizeHtml(parsedContent);
+  const safeHtml = await sanitizeHtml(parsedContent);
 
   return <div dangerouslySetInnerHTML={{ __html: safeHtml }} />;
 }
