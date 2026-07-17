@@ -3,7 +3,7 @@ import { TaxonomyService } from '@/core/services/TaxonomyService';
 import { PostTypeService } from '@/core/services/PostTypeService';
 import { deleteTaxonomyAction } from './actions';
 import TaxonomyForm from './TaxonomyForm';
-import { Trash2, Tags, Settings2, ChevronLeft } from 'lucide-react';
+import { Trash2, Tags, Settings2, ChevronLeft, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function TaxonomyTypesPage() {
@@ -54,8 +54,12 @@ export default async function TaxonomyTypesPage() {
                     <td className="text-sm text-text-muted">{tx._count?.terms ?? 0}</td>
                     <td className="text-right">
                       <div className="flex justify-end items-center gap-1.5">
-                        <Link href={`/admin/settings/taxonomy-types/${tx.id}/terms`} className="p-1.5 text-text-muted hover:text-action transition-colors" title="Gerenciar Termos">
-                          <Settings2 size={16} />
+                        <Link 
+                          href={`/admin/taxonomies/${tx.slug}`} 
+                          className="p-1.5 text-text-muted hover:text-action transition-colors" 
+                          title="Gerenciar Termos"
+                        >
+                          <ExternalLink size={16} />
                         </Link>
                         <form action={async () => { 'use server'; await deleteTaxonomyAction(tx.id); }}>
                           <button className="p-1.5 text-text-muted hover:text-status-trash transition-colors"><Trash2 size={16} /></button>

@@ -137,7 +137,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 icon={renderPostTypeIcon(pt.settings)}
                 items={pt.taxonomies.map((t: any) => ({
                   label: t.label,
-                  href: `/admin/posts?type=${pt.slug}&taxonomy=${t.slug}`,
+                  href: `/admin/taxonomies/${t.slug}`,
                 }))}
               />
             ))}
