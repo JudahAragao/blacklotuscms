@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-13"
+spec_version: "1.3"
+last_updated: "2026-07-17"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -36,7 +36,7 @@ status: approved
   - Priority: P1
   - Status: implemented
   - Depends on: FR04
-- **FR07: Taxonomies:** Hierarchical and flat taxonomy types linked to post types, com term management
+- **FR07: Taxonomies:** Hierarchical and flat taxonomy types linked to post types, com term management. Default taxonomies (category, post_tag) created for 'post' type during auto-install.
   - Priority: P1
   - Status: implemented
   - Depends on: FR04

@@ -106,6 +106,13 @@ async function autoInstall() {
     await prisma.postType.upsert({ where: { slug: 'post' }, update: {}, create: { slug: 'post', label: 'Posts' } });
     await prisma.postType.upsert({ where: { slug: 'page' }, update: {}, create: { slug: 'page', label: 'Pages', hierarchical: true } });
 
+    // Create default taxonomies for 'post' type (like WordPress: Categories + Tags)
+    const postType = await prisma.postType.findUnique({ where: { slug: 'post' } });
+    if (postType) {
+      await prisma.taxonomy.upsert({ where: { slug: 'category' }, update: {}, create: { slug: 'category', label: 'Categories', postTypeId: postType.id } });
+      await prisma.taxonomy.upsert({ where: { slug: 'post_tag' }, update: {}, create: { slug: 'post_tag', label: 'Tags', postTypeId: postType.id } });
+    }
+
     // Create admin user from env vars
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@blacklotuscms.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';

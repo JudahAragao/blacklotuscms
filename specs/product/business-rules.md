@@ -1,5 +1,5 @@
 ---
-spec_version: "1.3"
+spec_version: "1.4"
 last_updated: "2026-07-17"
 author: "BlackLotusCMS Team"
 status: approved
@@ -134,3 +134,12 @@ status: approved
 - **SENÃO** o IP é usado para identificação de spam (mesmo IP, múltiplos comentários)
 - **Referência:** FR14
 - **Implementação:** `CommentService.create()` — recebe `ip` param, armazena no DB
+
+## BR21: Default Taxonomies (WordPress Parity)
+- **SE** o auto-install é executado (banco vazio)
+- **ENTÃO** são criadas automaticamente 2 taxonomias para o post type `post`:
+  - `category` (Categories) — taxonomia hierárquica
+  - `post_tag` (Tags) — taxonomia flat
+- **SENÃO** o post type `page` não recebe taxonomias padrão (igual ao WordPress)
+- **Referência:** FR07
+- **Implementação:** `init.ts` — `autoInstall()` cria taxonomias após criar post types
