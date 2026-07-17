@@ -16,7 +16,10 @@ export default async function TaxonomyTypesPage() {
       slug: formData.get('slug') as string,
       postTypeId: formData.get('postTypeId') as string,
     };
-    await createTaxonomyAction(data);
+    const result = await createTaxonomyAction(data);
+    if (result && 'error' in result) {
+      throw new Error(result.error);
+    }
   }
 
   return (

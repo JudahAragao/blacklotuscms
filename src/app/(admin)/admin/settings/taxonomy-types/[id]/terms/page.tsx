@@ -22,7 +22,10 @@ export default async function TermManagementPage({ params }: { params: Promise<{
       slug: formData.get('slug') as string,
       taxonomyId: id,
     };
-    await createTermAction(data);
+    const result = await createTermAction(data);
+    if (result && 'error' in result) {
+      throw new Error(result.error);
+    }
   }
 
   return (
