@@ -2,14 +2,12 @@ import React from 'react';
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 import { notFound, redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import ThemeRenderer from '@/components/ThemeRenderer';
 import { SearchService } from '@/core/services/SearchService';
 import { PostService } from '@/core/services/PostService';
 import { themeStorage } from '@/lib/theme-context';
 import { ThemeService } from '@/core/services/ThemeService';
 import { HookService } from '@/core/services/HookService';
-import { resolveMetaUrls } from '@/lib/field-utils';
 import { themeRegistry } from '@/generated/theme-registry';
 
 interface PublicPageProps {
@@ -20,13 +18,6 @@ interface PublicPageProps {
 import { SecretsService } from '@/lib/secrets';
 
 import { SettingService } from '@/core/services/SettingService';
-
-async function getBaseUrl(): Promise<string> {
-  const h = await headers();
-  const host = h.get('host') || 'localhost:3000';
-  const proto = h.get('x-forwarded-proto') || 'http';
-  return `${proto}://${host}`;
-}
 
 export async function generateMetadata({ params, searchParams }: PublicPageProps) {
   try {
@@ -203,7 +194,7 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
         if (readingSettings.show_on_front === 'page' && readingSettings.page_on_front) {
           const homePost = await PostService.getLeanPostById(readingSettings.page_on_front);
           if (homePost) {
-            const resolvedHome = homePost.meta ? { ...homePost, meta: resolveMetaUrls(homePost.meta, await getBaseUrl()) } : homePost;
+            const resolvedHome = homePost.meta ? { ...homePost, meta: homePost.meta } : homePost;
             return <ThemeRenderer context="single" data={resolvedHome} previewTheme={safePreviewTheme} />;
           }
         }
@@ -217,7 +208,7 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
       const post = await PostService.getLeanPostBySlug(lastSlug);
 
       if (post && post.status === 'published') {
-        const resolvedPost = post.meta ? { ...post, meta: resolveMetaUrls(post.meta, await getBaseUrl()) } : post;
+        const resolvedPost = post.meta ? { ...post, meta: post.meta } : post;
         return <ThemeRenderer context="single" data={resolvedPost} previewTheme={safePreviewTheme} />;
       }
 
