@@ -110,6 +110,12 @@
     --color-status-inactive: #8c8f94;
 
   }
+
+  .bl-admin input,
+  .bl-admin textarea,
+  .bl-admin select {
+    caret-color: var(--color-text-heading);
+  }
 }
 
 @layer base {
@@ -225,18 +231,21 @@
   @apply bg-surface-card border border-border-input rounded px-3 py-2
          text-sm focus:border-border-focus focus:shadow-[0_0_0_1px_var(--color-border-focus)]
          outline-none transition-all text-text-heading placeholder:text-text-muted;
+  caret-color: var(--color-text-heading);
 }
 
 @utility field-select {
   @apply bg-surface-card border border-border-input rounded px-3 py-2
          text-sm focus:border-border-focus focus:shadow-[0_0_0_1px_var(--color-border-focus)]
          outline-none transition-all appearance-none cursor-pointer text-text-heading;
+  caret-color: var(--color-text-heading);
 }
 
 @utility field-textarea {
   @apply bg-surface-card border border-border-input rounded px-3 py-2
          text-sm focus:border-border-focus focus:shadow-[0_0_0_1px_var(--color-border-focus)]
          outline-none transition-all resize-none text-text-heading placeholder:text-text-muted;
+  caret-color: var(--color-text-heading);
 }
 
 /* Labels em formularios */

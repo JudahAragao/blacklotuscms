@@ -3,6 +3,7 @@ import { PostTypeService } from '@/core/services/PostTypeService';
 import { createPostTypeAction, deletePostTypeAction } from './actions';
 import { Box, Plus, Trash2, Layers, Settings2, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { renderPostTypeIcon } from '@/lib/icon-utils';
 
 export default async function PostTypesPage() {
   const postTypes = await PostTypeService.listAll();
@@ -101,7 +102,7 @@ export default async function PostTypesPage() {
                     <td>
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded bg-surface-muted flex items-center justify-center text-text-muted">
-                          <Layers size={14} />
+                          {renderPostTypeIcon(pt.settings, 14)}
                         </div>
                         <div>
                           <div className="font-medium text-text-heading text-sm">{pt.label}</div>
@@ -115,11 +116,19 @@ export default async function PostTypesPage() {
                     <td className="text-right">
                       <div className="flex justify-end items-center gap-1.5">
                         <Link
-                          href={`/admin/settings/post-types/${pt.id}/fields`}
+                          href={`/admin/settings/post-types/${pt.id}`}
                           className="p-1.5 text-text-muted hover:text-action transition-colors"
-                          title="Gerenciar"
+                          title="Editar"
                         >
                           <Settings2 size={16} />
+                        </Link>
+
+                        <Link
+                          href={`/admin/settings/post-types/${pt.id}/fields`}
+                          className="p-1.5 text-text-muted hover:text-action transition-colors"
+                          title="Campos"
+                        >
+                          <Layers size={16} />
                         </Link>
 
                         {pt.slug !== 'post' && pt.slug !== 'page' && (

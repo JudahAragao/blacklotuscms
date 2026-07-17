@@ -9,7 +9,7 @@ status: approved
 
 ## 1. MediaPicker (`src/components/admin/MediaPicker.tsx`)
 
-Modal media library picker with upload capability.
+Modal media library picker with upload capability and image properties editor.
 
 ### Props
 
@@ -30,7 +30,26 @@ interface MediaPickerProps {
 - **Progress Indicator:** Upload progress bar
 - **Multi-Select:** Select multiple items with confirm button
 - **Image Preview:** Thumbnail preview for images, file icon for non-images
+- **Image Properties Editor:** When selecting an image, shows editable fields:
+  - Width (e.g., "800px" or "100%")
+  - Alt Text (accessibility)
+  - Title (tooltip)
+  - Alignment (left, center, right, none)
 - **API Integration:** Fetches from `GET /api/v1/media`
+
+### Return Object
+```typescript
+{
+  url: string;
+  name: string;
+  mimeType: string;
+  // Optional image properties
+  width?: string;
+  alt?: string;
+  title?: string;
+  align?: 'left' | 'center' | 'right';
+}
+```
 
 ---
 
@@ -141,17 +160,24 @@ interface RichTextEditorProps {
 | Italic | StarterKit | Italic text |
 | Underline | Underline | Underlined text |
 | Strikethrough | StarterKit | Strikethrough text |
+| Highlight | Highlight | Highlighted text |
 | Bullet List | StarterKit | Unordered list |
 | Ordered List | StarterKit | Ordered list |
 | Blockquote | StarterKit | Block quote |
-| Link | Link | Hyperlink |
-| Image | Image | Insert image |
-| Clear Formatting | — | Remove formatting |
+| Link | Link | Hyperlink with custom popover (URL, target) |
+| Image | Image + MediaPicker | Insert image with properties (width, alt, title, align) |
+| Clear Formatting | — | Remove all marks from selection |
 | Undo/Redo | StarterKit | History navigation |
 
+### Features
+- **Link Popover:** Custom dropdown with URL input, "Open in new tab" checkbox, Apply/Remove/Close buttons
+- **Image Integration:** Uses MediaPicker for image selection with properties editor
+- **Image Properties:** Width, Alt Text, Title, Alignment applied to inserted images
+- **Clear Formatting:** Removes all marks (bold, italic, etc.) from selected text
+
 ### Styling
-- Dark theme with gold accent (`#F2CA50`)
-- Active button: gold background with glow shadow
+- Light theme with blue accent (`#2271b1`)
+- Active button: blue background
 - Toolbar hidden in readOnly mode
 
 ---

@@ -18,6 +18,9 @@ export default async function SEOSettingsPage() {
 
   const settings = await SettingService.getAll();
   const postTypes = await prisma.postType.findMany();
+  const taxonomies = await prisma.taxonomy.findMany({
+    include: { postType: { select: { slug: true, label: true } } }
+  });
 
   const seoSettings = settings.seo || {
     site_name: 'BlackLotus CMS',
@@ -25,7 +28,19 @@ export default async function SEOSettingsPage() {
     meta_description: '',
     og_image: '',
     google_site_verification: '',
+    bing_site_verification: '',
+    yandex_site_verification: '',
+    baidu_site_verification: '',
+    naver_site_verification: '',
+    pinterest_site_verification: '',
+    apple_domain_verification: '',
+    majestic_site_verification: '',
+    ahrefs_site_verification: '',
+    semrush_site_verification: '',
   };
+
+  const sitemapPostTypes = settings.sitemap_post_types as string[] | null;
+  const sitemapTaxonomies = settings.sitemap_taxonomies as string[] | null;
 
   async function updateSEO(formData: FormData) {
     'use server';
@@ -41,10 +56,30 @@ export default async function SEOSettingsPage() {
       meta_description: formData.get('meta_description'),
       og_image: formData.get('og_image'),
       google_site_verification: formData.get('google_site_verification'),
+      bing_site_verification: formData.get('bing_site_verification'),
+      yandex_site_verification: formData.get('yandex_site_verification'),
+      baidu_site_verification: formData.get('baidu_site_verification'),
+      naver_site_verification: formData.get('naver_site_verification'),
+      pinterest_site_verification: formData.get('pinterest_site_verification'),
+      apple_domain_verification: formData.get('apple_domain_verification'),
+      majestic_site_verification: formData.get('majestic_site_verification'),
+      ahrefs_site_verification: formData.get('ahrefs_site_verification'),
+      semrush_site_verification: formData.get('semrush_site_verification'),
     };
     await SettingService.set('seo', seoData, session?.user);
-    const selectedPostTypes = postTypes.filter(pt => formData.get(`sitemap_${pt.slug}`) === 'on').map(pt => pt.slug);
+
+    // Post types for sitemap
+    const selectedPostTypes = postTypes
+      .filter(pt => formData.get(`sitemap_${pt.slug}`) === 'on')
+      .map(pt => pt.slug);
     await SettingService.set('sitemap_post_types', selectedPostTypes, session?.user);
+
+    // Taxonomies for sitemap
+    const selectedTaxonomies = taxonomies
+      .filter(t => formData.get(`sitemap_taxonomy_${t.slug}`) === 'on')
+      .map(t => t.slug);
+    await SettingService.set('sitemap_taxonomies', selectedTaxonomies, session?.user);
+
     revalidatePath('/admin/seo');
   }
 
@@ -95,19 +130,51 @@ export default async function SEOSettingsPage() {
                 <Globe size={16} className="text-action" />
                 <h3 className="font-semibold text-sm text-text-heading">Arquitetura do Sitemap</h3>
               </div>
-              <p className="text-xs text-text-muted">Selecione os tipos de conteudo para indexacao.</p>
+              <p className="text-xs text-text-muted">Selecione os tipos de conteudo e taxonomias para indexacao.</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {postTypes.map((pt) => (
-                  <label key={pt.id} className="flex items-center justify-between content-card p-3 hover:shadow-sm transition-all cursor-pointer">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-text-heading">{pt.label}</span>
-                      <span className="text-xs text-text-muted font-mono">/{pt.slug}</span>
-                    </div>
-                    <input type="checkbox" name={`sitemap_${pt.slug}`} defaultChecked={settings.sitemap_post_types?.includes(pt.slug) ?? true} className="check-field" />
-                  </label>
-                ))}
+              {/* Post Types */}
+              <div className="space-y-2">
+                <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Tipos de Conteudo</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {postTypes.map((pt) => {
+                    const isChecked = sitemapPostTypes !== null 
+                      ? sitemapPostTypes.includes(pt.slug) 
+                      : true;
+                    return (
+                      <label key={pt.id} className="flex items-center justify-between content-card p-3 hover:shadow-sm transition-all cursor-pointer">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-text-heading">{pt.label}</span>
+                          <span className="text-xs text-text-muted font-mono">/{pt.slug}</span>
+                        </div>
+                        <input type="checkbox" name={`sitemap_${pt.slug}`} defaultChecked={isChecked} className="check-field" />
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
+
+              {/* Taxonomies */}
+              {taxonomies.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Taxonomias</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {taxonomies.map((t) => {
+                      const isChecked = sitemapTaxonomies !== null 
+                        ? sitemapTaxonomies.includes(t.slug) 
+                        : false;
+                      return (
+                        <label key={t.id} className="flex items-center justify-between content-card p-3 hover:shadow-sm transition-all cursor-pointer">
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium text-text-heading">{t.label}</span>
+                            <span className="text-xs text-text-muted font-mono">/{t.postType.slug}/{t.slug}</span>
+                          </div>
+                          <input type="checkbox" name={`sitemap_taxonomy_${t.slug}`} defaultChecked={isChecked} className="check-field" />
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </section>
 
             <section className="pt-5 border-t border-border-default space-y-4">
@@ -126,9 +193,49 @@ export default async function SEOSettingsPage() {
                 <Globe size={16} className="text-action" />
                 <h3 className="font-semibold text-sm text-text-heading">Ferramentas de Webmaster</h3>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="label-field-muted">Verificacao Google</label>
-                <input name="google_site_verification" defaultValue={seoSettings.google_site_verification} className="field-input font-mono" placeholder="google-site-verification-id" />
+              <p className="text-xs text-text-muted">Cole os IDs de verificacao para incluir as meta tags no site.</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Google Search Console</label>
+                  <input name="google_site_verification" defaultValue={seoSettings.google_site_verification} className="field-input font-mono text-xs" placeholder="google-site-verification-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Bing Webmaster Tools</label>
+                  <input name="bing_site_verification" defaultValue={seoSettings.bing_site_verification} className="field-input font-mono text-xs" placeholder="msvalidate.01-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Yandex Webmaster</label>
+                  <input name="yandex_site_verification" defaultValue={seoSettings.yandex_site_verification} className="field-input font-mono text-xs" placeholder="yandex-verification-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Baidu Webmaster</label>
+                  <input name="baidu_site_verification" defaultValue={seoSettings.baidu_site_verification} className="field-input font-mono text-xs" placeholder="baidu-site-verification-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Naver Webmaster</label>
+                  <input name="naver_site_verification" defaultValue={seoSettings.naver_site_verification} className="field-input font-mono text-xs" placeholder="naver-site-verification-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Pinterest</label>
+                  <input name="pinterest_site_verification" defaultValue={seoSettings.pinterest_site_verification} className="field-input font-mono text-xs" placeholder="p-domain-verify-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Apple Business Connect</label>
+                  <input name="apple_domain_verification" defaultValue={seoSettings.apple_domain_verification} className="field-input font-mono text-xs" placeholder="apple-domain-verification-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Majestic</label>
+                  <input name="majestic_site_verification" defaultValue={seoSettings.majestic_site_verification} className="field-input font-mono text-xs" placeholder="majestic-site-verification-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">Ahrefs</label>
+                  <input name="ahrefs_site_verification" defaultValue={seoSettings.ahrefs_site_verification} className="field-input font-mono text-xs" placeholder="ahrefs-site-verification-id" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="label-field-muted">SEMrush</label>
+                  <input name="semrush_site_verification" defaultValue={seoSettings.semrush_site_verification} className="field-input font-mono text-xs" placeholder="semrush-site-verification-id" />
+                </div>
               </div>
             </section>
           </div>

@@ -104,6 +104,17 @@ Global key/value settings store backed by Prisma.
 | `seo_og_image` | string | Default OG image URL |
 | `google_site_verification` | string | Google Search Console verification code |
 | `sitemap_post_types` | string[] | Post types included in sitemap |
+| `sitemap_taxonomies` | string[] | Taxonomies included in sitemap |
+| `google_site_verification` | string | Google Search Console verification ID |
+| `bing_site_verification` | string | Bing Webmaster Tools verification ID |
+| `yandex_site_verification` | string | Yandex Webmaster verification ID |
+| `baidu_site_verification` | string | Baidu Webmaster verification ID |
+| `naver_site_verification` | string | Naver Webmaster verification ID |
+| `pinterest_site_verification` | string | Pinterest verification ID |
+| `apple_domain_verification` | string | Apple Business Connect verification ID |
+| `majestic_site_verification` | string | Majestic verification ID |
+| `ahrefs_site_verification` | string | Ahrefs verification ID |
+| `semrush_site_verification` | string | SEMrush verification ID |
 | `storage_driver` | string | "local" or "s3" or "r2" |
 | `s3_config` | object | S3/R2 credentials (endpoint, bucket, keys) |
 | `captcha_enabled` | boolean | Enable captcha on comments |

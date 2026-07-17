@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -8,6 +8,7 @@ import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
 import Highlight from '@tiptap/extension-highlight';
+import MediaPicker from './MediaPicker';
 import {
   Bold, Italic, Underline as UnderlineIcon,
   List, ListOrdered, Quote, Link as LinkIcon,
@@ -50,6 +51,11 @@ const MenuButton = ({
 );
 
 export default function RichTextEditor({ value, onChange, readOnly }: RichTextEditorProps) {
+  const [showLinkPopover, setShowLinkPopover] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkTarget, setLinkTarget] = useState('_blank');
+  const linkPopoverRef = useRef<HTMLDivElement>(null);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -67,7 +73,7 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
         },
       }),
       Placeholder.configure({
-        placeholder: 'Comece a escrever sua história...',
+        placeholder: 'Comece a escrever sua historia...',
       }),
       Image,
       Highlight.configure({
@@ -82,26 +88,68 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
     },
   });
 
-  const setLink = useCallback(() => {
-    if (!editor) return;
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL do Link:', previousUrl);
-
-    if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
+  // Close link popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (linkPopoverRef.current && !linkPopoverRef.current.contains(event.target as Node)) {
+        setShowLinkPopover(false);
+      }
+    };
+    if (showLinkPopover) {
+      document.addEventListener('mousedown', handleClickOutside);
     }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showLinkPopover]);
 
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+  const openLinkPopover = useCallback(() => {
+    if (!editor) return;
+    
+    const previousUrl = editor.getAttributes('link').href || '';
+    const previousTarget = editor.getAttributes('link').target || '_blank';
+    
+    setLinkUrl(previousUrl);
+    setLinkTarget(previousTarget);
+    setShowLinkPopover(true);
   }, [editor]);
 
-  const insertImage = useCallback(() => {
+  const applyLink = useCallback(() => {
     if (!editor) return;
-    const url = window.prompt('URL da Imagem:');
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+    
+    if (linkUrl === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else {
+      const attrs: any = { href: linkUrl };
+      if (linkTarget) {
+        attrs.target = linkTarget;
+      }
+      editor.chain().focus().extendMarkRange('link').setLink(attrs).run();
     }
+    
+    setShowLinkPopover(false);
+    setLinkUrl('');
+  }, [editor, linkUrl, linkTarget]);
+
+  const removeLink = useCallback(() => {
+    if (!editor) return;
+    editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    setShowLinkPopover(false);
+    setLinkUrl('');
+  }, [editor]);
+
+  const handleImageSelect = useCallback((media: any) => {
+    if (!editor) return;
+    const attrs: any = { src: media.url };
+    if (media.alt) attrs.alt = media.alt;
+    if (media.title) attrs.title = media.title;
+    if (media.width) attrs.width = media.width;
+    if (media.align) {
+      attrs.style = `display: block; margin-left: auto; margin-right: auto;`;
+      if (media.align === 'left') attrs.style = 'display: block; margin-right: auto;';
+      if (media.align === 'right') attrs.style = 'display: block; margin-left: auto;';
+    }
+    editor.chain().focus().setImage(attrs).run();
   }, [editor]);
 
   if (!editor) return null;
@@ -112,21 +160,21 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
         <div className="bl-tiptap-toolbar bg-surface-muted p-1.5 border-b border-border-input flex flex-wrap gap-0.5 items-center sticky top-0 z-10">
           <div className="flex items-center gap-0.5 pr-1.5 border-r border-border-input">
             <MenuButton
-              title="Título 1"
+              title="Titulo 1"
               onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
               isActive={editor.isActive('heading', { level: 1 })}
             >
               <Heading1 size={16} />
             </MenuButton>
             <MenuButton
-              title="Título 2"
+              title="Titulo 2"
               onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
               isActive={editor.isActive('heading', { level: 2 })}
             >
               <Heading2 size={16} />
             </MenuButton>
             <MenuButton
-              title="Título 3"
+              title="Titulo 3"
               onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
               isActive={editor.isActive('heading', { level: 3 })}
             >
@@ -150,7 +198,7 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
               <Bold size={16} />
             </MenuButton>
             <MenuButton
-              title="Itálico"
+              title="Italico"
               onClick={() => editor.chain().focus().toggleItalic().run()}
               isActive={editor.isActive('italic')}
             >
@@ -195,7 +243,7 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
               <ListOrdered size={16} />
             </MenuButton>
             <MenuButton
-              title="Citação"
+              title="Citacao"
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               isActive={editor.isActive('blockquote')}
             >
@@ -203,23 +251,95 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
             </MenuButton>
           </div>
 
-          <div className="flex items-center gap-0.5 px-1.5 border-r border-border-input">
+          <div className="flex items-center gap-0.5 px-1.5 border-r border-border-input relative">
             <MenuButton
               title="Inserir Link"
-              onClick={setLink}
+              onClick={openLinkPopover}
               isActive={editor.isActive('link')}
             >
               <LinkIcon size={16} />
             </MenuButton>
+            
+            {/* Link Popover */}
+            {showLinkPopover && (
+              <div 
+                ref={linkPopoverRef}
+                className="absolute top-full left-0 mt-2 bg-surface-card border border-border-default rounded-lg shadow-xl p-4 z-50 w-80"
+              >
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="label-field-muted">URL do Link</label>
+                    <input
+                      type="url"
+                      value={linkUrl}
+                      onChange={(e) => setLinkUrl(e.target.value)}
+                      className="field-input text-sm"
+                      placeholder="https://exemplo.com"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          applyLink();
+                        }
+                        if (e.key === 'Escape') {
+                          setShowLinkPopover(false);
+                        }
+                      }}
+                    />
+                  </div>
+                  
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={linkTarget === '_blank'}
+                      onChange={(e) => setLinkTarget(e.target.checked ? '_blank' : '')}
+                      className="check-field"
+                    />
+                    <span className="text-sm text-text-body">Abrir em nova aba</span>
+                  </label>
+                  
+                  <div className="flex items-center gap-2 pt-2 border-t border-border-default">
+                    <button
+                      type="button"
+                      onClick={applyLink}
+                      className="btn-action text-sm flex-1"
+                    >
+                      Aplicar
+                    </button>
+                    {editor.isActive('link') && (
+                      <button
+                        type="button"
+                        onClick={removeLink}
+                        className="px-3 py-2 text-sm text-status-trash hover:bg-status-trash/10 rounded transition-colors"
+                      >
+                        Remover
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowLinkPopover(false)}
+                      className="px-3 py-2 text-sm text-text-muted hover:text-text-heading transition-colors"
+                    >
+                      Fechar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <MediaPicker onSelect={handleImageSelect}>
+              <button
+                type="button"
+                title="Inserir Imagem"
+                className="p-1.5 rounded transition-all duration-200 flex items-center justify-center text-text-muted hover:bg-surface-muted hover:text-text-heading"
+              >
+                <ImageIcon size={16} />
+              </button>
+            </MediaPicker>
+            
             <MenuButton
-              title="Inserir Imagem"
-              onClick={insertImage}
-            >
-              <ImageIcon size={16} />
-            </MenuButton>
-            <MenuButton
-              title="Limpar Formatação"
-              onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
+              title="Limpar Formatacao"
+              onClick={() => editor.chain().focus().unsetAllMarks().run()}
             >
               <Eraser size={16} />
             </MenuButton>

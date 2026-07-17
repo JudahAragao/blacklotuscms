@@ -139,3 +139,41 @@ export function getLucideSvgString(iconName: string, props?: { size?: number; co
   // Return a placeholder - actual implementation would need to extract SVG path data
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- ${iconName} icon --></svg>`;
 }
+
+/**
+ * Renders an icon based on stored icon data from post type settings.
+ * Falls back to FileText if no icon is configured.
+ */
+export function renderPostTypeIcon(settings: any, size = 16): React.ReactNode {
+  const iconData = settings?.icon as {
+    iconName?: string;
+    iconSource?: string;
+    iconSvg?: string;
+  } | undefined;
+  
+  if (!iconData?.iconName && !iconData?.iconSvg) {
+    const { FileText } = require('lucide-react');
+    return React.createElement(FileText, { size });
+  }
+
+  // Custom SVG
+  if (iconData.iconSource === 'custom' && iconData.iconSvg) {
+    return React.createElement('span', {
+      className: 'flex items-center justify-center',
+      style: { width: size, height: size },
+      dangerouslySetInnerHTML: { __html: iconData.iconSvg },
+    });
+  }
+
+  // Lucide icon
+  if (iconData.iconName) {
+    const IconComponent = (LucideIcons as any)[iconData.iconName];
+    if (IconComponent) {
+      return React.createElement(IconComponent, { size });
+    }
+  }
+
+  // Fallback
+  const { FileText } = require('lucide-react');
+  return React.createElement(FileText, { size });
+}

@@ -18,6 +18,13 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
   const [mediaList, setMediaList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
+  const [pendingImage, setPendingImage] = useState<any>(null);
+  
+  // Image properties
+  const [imageWidth, setImageWidth] = useState('');
+  const [imageAlt, setImageAlt] = useState('');
+  const [imageTitle, setImageTitle] = useState('');
+  const [imageAlign, setImageAlign] = useState('');
   
   // Upload states
   const [isUploading, setIsUploading] = useState(false);
@@ -43,6 +50,14 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
     }
   }, [isOpen, disabled, activeTab]);
 
+  const resetImageProperties = () => {
+    setImageWidth('');
+    setImageAlt('');
+    setImageTitle('');
+    setImageAlign('');
+    setPendingImage(null);
+  };
+
   const handleSelect = (media: any) => {
     if (multiple) {
       const isSelected = selectedItems.find(item => item.id === media.id);
@@ -52,7 +67,28 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
         setSelectedItems([...selectedItems, media]);
       }
     } else {
-      onSelect(media);
+      // Check if it's an image - show properties form
+      if (media.mimeType?.startsWith('image/')) {
+        setPendingImage(media);
+        setImageAlt(media.alt || '');
+        setImageTitle(media.title || '');
+      } else {
+        onSelect(media);
+        setIsOpen(false);
+      }
+    }
+  };
+
+  const confirmImageSelection = () => {
+    if (pendingImage) {
+      onSelect({
+        ...pendingImage,
+        width: imageWidth || undefined,
+        alt: imageAlt || undefined,
+        title: imageTitle || undefined,
+        align: imageAlign || undefined,
+      });
+      resetImageProperties();
       setIsOpen(false);
     }
   };
@@ -94,18 +130,30 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
       }
     }
 
-    // Após o upload, selecionar automaticamente e fechar ou ir para biblioteca
     if (uploadedMedia.length > 0) {
       if (multiple) {
         setSelectedItems([...selectedItems, ...uploadedMedia]);
         setActiveTab('library');
       } else {
-        onSelect(uploadedMedia[0]);
-        setIsOpen(false);
+        // Check if uploaded file is an image
+        const uploaded = uploadedMedia[0];
+        if (uploaded.mimeType?.startsWith('image/')) {
+          setPendingImage(uploaded);
+          setImageAlt(uploaded.alt || '');
+          setImageTitle(uploaded.title || '');
+        } else {
+          onSelect(uploaded);
+          setIsOpen(false);
+        }
       }
     }
     
     setIsUploading(false);
+  };
+
+  const handleClose = () => {
+    resetImageProperties();
+    setIsOpen(false);
   };
 
   return (
@@ -146,27 +194,110 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
           <div className="bg-surface-card border border-border-default w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-xl rounded">
             <div className="flex flex-col border-b border-border-default">
               <div className="p-4 flex justify-between items-center">
-                <h3 className="font-semibold text-sm text-text-heading">Gerenciar Midia</h3>
-                <button onClick={() => setIsOpen(false)} className="text-text-muted hover:text-text-heading p-1">✕</button>
+                <h3 className="font-semibold text-sm text-text-heading">
+                  {pendingImage ? 'Propriedades da Imagem' : 'Gerenciar Midia'}
+                </h3>
+                <button onClick={handleClose} className="text-text-muted hover:text-text-heading p-1">✕</button>
               </div>
-              <div className="flex px-4 gap-4">
-                <button
-                  onClick={() => setActiveTab('library')}
-                  className={`pb-2.5 text-sm font-medium transition-all border-b-2 ${activeTab === 'library' ? 'border-action text-action' : 'border-transparent text-text-muted hover:text-text-heading'}`}
-                >
-                  Biblioteca
-                </button>
-                <button
-                  onClick={() => setActiveTab('upload')}
-                  className={`pb-2.5 text-sm font-medium transition-all border-b-2 ${activeTab === 'upload' ? 'border-action text-action' : 'border-transparent text-text-muted hover:text-text-heading'}`}
-                >
-                  Upload
-                </button>
-              </div>
+              {!pendingImage && (
+                <div className="flex px-4 gap-4">
+                  <button
+                    onClick={() => setActiveTab('library')}
+                    className={`pb-2.5 text-sm font-medium transition-all border-b-2 ${activeTab === 'library' ? 'border-action text-action' : 'border-transparent text-text-muted hover:text-text-heading'}`}
+                  >
+                    Biblioteca
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('upload')}
+                    className={`pb-2.5 text-sm font-medium transition-all border-b-2 ${activeTab === 'upload' ? 'border-action text-action' : 'border-transparent text-text-muted hover:text-text-heading'}`}
+                  >
+                    Upload
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar min-h-[400px]">
-              {activeTab === 'library' ? (
+              {pendingImage ? (
+                /* Image Properties Form */
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="flex-shrink-0">
+                    <img 
+                      src={pendingImage.thumbnail || pendingImage.url} 
+                      className="w-48 h-48 object-cover rounded border border-border-default" 
+                      alt={pendingImage.name} 
+                    />
+                    <p className="text-xs text-text-muted mt-2 text-center truncate max-w-[192px]">{pendingImage.name}</p>
+                  </div>
+                  
+                  <div className="flex-1 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-1">
+                        <label className="label-field-muted">Largura</label>
+                        <input
+                          type="text"
+                          value={imageWidth}
+                          onChange={(e) => setImageWidth(e.target.value)}
+                          className="field-input text-sm"
+                          placeholder="ex: 800px ou 100%"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="label-field-muted">Alinhamento</label>
+                        <select
+                          value={imageAlign}
+                          onChange={(e) => setImageAlign(e.target.value)}
+                          className="field-select text-sm"
+                        >
+                          <option value="">Nenhum</option>
+                          <option value="left">Esquerda</option>
+                          <option value="center">Centro</option>
+                          <option value="right">Direita</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-1">
+                      <label className="label-field-muted">Texto Alternativo (Alt)</label>
+                      <input
+                        type="text"
+                        value={imageAlt}
+                        onChange={(e) => setImageAlt(e.target.value)}
+                        className="field-input text-sm"
+                        placeholder="Descricao para acessibilidade"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-1">
+                      <label className="label-field-muted">Titulo</label>
+                      <input
+                        type="text"
+                        value={imageTitle}
+                        onChange={(e) => setImageTitle(e.target.value)}
+                        className="field-input text-sm"
+                        placeholder="Tooltip ao passar o mouse"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center gap-3 pt-4 border-t border-border-default">
+                      <button 
+                        type="button" 
+                        onClick={confirmImageSelection} 
+                        className="btn-action text-sm"
+                      >
+                        Selecionar
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => resetImageProperties()} 
+                        className="px-4 py-2 text-sm text-text-muted hover:text-text-heading"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : activeTab === 'library' ? (
                 loading ? (
                   <div className="flex items-center justify-center py-20">
                     <Loader2 className="w-8 h-8 text-action animate-spin" />
@@ -243,11 +374,11 @@ export default function MediaPicker({ onSelect, currentValue, disabled, children
               )}
             </div>
 
-            {multiple && (
+            {multiple && !pendingImage && (
               <div className="p-3 border-t border-border-default bg-surface-muted flex justify-between items-center">
                 <span className="text-xs text-text-muted">{selectedItems.length} selecionados</span>
                 <div className="flex gap-3">
-                  <button onClick={() => setIsOpen(false)} className="px-4 py-1.5 text-sm text-text-muted hover:text-text-heading">Cancelar</button>
+                  <button onClick={handleClose} className="px-4 py-1.5 text-sm text-text-muted hover:text-text-heading">Cancelar</button>
                   <button onClick={confirmSelection} className="btn-action text-sm">Confirmar</button>
                 </div>
               </div>

@@ -17,9 +17,10 @@ interface PostEditorProps {
   capabilities?: {
     canPublish: boolean;
   };
+  siteUrl?: string;
 }
 
-export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave, readOnly, capabilities }: PostEditorProps) {
+export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave, readOnly, capabilities, siteUrl = 'https://seusite.com.br' }: PostEditorProps) {
   const router = useRouter();
   
   // fieldGroups: prop ou fallback para post.postType.fieldGroups (compatibilidade)
@@ -615,38 +616,40 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
     <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       {/* COLUNA PRINCIPAL */}
       <div className="lg:col-span-9 space-y-6">
-        <div className="content-card p-6 space-y-6">
-          {post?.postType?.supportsTitle !== false && (
-            <label className="flex flex-col gap-1.5">
-              <span className="label-field-muted">
-                {post?.postType?.settings?.titleLabel || 'Titulo'}
-              </span>
-              <input
-                type="text"
-                required
-                readOnly={readOnly}
-                className="w-full border-0 border-b border-border-default p-3 text-2xl font-semibold text-text-heading placeholder:text-text-muted focus:border-action focus:border-b-2 outline-none transition-all bg-transparent"
-                placeholder="Digite o titulo..."
-                value={formData.title}
-                onBlur={handleTitleBlur}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              />
-            </label>
-          )}
+        {(post?.postType?.supportsTitle !== false || post?.postType?.supportsEditor !== false) && (
+          <div className="content-card p-6 space-y-6">
+            {post?.postType?.supportsTitle !== false && (
+              <label className="flex flex-col gap-1.5">
+                <span className="label-field-muted">
+                  {post?.postType?.settings?.titleLabel || 'Titulo'}
+                </span>
+                <input
+                  type="text"
+                  required
+                  readOnly={readOnly}
+                  className="w-full border-0 border-b border-border-default p-3 text-2xl font-semibold text-text-heading placeholder:text-text-muted focus:border-action focus:border-b-2 outline-none transition-all bg-transparent"
+                  placeholder="Digite o titulo..."
+                  value={formData.title}
+                  onBlur={handleTitleBlur}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                />
+              </label>
+            )}
 
-          {post?.postType?.supportsEditor !== false && (
-            <label className="flex flex-col gap-3">
-              <span className="label-field-muted">
-                {post?.postType?.settings?.editorLabel || 'Conteudo'}
-              </span>
-              <RichTextEditor
-                value={formData.content}
-                onChange={(content) => setFormData({ ...formData, content })}
-                readOnly={readOnly}
-              />
-            </label>
-          )}
-        </div>
+            {post?.postType?.supportsEditor !== false && (
+              <label className="flex flex-col gap-3">
+                <span className="label-field-muted">
+                  {post?.postType?.settings?.editorLabel || 'Conteudo'}
+                </span>
+                <RichTextEditor
+                  value={formData.content}
+                  onChange={(content) => setFormData({ ...formData, content })}
+                  readOnly={readOnly}
+                />
+              </label>
+            )}
+          </div>
+        )}
 
         {/* GRUPOS DE CAMPOS */}
         {fieldGroups?.map((group: any) => (
@@ -664,7 +667,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                   const width = field.config?.width || 100;
                   return (
                     <div key={field.id} className="px-2 mb-6 transition-all duration-300" style={{ width: `${width}%`, minWidth: width < 100 ? '300px' : '100%' }}>
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-2">
                         <div className="flex justify-between items-center">
                           <label className="label-field">
                             {field.label} {field.config?.required && <span className="text-status-trash">*</span>}
@@ -834,7 +837,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                     </div>
                   )}
                   <div className="text-xs text-text-muted truncate">
-                    https://seusite.com.br <span className="text-text-muted">/ {formData.slug || 'slug-do-post'}</span>
+                    {siteUrl.replace(/\/+$/, '')} <span className="text-text-muted">/ {formData.slug || 'slug-do-post'}</span>
                   </div>
                   <div className="text-lg text-action font-medium hover:underline cursor-pointer leading-tight line-clamp-1">
                     {formData.seoTitle || formData.title || 'Titulo do Post'}
@@ -851,7 +854,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
 
       {/* COLUNA LATERAL (SIDEBAR) */}
       <aside className="lg:col-span-3 space-y-4">
-        <div className="meta-box overflow-hidden sticky top-6 z-20">
+        <div className="meta-box overflow-hidden">
           <div className="meta-box-header flex items-center justify-between">
             <h3 className="font-semibold text-sm">Publicacao</h3>
             <div className={`w-2 h-2 rounded-full ${formData.status === 'published' ? 'bg-status-published' : 'bg-status-draft'}`}></div>

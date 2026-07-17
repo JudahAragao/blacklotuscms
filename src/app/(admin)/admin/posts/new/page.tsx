@@ -4,6 +4,7 @@ import PostEditor from '@/components/admin/PostEditor';
 import { redirect } from 'next/navigation';
 import { PostService } from '@/core/services/PostService';
 import { FieldService } from '@/core/services/FieldService';
+import { SettingService } from '@/core/services/SettingService';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -92,6 +93,9 @@ export default async function NewPostPage({
     canPublish: hasCapability((session.user as any).role, 'post.publish')
   };
 
+  const settings = await SettingService.getAll();
+  const siteUrl = (settings.site_url as string) || 'https://seusite.com.br';
+
   return (
     <div className="w-full">
       <div className="mb-6">
@@ -104,6 +108,7 @@ export default async function NewPostPage({
         fieldGroups={JSON.parse(JSON.stringify(fieldGroups))}
         onSave={savePostAction}
         capabilities={userCapabilities}
+        siteUrl={siteUrl}
       />
     </div>
   );

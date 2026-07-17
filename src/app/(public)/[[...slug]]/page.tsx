@@ -90,7 +90,19 @@ export async function generateMetadata({ params, searchParams }: PublicPageProps
         type: 'website',
       },
       verification: {
-        google: seoSettings.google_site_verification,
+        google: seoSettings.google_site_verification || undefined,
+        yandex: seoSettings.yandex_site_verification || undefined,
+        bing: seoSettings.bing_site_verification || undefined,
+        apple: seoSettings.apple_domain_verification || undefined,
+      },
+      other: {
+        'msvalidate.01': seoSettings.bing_site_verification || undefined,
+        'baidu-site-verification': seoSettings.baidu_site_verification || undefined,
+        'naver-site-verification': seoSettings.naver_site_verification || undefined,
+        'p:domain_verify': seoSettings.pinterest_site_verification || undefined,
+        'majestic-site-verification': seoSettings.majestic_site_verification || undefined,
+        'ahrefs-site-verification': seoSettings.ahrefs_site_verification || undefined,
+        'semrush-site-verification': seoSettings.semrush_site_verification || undefined,
       },
       icons: {
         icon: manifest?.favicon 

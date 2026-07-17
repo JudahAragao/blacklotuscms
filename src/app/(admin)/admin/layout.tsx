@@ -7,10 +7,12 @@ import { redirect } from 'next/navigation';
 import UserControl from '@/components/admin/UserControl';
 import BlackLotusCMSSlot from '@/components/admin/BlackLotusCMSSlot';
 import PluginSidebarNav from '@/components/admin/PluginSidebarNav';
+import SidebarDropdownItem from '@/components/admin/SidebarDropdownItem';
+import { renderPostTypeIcon } from '@/lib/icon-utils';
 import { hasCapability } from '@/lib/auth-utils';
 import {
   LayoutDashboard, FileText, Image, Menu, MessageSquare,
-  Palette, Puzzle, Search, Settings, ExternalLink, Layers
+  Palette, Puzzle, Search, Settings, ExternalLink
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -22,7 +24,6 @@ const iconMap: Record<string, React.ReactNode> = {
   plugins: <Puzzle size={16} />,
   seo: <Search size={16} />,
   settings: <Settings size={16} />,
-  'field-groups': <Layers size={16} />,
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -33,7 +34,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   const postTypes = await prisma.postType.findMany({
-    orderBy: { label: 'asc' }
+    orderBy: { label: 'asc' },
+    include: {
+      taxonomies: {
+        select: { id: true, label: true, slug: true }
+      }
+    }
   });
 
   const dbUser = await prisma.user.findUnique({
@@ -63,9 +69,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: '/admin/themes', label: 'Aparencia', icon: 'themes', visible: canSeeThemes },
     { href: '/admin/plugins', label: 'Plugins', icon: 'plugins', visible: canSeePlugins },
     { href: '/admin/seo', label: 'SEO', icon: 'seo', visible: canSeeSettings },
-    { href: '/admin/settings/field-groups', label: 'Campos Customizados', icon: 'field-groups', visible: canSeeSettings },
-    { href: '/admin/settings', label: 'Configuracoes', icon: 'settings', visible: canSeeSettings },
   ].filter(item => item.visible);
+
+  const settingsItems = [
+    { label: 'Chave API', href: '/admin/settings/keys' },
+    { label: 'Tipos de Posts', href: '/admin/settings/post-types' },
+    { label: 'Campos Customizados', href: '/admin/settings/field-groups' },
+    { label: 'Usuarios e Roles', href: '/admin/settings/users' },
+    { label: 'Taxonomias', href: '/admin/settings/taxonomy-types' },
+    { label: 'Leitura', href: '/admin/settings/reading' },
+  ];
 
   return (
     <div className="bl-admin h-screen flex flex-col overflow-hidden">
@@ -117,14 +130,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </div>
 
             {postTypes.filter(pt => hasCapability(userRole, `${pt.slug}.read`) || hasCapability(userRole, `${pt.slug}.manage`)).map((pt) => (
-              <Link
+              <SidebarDropdownItem
                 key={pt.id}
                 href={`/admin/posts?type=${pt.slug}`}
-                className="flex items-center gap-2.5 px-3 py-2 rounded text-sm text-[#d0cfc8] hover:bg-[#2c3338] hover:text-white transition-colors"
-              >
-                <FileText size={16} />
-                <span>{pt.label}</span>
-              </Link>
+                label={pt.label}
+                icon={renderPostTypeIcon(pt.settings)}
+                items={pt.taxonomies.map((t: any) => ({
+                  label: t.label,
+                  href: `/admin/posts?type=${pt.slug}&taxonomy=${t.slug}`,
+                }))}
+              />
             ))}
 
             {systemItems.length > 0 && (
@@ -144,6 +159,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                   </Link>
                 ))}
               </>
+            )}
+
+            {canSeeSettings && (
+              <SidebarDropdownItem
+                href="/admin/settings"
+                label="Configuracoes"
+                icon={<Settings size={16} />}
+                items={settingsItems}
+              />
             )}
 
             <BlackLotusCMSSlot name="admin.sidebar.menu_after" />

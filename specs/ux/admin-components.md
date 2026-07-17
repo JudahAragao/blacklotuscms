@@ -89,11 +89,16 @@ Renders appropriate input for each of 15 field types:
 - Live Google preview showing how the post would appear in search results
 
 #### 7. Publishing Sidebar
+- **Static positioning**: Card is static (no sticky/fixed), stays in natural document flow
 - **Status selector**: draft / published / private (private only if `canPublish`)
 - **Scheduling**: publishedAt and expiresAt datetime pickers
 - **Author display**: Shows current author name
 - **Permalink/Slug editor**: Auto-generated from title, editable
 - **Taxonomy assignment**: Checkbox lists for each associated taxonomy
+
+#### 7.1 Default Content Card (Title + Editor)
+- **Conditional rendering**: The content card containing title input and rich text editor only renders when `supportsTitle !== false` OR `supportsEditor !== false`
+- If both `supportsTitle` and `supportsEditor` are `false`, the card is hidden entirely, allowing custom field groups to move up without empty space
 
 #### 8. Slug Generation
 - Auto-generates from title via `generateSlug()`

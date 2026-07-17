@@ -4,6 +4,7 @@ import PostEditor from '@/components/admin/PostEditor';
 import { notFound, redirect } from 'next/navigation';
 import { PostService } from '@/core/services/PostService';
 import { FieldService } from '@/core/services/FieldService';
+import { SettingService } from '@/core/services/SettingService';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -87,6 +88,9 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
                 hasCapability(userRole, `${postTypeSlug}.manage`)
   };
 
+  const settings = await SettingService.getAll();
+  const siteUrl = (settings.site_url as string) || 'https://seusite.com.br';
+
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-6">
@@ -107,6 +111,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
         onSave={savePostAction}
         readOnly={!canEdit}
         capabilities={userCapabilities}
+        siteUrl={siteUrl}
       />
     </div>
   );

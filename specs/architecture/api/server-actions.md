@@ -105,9 +105,10 @@ export async function actionName(params) {
 | Function | Parameters | Auth | RBAC | Description |
 |----------|-----------|------|------|-------------|
 | `createPostTypeAction(data)` | slug, label, hierarchical, supportsTitle, supportsEditor, supportsPermalink, supportsTaxonomies | Session | `post.manage` | Create a custom post type |
+| `updatePostTypeAction(id, data)` | id, { label, icon } | Session | `post.manage` | Update post type settings (label, icon) |
 | `deletePostTypeAction(slug)` | slug: string | Session | `post.manage` | Delete post type (blocked if posts exist) |
 
-**Revalidates:** `/admin/settings/post-types`, `/admin` (sidebar update)
+**Revalidates:** `/admin/settings/post-types`, `/admin/settings/post-types/[id]`, `/admin` (sidebar update)
 
 ---
 
