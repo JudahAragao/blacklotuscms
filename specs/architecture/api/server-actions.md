@@ -145,25 +145,29 @@ export async function actionName(params) {
 
 ---
 
-## 9. Taxonomy Management (`admin/settings/taxonomy-types/actions.ts`)
+## 9. Taxonomy Type Management (`admin/settings/taxonomy-types/actions.ts`)
 
 | Function | Parameters | Auth | RBAC | Description |
 |----------|-----------|------|------|-------------|
 | `createTaxonomyAction(data)` | { label, slug, postTypeId } | Session | `post.manage` | Create a taxonomy type |
+| `updateTaxonomyAction(id, data)` | id, { label, slug, postTypeId } | Session | `post.manage` | Update taxonomy type configuration |
 | `deleteTaxonomyAction(id)` | id: string | Session | `post.manage` | Delete a taxonomy |
 
-**Revalidates:** `/admin/settings/taxonomy-types`
+**Revalidates:** `/admin/settings/taxonomy-types`, `/admin/taxonomies`, `/admin`
 
 ---
 
-## 10. Term Management (`admin/settings/taxonomy-types/[id]/terms/actions.ts`)
+## 10. Taxonomy Terms Management (`admin/taxonomies/[slug]/actions.ts`)
 
 | Function | Parameters | Auth | RBAC | Description |
 |----------|-----------|------|------|-------------|
-| `createTermAction(data)` | { name, slug, taxonomyId } | Session | `post.manage` | Create a term within a taxonomy |
-| `deleteTermAction(id, taxonomyId)` | id, taxonomyId | Session | `post.manage` | Delete a term |
+| `createTermAction(taxonomyId, data)` | taxonomyId, { name, slug } | Session | `post.manage` | Create a term within a taxonomy |
+| `updateTermAction(termId, taxonomyId, data)` | termId, taxonomyId, { name, slug } | Session | `post.manage` | Update a term |
+| `deleteTermAction(termId)` | termId: string | Session | `post.manage` | Delete a term |
 
-**Revalidates:** `/admin/settings/taxonomy-types/:taxonomyId/terms`
+**Revalidates:** `/admin/taxonomies`, `/admin`
+
+**Note:** Terms are managed via `/admin/taxonomies/[slug]` page, accessible from sidebar dropdown links.
 
 ---
 
