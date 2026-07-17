@@ -4,11 +4,9 @@ let cached: any = null;
 
 async function getDOMPurify() {
   if (cached) return cached;
-  const mod: any = await import('dompurify');
-  const factory = mod.createDOMPurify || mod.default?.createDOMPurify;
-  if (!factory) throw new Error('dompurify: createDOMPurify not found');
+  const DOMPurify = await import('dompurify').then((m: any) => m.default || m);
   const { window } = parseHTML('');
-  cached = factory(window);
+  cached = DOMPurify(window);
   return cached;
 }
 
