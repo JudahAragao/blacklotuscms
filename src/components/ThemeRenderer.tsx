@@ -35,7 +35,9 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
   if (context === 'single') {
     const postTypeSlug = sanitizePath(data.postType.slug);
     if (postTypeSlug === 'page') {
-      layoutKey = 'page';
+      // Check for page.{slug} first (e.g. page.blog), fallback to page
+      const pageSlug = sanitizePath(data.slug);
+      layoutKey = themeLayouts[`page.${pageSlug}`] ? `page.${pageSlug}` : 'page';
     } else if (themeLayouts[`post.${postTypeSlug}`]) {
       layoutKey = `post.${postTypeSlug}`;
     } else {
