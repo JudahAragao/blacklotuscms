@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-06"
+spec_version: "1.3"
+last_updated: "2026-07-17"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -78,3 +78,59 @@ status: approved
 - **ENTÃO** fields sensíveis (passwordHash, secret, token, etc.) são removidos
 - **SENÃO** os data são preservados como estão
 - **Referência:** FR25
+
+## BR13: Post Expiration
+- **SE** um post tem `expiresAt` definido E `expiresAt < now()`
+- **ENTÃO** ele não aparece em queries públicas, sitemap, nem busca
+- **SENÃO** o post é visível normalmente (se status = "published" e publishedAt <= now())
+- **Referência:** FR05, FR17
+- **Implementação:** `PostService.ts` — queries filtram por `expiresAt: null OR expiresAt >= now()`
+
+## BR14: LGPD Data Export (Art. 15, 20)
+- **SE** um user solicita exportação de dados
+- **ENTÃO** o sistema retorna: profile (email, role, image, dates), posts criados, metadados de API keys (nome, data de criação, último uso — nunca a chave em si)
+- **SENÃO** apenas admins podem exportar dados de outros users
+- **Referência:** FR22, COMPLIANCE.md
+- **Implementação:** `UserService.exportData()` — via `GET /api/v1/users/:id`
+
+## BR15: LGPD Account Deletion (Art. 17)
+- **SE** um user solicita exclusão de conta
+- **ENTÃO** cascade delete: postTerms → metaValues → comments → posts → apiKeys → user
+- **SENÃO** não é possível excluir o último user com role "Administrador"
+- **Referência:** FR22, COMPLIANCE.md
+- **Implementação:** `UserService.deleteAccount()` — via `DELETE /api/v1/users/:id`
+
+## BR16: API Key Security
+- **SE** uma API key é criada
+- **ENTÃO** apenas o hash SHA-256 é armazenado no banco, com prefixo `bl_` + 64 hex chars
+- **SENÃO** a chave plain text é retornada UMA única vez na criação — nunca mais
+- **Referência:** FR03, FR21
+- **Implementação:** `ApiKeyService.ts` — `createKey()` retorna plain key, `validateKey()` compara hash
+
+## BR17: Plugin DB Rate Limit
+- **SE** um plugin excede 50 requisições de banco por segundo
+- **ENTÃO** a requisição é bloqueada com erro RATE_LIMIT_EXCEEDED
+- **SENÃO** cada acesso ao banco tem jitter aleatório de 1-5ms para evitar thundering herd
+- **Referência:** FR10
+- **Implementação:** `PluginService.ts` — Bridge API `db.read` e `db.create` são rate-limited
+
+## BR18: Webhook Retry
+- **SE** um webhook inbound falha no processamento
+- **ENTÃO** o sistema retenta com exponential backoff: 1s → 2s → 4s (máximo 3 tentativas)
+- **SENÃO** após 3 falhas, o webhook é registrado como falha no `NetworkAuditLog`
+- **Referência:** FR10
+- **Implementação:** `NetworkService.receiveWebhook()` — retry loop com backoff exponencial
+
+## BR19: Theme Permission Cache
+- **SE** um theme acessa dados do sistema via `ThemeDataService.get()`
+- **ENTÃO** a validação de permissão usa cache com TTL de 10 segundos
+- **SENÃO** cache é invalidado quando permissão muda de status (approved/denied)
+- **Referência:** FR11
+- **Implementação:** `ThemeDataService.ts` — `permissionCache` Map com 10s TTL
+
+## BR20: Comment IP Capture
+- **SE** um comentário é criado via API pública
+- **ENTÃO** o endereço IP do autor é capturado e armazenado no campo `ip`
+- **SENÃO** o IP é usado para identificação de spam (mesmo IP, múltiplos comentários)
+- **Referência:** FR14
+- **Implementação:** `CommentService.create()` — recebe `ip` param, armazena no DB
