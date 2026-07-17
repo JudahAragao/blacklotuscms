@@ -1,9 +1,54 @@
-import React from 'react';
+'use client';
+
+import React, { useActionState } from 'react';
 import { TaxonomyService } from '@/core/services/TaxonomyService';
 import { createTermAction, deleteTermAction } from './actions';
 import { Plus, Trash2, Tag, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { toast } from 'sonner';
+
+function TermForm({ taxonomyId }: { taxonomyId: string }) {
+  const [state, formAction, isPending] = useActionState(
+    async (prev: any, formData: FormData) => {
+      const data = {
+        name: formData.get('name') as string,
+        slug: formData.get('slug') as string,
+        taxonomyId: taxonomyId,
+      };
+      const result = await createTermAction(data);
+      if (result && 'error' in result) {
+        toast.error(result.error);
+        return result;
+      }
+      toast.success('Termo criado com sucesso');
+      return null;
+    },
+    null
+  );
+
+  return (
+    <form action={formAction} className="content-card p-5 space-y-4">
+      <div className="flex items-center gap-2 mb-2">
+        <Plus size={16} className="text-action" />
+        <h3 className="font-semibold text-sm text-text-heading">Novo Termo</h3>
+      </div>
+      <div className="space-y-3">
+        <div className="flex flex-col gap-1">
+          <label className="label-field-muted">Nome</label>
+          <input required name="name" placeholder="Ex: Tecnologia" className="field-input" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="label-field-muted">Slug</label>
+          <input required name="slug" placeholder="ex: tecnologia" className="field-input" />
+        </div>
+      </div>
+      <button type="submit" disabled={isPending} className="btn-action w-full">
+        {isPending ? 'Adicionando...' : 'Adicionar'}
+      </button>
+    </form>
+  );
+}
 
 export default async function TermManagementPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -13,20 +58,6 @@ export default async function TermManagementPage({ params }: { params: Promise<{
     notFound();
   }
   const terms = taxonomy.terms ?? [];
-
-  async function handleCreate(formData: FormData) {
-    'use server';
-    const { id } = await params;
-    const data = {
-      name: formData.get('name') as string,
-      slug: formData.get('slug') as string,
-      taxonomyId: id,
-    };
-    const result = await createTermAction(data);
-    if (result && 'error' in result) {
-      throw new Error(result.error);
-    }
-  }
 
   return (
     <div className="space-y-6">
@@ -42,23 +73,7 @@ export default async function TermManagementPage({ params }: { params: Promise<{
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <form action={handleCreate} className="content-card p-5 space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Plus size={16} className="text-action" />
-              <h3 className="font-semibold text-sm text-text-heading">Novo Termo</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex flex-col gap-1">
-                <label className="label-field-muted">Nome</label>
-                <input required name="name" placeholder="Ex: Tecnologia" className="field-input" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="label-field-muted">Slug</label>
-                <input required name="slug" placeholder="ex: tecnologia" className="field-input" />
-              </div>
-            </div>
-            <button type="submit" className="btn-action w-full">Adicionar</button>
-          </form>
+          <TermForm taxonomyId={id} />
         </div>
 
         <div className="lg:col-span-2">
@@ -83,7 +98,7 @@ export default async function TermManagementPage({ params }: { params: Promise<{
                       </div>
                     </td>
                     <td className="text-right">
-                      <form action={async () => { 'use server'; const { id } = await params; await deleteTermAction(term.id, id); }}>
+                      <form action={async () => { 'use server'; await deleteTermAction(term.id, id); }}>
                         <button className="p-1.5 text-text-muted hover:text-status-trash transition-colors"><Trash2 size={16} /></button>
                       </form>
                     </td>
