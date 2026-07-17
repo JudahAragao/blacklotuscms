@@ -108,6 +108,7 @@
     --color-status-draft: #dba617;
     --color-status-trash: #b32d2e;
     --color-status-inactive: #8c8f94;
+
   }
 }
 
@@ -353,4 +354,3 @@
     scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
   }
 }
-
