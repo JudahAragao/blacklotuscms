@@ -15,7 +15,7 @@ export default function TermForm({ taxonomyId }: { taxonomyId: string }) {
       };
       const result = await createTermAction(data);
       if (result && 'error' in result) {
-        toast.error(result.error);
+        toast.error(result.details ? Object.values(result.details).flat().join(', ') : result.error);
         return result;
       }
       toast.success('Termo criado com sucesso');

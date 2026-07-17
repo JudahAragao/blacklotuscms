@@ -15,7 +15,7 @@ export default function TaxonomyForm({ postTypes }: { postTypes: any[] }) {
       };
       const result = await createTaxonomyAction(data);
       if (result && 'error' in result) {
-        toast.error(result.error);
+        toast.error(result.details ? Object.values(result.details).flat().join(', ') : result.error);
         return result;
       }
       toast.success('Taxonomia criada com sucesso');
