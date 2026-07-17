@@ -53,6 +53,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
 
+# Symlink uploads into public/ so Next.js Image optimization can serve them
+RUN ln -sf /app/uploads ./public/uploads
+
 # Prisma + pg packages for database connectivity (not bundled by standalone)
 COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=deps /app/node_modules/prisma ./node_modules/prisma
