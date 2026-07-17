@@ -32,7 +32,7 @@ status: approved
   - Priority: P0
   - Status: implemented
   - Depends on: FR04
-- **FR06: Custom Fields (MetaFields):** Extensible field sistema com typed config (text, image, repeater, tab, section, etc.) via FieldGroups independentes com location rules que determinam onde aparecem (post types, taxonomias, posts específicos, templates, status).
+- **FR06: Custom Fields (MetaFields):** Extensible field sistema com typed config (text, image, repeater, tab, section, etc.) via FieldGroups independentes com location rules que determinam onde aparecem (post types, taxonomias, posts específicos, templates, status). Conditional logic evaluation and field validation documented in `specs/architecture/api/field-utils.md`.
   - Priority: P1
   - Status: implemented
   - Depends on: FR04
