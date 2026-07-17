@@ -39,8 +39,8 @@ export default async function SEOSettingsPage() {
     semrush_site_verification: '',
   };
 
-  const sitemapPostTypes = settings.sitemap_post_types as string[] | null;
-  const sitemapTaxonomies = settings.sitemap_taxonomies as string[] | null;
+  const sitemapPostTypes = (settings.sitemap_post_types as string[] | null) ?? null;
+  const sitemapTaxonomies = (settings.sitemap_taxonomies as string[] | null) ?? null;
 
   async function updateSEO(formData: FormData) {
     'use server';
