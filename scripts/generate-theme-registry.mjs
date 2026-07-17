@@ -79,6 +79,7 @@ for (const entry of entries.filter((e) => e.isDirectory()).sort((a, b) => a.name
   validateCss(css, id);
   themes.push({
     id,
+    manifest,
     entrypoint,
     css: namespaceAnimations(css.replace(/:root\b/g, ':scope'), id),
   });
