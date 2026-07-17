@@ -39,11 +39,11 @@ const MenuButton = ({
     onClick={(e) => { e.preventDefault(); onClick(); }}
     disabled={disabled}
     title={title}
-    className={`p-2 rounded-md transition-all duration-200 flex items-center justify-center ${
-      isActive 
-      ? 'bg-[#F2CA50] text-[#121212] shadow-[0_0_10px_rgba(242,202,80,0.3)]' 
-      : 'text-white/60 hover:bg-white/5 hover:text-white'
-    } ${disabled ? 'opacity-20 cursor-not-allowed' : ''}`}
+    className={`p-1.5 rounded transition-all duration-200 flex items-center justify-center ${
+      isActive
+      ? 'bg-action text-white'
+      : 'text-text-muted hover:bg-surface-muted hover:text-text-heading'
+    } ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
   >
     {children}
   </button>
@@ -63,7 +63,7 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-[#F2CA50] underline cursor-pointer',
+          class: 'text-action underline cursor-pointer',
         },
       }),
       Placeholder.configure({
@@ -97,9 +97,9 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
   if (!editor) return null;
 
   return (
-    <div className={`bl-tiptap-container flex flex-col border border-white/10 rounded-lg overflow-hidden transition-all duration-500 group focus-within:border-[#F2CA50]/30 ${readOnly ? 'read-only' : ''}`}>
+    <div className={`bl-tiptap-container flex flex-col bg-surface-card border border-border-input rounded overflow-hidden transition-all duration-500 group focus-within:border-border-focus focus-within:shadow-[0_0_0_1px_var(--color-border-focus)] ${readOnly ? 'read-only' : ''}`}>
       {!readOnly && (
-        <div className="bl-tiptap-toolbar bg-[#1e1e1e] p-2 border-b border-white/5 flex flex-wrap gap-1 items-center sticky top-0 z-10">
+        <div className="bl-tiptap-toolbar bg-surface-muted p-2 border-b border-border-input flex flex-wrap gap-1 items-center sticky top-0 z-10">
           <div className="flex items-center gap-1 pr-2 border-r border-white/5">
             <MenuButton 
               title="Título 1"
@@ -221,45 +221,49 @@ export default function RichTextEditor({ value, onChange, readOnly }: RichTextEd
         </div>
       )}
 
-      <div className="bl-tiptap-content bg-[#121212] min-h-[450px] relative">
-        <EditorContent editor={editor} className="p-8 prose prose-invert max-w-none focus:outline-none" />
+      <div className="bl-tiptap-content bg-surface-card min-h-[450px] relative">
+        <EditorContent editor={editor} className="p-4 text-sm max-w-none focus:outline-none text-text-heading" />
       </div>
 
       <style jsx global>{`
         .ProseMirror {
           min-height: 400px;
           outline: none !important;
-          color: #e0e0e0;
+          color: var(--color-text-heading, #1d2327);
           font-family: var(--font-sans);
-          font-size: 15px;
-          line-height: 1.8;
+          font-size: 14px;
+          line-height: 1.7;
         }
         .ProseMirror p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
           float: left;
-          color: rgba(255, 255, 255, 0.15);
+          color: var(--color-text-muted, #787c82);
           pointer-events: none;
           height: 0;
           font-style: italic;
         }
-        .ProseMirror h1 { font-size: 2em; margin-bottom: 0.5em; color: #ffffff; font-weight: 700; }
-        .ProseMirror h2 { font-size: 1.5em; margin-bottom: 0.5em; color: #ffffff; font-weight: 600; }
-        .ProseMirror h3 { font-size: 1.25em; margin-bottom: 0.5em; color: #ffffff; font-weight: 600; }
+        .ProseMirror h1 { font-size: 1.75em; margin-bottom: 0.5em; color: var(--color-text-heading, #1d2327); font-weight: 700; }
+        .ProseMirror h2 { font-size: 1.35em; margin-bottom: 0.5em; color: var(--color-text-heading, #1d2327); font-weight: 600; }
+        .ProseMirror h3 { font-size: 1.15em; margin-bottom: 0.5em; color: var(--color-text-heading, #1d2327); font-weight: 600; }
         .ProseMirror blockquote {
-          border-left: 3px solid #F2CA50;
-          padding-left: 1.5rem;
+          border-left: 3px solid var(--color-action, #2271b1);
+          padding-left: 1rem;
           font-style: italic;
-          color: rgba(255, 255, 255, 0.7);
-          margin: 1.5em 0;
+          color: var(--color-text-body, #50575e);
+          margin: 1em 0;
         }
         .ProseMirror ul, .ProseMirror ol {
           padding-left: 1.5rem;
           margin: 1em 0;
         }
         .ProseMirror li {
-          margin-bottom: 0.5em;
+          margin-bottom: 0.4em;
         }
-        
+        .ProseMirror a {
+          color: var(--color-action, #2271b1);
+          text-decoration: underline;
+        }
+
         .read-only .ProseMirror {
           cursor: default;
         }
