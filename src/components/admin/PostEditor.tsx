@@ -353,7 +353,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
         };
 
         const renderSubField = (sub: any, row: any, idx: number) => (
-          <div key={sub.name} className="flex flex-col gap-1.5" style={{ width: `${sub.config?.width || 100}%` }}>
+          <div key={sub.name} className="flex flex-col gap-2.5" style={{ width: `${sub.config?.width || 100}%` }}>
             <label className="label-field-muted">{sub.label}</label>
             {renderFieldInput(sub, row[sub.name], (val) => updateRowField(idx, sub.name, val))}
           </div>
@@ -405,7 +405,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                   <div key={idx} className="flex items-end gap-3 p-3 bg-surface-muted border border-border-default rounded relative group">
                     <span className="text-[10px] text-text-muted self-center">{idx + 1}.</span>
                     {subFields.map((sub: any) => (
-                      <div key={sub.name} className="flex-1 flex flex-col gap-1">
+                      <div key={sub.name} className="flex-1 flex flex-col gap-2">
                         <label className="label-field-muted text-[10px]">{sub.label}</label>
                         {renderFieldInput(sub, row[sub.name], (val) => updateRowField(idx, sub.name, val))}
                       </div>
@@ -495,7 +495,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                 const layoutMode = layout?.layout || 'block';
 
                 const renderSubFieldFlex = (sub: any) => (
-                  <div key={sub.name} className="flex flex-col gap-1.5" style={{ width: `${sub.config?.width || 100}%` }}>
+                  <div key={sub.name} className="flex flex-col gap-2.5" style={{ width: `${sub.config?.width || 100}%` }}>
                     <label className="label-field-muted">{sub.label}</label>
                     {renderFieldInput(sub, row[sub.name], (val: any) => updateFlexRowField(idx, sub.name, val))}
                   </div>
@@ -548,7 +548,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                       <div className="flex items-end gap-3">
                         <span className="text-[10px] text-text-muted self-center">{idx + 1}.</span>
                         {layoutFields.map((sub: any) => (
-                          <div key={sub.name} className="flex-1 flex flex-col gap-1">
+                          <div key={sub.name} className="flex-1 flex flex-col gap-2">
                             <label className="label-field-muted text-[10px]">{sub.label}</label>
                             {renderFieldInput(sub, row[sub.name], (val: any) => updateFlexRowField(idx, sub.name, val))}
                           </div>
