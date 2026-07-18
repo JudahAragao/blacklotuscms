@@ -637,7 +637,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
             )}
 
             {post?.postType?.supportsEditor !== false && (
-              <label className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3">
                 <span className="label-field-muted">
                   {post?.postType?.settings?.editorLabel || 'Conteudo'}
                 </span>
@@ -646,7 +646,7 @@ export default function PostEditor({ post, fieldGroups: propFieldGroups, onSave,
                   onChange={(content) => setFormData({ ...formData, content })}
                   readOnly={readOnly}
                 />
-              </label>
+              </div>
             )}
           </div>
         )}
