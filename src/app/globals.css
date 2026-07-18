@@ -86,7 +86,7 @@
 @layer base {
   /* Admin Shield - Garante que o Admin use os valores corretos independente do tema */
   .bl-admin {
-    color-scheme: light;
+    color-scheme: light !important;
     --color-background: #121317;
     --color-primary: #f2ca50;
     --color-on-background: #e3e2e7;
@@ -116,8 +116,8 @@
   .bl-admin textarea,
   .bl-admin select,
   .bl-admin [contenteditable] {
-    caret-color: var(--color-text-heading);
-    color-scheme: light;
+    caret-color: #1d2327 !important;
+    color-scheme: light !important;
   }
 }
 
