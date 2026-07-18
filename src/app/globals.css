@@ -86,6 +86,7 @@
 @layer base {
   /* Admin Shield - Garante que o Admin use os valores corretos independente do tema */
   .bl-admin {
+    color-scheme: light;
     --color-background: #121317;
     --color-primary: #f2ca50;
     --color-on-background: #e3e2e7;
