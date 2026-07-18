@@ -114,8 +114,10 @@
 
   .bl-admin input,
   .bl-admin textarea,
-  .bl-admin select {
+  .bl-admin select,
+  .bl-admin [contenteditable] {
     caret-color: var(--color-text-heading);
+    color-scheme: light;
   }
 }
 
