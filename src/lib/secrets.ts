@@ -1,6 +1,5 @@
 import 'dotenv/config';
-import fs from 'fs/promises';
-import { readFileSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import path from 'path';
 
 export interface DockerSecrets {
@@ -46,15 +45,6 @@ export class SecretsService {
     if (this.cachedSecrets) return this.cachedSecrets;
     this.cachedSecrets = this.fromEnv();
     return this.cachedSecrets;
-  }
-
-  static async save(secrets: DockerSecrets): Promise<void> {
-    const envPath = path.join(BASE_PATH, '.env');
-    const lines = Object.entries(secrets)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('\n');
-    await fs.writeFile(envPath, lines + '\n');
-    this.cachedSecrets = secrets;
   }
 
   static isConfigured(): boolean {

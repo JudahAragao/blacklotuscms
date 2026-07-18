@@ -79,6 +79,9 @@ export function createRateLimiter(config: RateLimiterConfig) {
     }
 
     // Fallback to in-memory
+    if (process.env.NODE_ENV === 'production') {
+      logger.warn('[RateLimiter] Running in memory mode in production — rate limits are NOT shared between containers. Set RATE_LIMIT_DRIVER=redis for shared limits.');
+    }
     const bucket = memoryStore.get(key);
 
     if (!bucket || now > bucket.resetAt) {

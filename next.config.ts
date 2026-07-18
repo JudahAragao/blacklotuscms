@@ -38,6 +38,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https:",
       "font-src 'self' https://fonts.gstatic.com",
       "connect-src 'self'",
+      "frame-src https://www.youtube.com https://player.vimeo.com https://www.google.com https://open.spotify.com https://codepen.io https://codesandbox.io",
       "frame-ancestors 'self'",
       "form-action 'self'",
       "base-uri 'self'",

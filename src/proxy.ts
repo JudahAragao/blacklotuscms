@@ -5,6 +5,28 @@ import { ApiKeyService } from "@/core/services/ApiKeyService";
 import { logger } from "@/lib/logger";
 import { rateLimiter } from "@/lib/rate-limiter";
 import { initCMS } from "@/lib/init";
+import crypto from "crypto";
+
+const CSP_NONCE_ENABLED = process.env.CSP_NONCE_ENABLED === 'true';
+
+function generateNonce(): string {
+  return crypto.randomBytes(16).toString('base64');
+}
+
+function buildCSP(nonce: string): string {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' https://static.cloudflareinsights.com`,
+    `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self'",
+    "frame-src https://www.youtube.com https://player.vimeo.com https://www.google.com https://open.spotify.com https://codepen.io https://codesandbox.io",
+    "frame-ancestors 'self'",
+    "form-action 'self'",
+    "base-uri 'self'",
+  ].join('; ');
+}
 
 const authProxy = withAuth(
   function proxy(req) {
@@ -64,7 +86,15 @@ export default async function proxy(req: NextRequest, event: any) {
     return (authProxy as any)(req, event);
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  if (CSP_NONCE_ENABLED) {
+    const nonce = generateNonce();
+    response.headers.set('x-nonce', nonce);
+    response.headers.set('Content-Security-Policy', buildCSP(nonce));
+  }
+
+  return response;
 }
 
 export const config: any = {

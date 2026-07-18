@@ -1,3 +1,7 @@
+# ============================================================
+# DEV ONLY - Local development environment
+# Production uses deploy/blue/ and deploy/green/ docker-compose files
+# ============================================================
 version: '3.8'
 
 services:

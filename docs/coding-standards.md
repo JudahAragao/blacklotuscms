@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-06"
+spec_version: "1.3"
+last_updated: "2026-07-18"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -85,8 +85,13 @@ await HookService.doAction('post.created', post);
 ## 7. Security
 - Sanitizar paths: `sanitizePath()`
 - Mascarar dados: `maskSensitiveData()`
-- Sanitizar HTML: `sanitizeHTML()` ou `sanitizeHtml()`
+- Sanitizar HTML: `sanitizeHTML()` ou `sanitizeHtml()` com validacao de dominio para iframes
 - Validar inputs: Zod schemas
+- NEXTAUTH_SECRET obrigatorio — app falha se nao configurado
+- ADMIN_PASSWORD validado — rejeita 'admin123' em producao
+- API Key re-validada no route handler — headers injetados nunca sao confiaveis diretamente
+- CSP nonce habilitado via `CSP_NONCE_ENABLED=true` em producao
+- SecretsService sem metodo `save()` — secrets gerenciados apenas via env vars
 
 ## 8. File Organization
 - `src/lib/` — Shared utilities, config, auth

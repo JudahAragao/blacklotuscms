@@ -15,11 +15,10 @@ export async function initCMS() {
     return;
   }
 
-  // Auto-generate NEXTAUTH_SECRET if empty
+  // NEXTAUTH_SECRET is required — fail if not set
   if (!process.env.NEXTAUTH_SECRET) {
-    const secret = crypto.randomBytes(32).toString('hex');
-    process.env.NEXTAUTH_SECRET = secret;
-    logger.info('BlackLotusCMS: Auto-generated NEXTAUTH_SECRET');
+    logger.error('BlackLotusCMS: NEXTAUTH_SECRET is not set. Generate one with: openssl rand -hex 32');
+    throw new Error('NEXTAUTH_SECRET is required. Set it in .env');
   }
 
   // Auto-install: apply schema + create defaults if database is empty
@@ -115,7 +114,17 @@ async function autoInstall() {
 
     // Create admin user from env vars
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@blacklotuscms.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminPassword) {
+      logger.error('BlackLotusCMS: ADMIN_PASSWORD is not set. Set it in .env');
+      throw new Error('ADMIN_PASSWORD is required for initial setup');
+    }
+
+    if (adminPassword === 'admin123' && process.env.NODE_ENV === 'production') {
+      logger.error('BlackLotusCMS: ADMIN_PASSWORD cannot be "admin123" in production');
+      throw new Error('ADMIN_PASSWORD must be changed from default in production');
+    }
 
     const existingUser = await prisma.user.findUnique({ where: { email: adminEmail } });
     if (!existingUser) {

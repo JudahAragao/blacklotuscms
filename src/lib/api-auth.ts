@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { hasCapability } from './auth-utils';
 import { logger } from './logger';
+import { ApiKeyService } from '@/core/services/ApiKeyService';
 
 export type ApiHandler = (
   req: NextRequest,
@@ -13,6 +14,7 @@ export type ApiHandler = (
 /**
  * Consolidated security wrapper for API routes.
  * Consumes authentication from both NextAuth and API Key Proxy.
+ * Never trusts x-api-user-id/x-api-user-role headers directly — always re-validates.
  */
 export function withApiAuth(handler: ApiHandler, requiredCapability?: string) {
   return async (req: NextRequest, context: any) => {
@@ -25,25 +27,24 @@ export function withApiAuth(handler: ApiHandler, requiredCapability?: string) {
         user = session.user;
       }
 
-      // 2. If no session, try headers injected by the Proxy (API Key)
+      // 2. If no session, re-validate via Authorization header (never trust injected headers)
       if (!user) {
-        const apiUserId = req.headers.get('x-api-user-id');
-        const apiUserRole = req.headers.get('x-api-user-role');
-
-        if (apiUserId && apiUserRole) {
-          user = {
-            id: apiUserId,
-            role: JSON.parse(apiUserRole)
-          };
+        const authHeader = req.headers.get('authorization');
+        if (authHeader?.startsWith('Bearer ')) {
+          const apiKey = authHeader.substring(7);
+          const authResult = await ApiKeyService.validateKey(apiKey);
+          if (authResult) {
+            user = (authResult as any).user;
+          }
         }
       }
 
       // 3. Block if there is no identity
       if (!user) {
         return NextResponse.json(
-          { 
+          {
             error: 'Unauthorized. Provide a valid API Key or log in.',
-            code: 'AUTH_UNAUTHORIZED' 
+            code: 'AUTH_UNAUTHORIZED'
           },
           { status: 401 }
         );

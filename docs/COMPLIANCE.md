@@ -68,11 +68,15 @@ Documented in this file and `specs/architecture/security.md`.
 - Passwords hashed com bcrypt (cost 12)
 - API keys hashed com SHA-256
 - JWT tokens for session management
-- Rate limiting on API endpoints
+- Rate limiting on API endpoints (Redis recommended for multi-container)
 - Input validation com Zod schemas
-- HTML sanitization com DOMPurify
+- HTML sanitization com DOMPurify + iframe domain allowlist
 - Path traversal protection
 - CORS configuration
+- CSP nonces em producao (via `CSP_NONCE_ENABLED=true`)
+- NEXTAUTH_SECRET obrigatorio (app falha se ausente)
+- ADMIN_PASSWORD validado (rejeita defaults fracos em producao)
+- API Key re-validada em route handlers (headers injetados nao sao confiados)
 
 ### Organizational Measures
 - Role-based access control (RBAC)
