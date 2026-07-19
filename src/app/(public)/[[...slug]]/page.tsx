@@ -67,14 +67,16 @@ export async function generateMetadata({ params, searchParams }: PublicPageProps
       post = await PostService.getLeanPostBySlug(lastSlug);
     }
 
-    // 3. Title Logic
-    const siteName = seoSettings.site_name || 'BlackLotusCMS';
+    // 3. Title Logic — per-page SEO > post title > global SEO fallback
+    const siteName = seoSettings.site_name || 'Judah de Aragão';
     const separator = seoSettings.title_separator || '|';
-    const pageTitle = post?.seoTitle || post?.title || (isHome ? 'Home' : safeSlug[safeSlug.length - 1]);
+    const pageTitle = post?.seo?.title || post?.title || (isHome ? 'Home' : safeSlug[safeSlug.length - 1]);
     const finalTitle = `${pageTitle} ${separator} ${siteName}`;
 
-    const description = post?.seoDescription || seoSettings.meta_description || '';
-    const ogImage = post?.ogImage || seoSettings.og_image || '';
+    // per-page SEO > global SEO description > empty
+    const description = post?.seo?.description || seoSettings.meta_description || '';
+    // per-page OG image > global OG image > empty
+    const ogImage = post?.seo?.ogImage || seoSettings.og_image || '';
 
     return {
       title: finalTitle,
@@ -88,6 +90,12 @@ export async function generateMetadata({ params, searchParams }: PublicPageProps
         description: description,
         images: ogImage ? [ogImage] : [],
         type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: finalTitle,
+        description: description,
+        images: ogImage ? [ogImage] : [],
       },
       verification: {
         google: seoSettings.google_site_verification || undefined,
