@@ -2,7 +2,7 @@ import React from 'react';
 import { ThemeService } from '@/core/services/ThemeService';
 import { ThemeDataService } from '@/core/services/ThemeDataService';
 import { sanitizePath, maskSensitiveData } from '@/lib/security-utils';
-import { themeStorage, getThemeStore } from '@/lib/theme-context';
+import { themeStorage, getThemeStore, getReactStore } from '@/lib/theme-context';
 
 import { themeRegistry } from '@/generated/theme-registry';
 
@@ -59,6 +59,11 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
   const store = getThemeStore();
   store.themeName = themeName;
   store.currentPost = safeData;
+
+  // Sync with React.cache as fallback for unstable_cache async boundaries
+  const reactStore = getReactStore();
+  reactStore.themeName = themeName;
+  reactStore.currentPost = safeData;
 
   return (
     <div data-bl-theme={themeName} className="blacklotuscms-theme min-h-screen" style={themeSettings}>

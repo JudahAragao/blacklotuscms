@@ -22,15 +22,19 @@ export const getReactStore = cache(() => {
 });
 
 /**
- * Helper to get the active store, favoring AsyncLocalStorage if present (e.g. in tests)
- * and falling back to the React request cache.
+ * Helper to get the active store.
+ * In RSC, React.cache is more reliable because it survives unstable_cache
+ * and other async boundaries that can lose the AsyncLocalStorage context.
+ * AsyncLocalStorage is kept as fallback for tests and non-RSC contexts.
  */
 export function getThemeStore(): ThemeStore {
+  const reactStore = getReactStore();
+  if (reactStore.themeName) return reactStore;
+
   const nodeStore = themeStorage.getStore();
-  if (nodeStore) {
-    return nodeStore;
-  }
-  return getReactStore();
+  if (nodeStore) return nodeStore;
+
+  return reactStore;
 }
 
 /**

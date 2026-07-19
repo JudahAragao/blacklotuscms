@@ -5,7 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import ThemeRenderer from '@/components/ThemeRenderer';
 import { SearchService } from '@/core/services/SearchService';
 import { PostService } from '@/core/services/PostService';
-import { themeStorage } from '@/lib/theme-context';
+import { themeStorage, getReactStore } from '@/lib/theme-context';
 import { ThemeService } from '@/core/services/ThemeService';
 import { HookService } from '@/core/services/HookService';
 import { themeRegistry } from '@/generated/theme-registry';
@@ -178,6 +178,11 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
   // Executes all search and rendering logic within the theme context
   // This ensures that ThemeDataService.validate knows who is requesting the data
   return await themeStorage.run({ themeName }, async () => {
+    // Sync with React.cache so ThemeDataService works even if AsyncLocalStorage
+    // context is lost during unstable_cache operations
+    const reactStore = getReactStore();
+    reactStore.themeName = themeName;
+
     try {
       const settings = await SettingService.getAll();
       const readingSettings = settings.reading || { show_on_front: 'posts' };
