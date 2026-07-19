@@ -1,6 +1,6 @@
 ---
-spec_version: "1.3"
-last_updated: "2026-07-12"
+spec_version: "1.4"
+last_updated: "2026-07-19"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -45,7 +45,7 @@ Inspirado no WordPress, o HookService fornece pontos de extensibilidade:
 4. **Audit Log**: Todas as chamadas de hook são registradas com source, type e timestamp
 5. **Auto-sanitization**: Filtros que processam conteúdo (title, body, etc.) são automaticamente sanitizados com DOMPurify
 
-## Theme Engine (Build-Time)
+## Theme Engine (Build-Time + Dual-Store Context)
 
 O sistema de temas é 100% build-time. Não há upload, instalação ou edição em runtime.
 
@@ -56,6 +56,13 @@ O sistema de temas é 100% build-time. Não há upload, instalação ou edição
 4. Namespace `@keyframes` com prefixo `bl-<id>-`
 5. Gera `src/generated/theme-registry.ts` (imports estáticos dos layouts)
 6. Gera `src/generated/theme-styles.css` (CSS isolado)
+
+### Contexto Dual-Store (React.cache + AsyncLocalStorage)
+O contexto do tema é mantido em duas stores para resiliência:
+- **React.cache (primário):** Sobrevive a `unstable_cache` e outras async boundaries do RSC
+- **AsyncLocalStorage (fallback):** Compatibilidade com testes e contextos non-RSC
+- `getThemeStore()` prioriza React.cache quando `themeName` está setado
+- `page.tsx` e `ThemeRenderer` sincronizam ambas stores apos `themeStorage.run()`
 
 ### Isolamento CSS
 - **Camada 1 (fallback):** Selector replacement — `.blacklotuscms-theme` → `.blacklotuscms-theme[data-bl-theme="id"]`

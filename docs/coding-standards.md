@@ -1,6 +1,6 @@
 ---
-spec_version: "1.3"
-last_updated: "2026-07-18"
+spec_version: "1.4"
+last_updated: "2026-07-19"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -74,6 +74,25 @@ private permissionCache = new Map<string, CacheEntry>();
 // 2. Se miss, busca no banco, armazena no cache com TTL
 // 3. Cache é limpo quando permission é aprovada/denegada/deletada
 ```
+
+### 5.3 Dual-Store Context (React.cache + AsyncLocalStorage)
+O contexto do tema usa duas stores para resiliência contra perda de contexto em async boundaries:
+
+```typescript
+// theme-context.ts — getThemeStore() prioriza React.cache
+export function getThemeStore(): ThemeStore {
+  const reactStore = getReactStore();        // React.cache (primário)
+  if (reactStore.themeName) return reactStore;
+  const nodeStore = themeStorage.getStore();  // AsyncLocalStorage (fallback)
+  if (nodeStore) return nodeStore;
+  return reactStore;
+}
+```
+
+Regras:
+- `page.tsx`: apos `themeStorage.run()`, setar `getReactStore().themeName = themeName`
+- `ThemeRenderer`: apos setar o store, sincronizar `getReactStore()` com themeName e currentPost
+- Nunca confiar apenas no AsyncLocalStorage em contexto RSC — `unstable_cache` pode perder o contexto
 
 ## 6. Hooks
 Services disparam hooks apos operacoes:

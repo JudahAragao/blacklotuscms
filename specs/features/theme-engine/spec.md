@@ -1,6 +1,6 @@
 ---
-spec_version: "1.5"
-last_updated: "2026-07-15"
+spec_version: "1.6"
+last_updated: "2026-07-19"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "theme-engine"
@@ -9,14 +9,14 @@ feature: "theme-engine"
 # Theme Engine Specification
 
 ## Description
-Motor de themes baseado em React Server Components com CSS scoping via build-time bundling, static imports gerados, variáveis CSS, sistema de permissions para acesso a data e helpers estilo ACF para campos customizados.
+Motor de themes baseado em React Server Components com CSS scoping via build-time bundling, static imports gerados, variáveis CSS, sistema de permissions para acesso a data, helpers estilo ACF para campos customizados, e contexto dual-store (React.cache + AsyncLocalStorage) para resiliência em async boundaries.
 
 ## Requirements
 - **REQ-01:** Static import de layouts via `theme-registry.ts` gerado pelo `themes:generate`
 - **REQ-02:** CSS Variables customizáveis via `style.css` do tema
 - **REQ-03:** CSS scoping via selector replacement (`.blacklotuscms-theme` → `.blacklotuscms-theme[data-bl-theme="id"]`) + `@scope` nativo para Chrome 118+
 - **REQ-04:** ThemeDataService com validação de permissions
-- **REQ-05:** AsyncLocalStorage para contexto do theme por request
+- **REQ-05:** Contexto dual-store: React.cache como store primário (sobrevive unstable_cache boundaries) + AsyncLocalStorage como fallback (compat com testes). getThemeStore() prioriza React.cache quando themeName esta setado
 - **REQ-06:** Sanitização de data antes de passar ao theme
 - **REQ-07:** Theme permission requests (pending/approved/denied)
 - **REQ-08:** `theme.json` como manifest do theme com `themeApiVersion: 1`
@@ -25,6 +25,7 @@ Motor de themes baseado em React Server Components com CSS scoping via build-tim
 - **REQ-11:** Theme helpers (get_field, the_field, have_rows, get_rows, get_sub_field, the_sub_field, get_row_index, get_field_object, get_field_name, get_field_type, acf_add_local_field_group)
 - **REQ-12:** Resolução dinâmica de layout por slug (slug bate com layout exportado pelo tema = context automático)
 - **REQ-13:** WordPress-style template hierarchy: post.{type} → post → default.post fallback chain
+- **REQ-14:** Sincronização automática: page.tsx e ThemeRenderer setam getReactStore() apos themeStorage.run() para garantir que ThemeDataService funcione mesmo se AsyncLocalStorage for perdido
 
 ## User Roles
 - **Administrador:** Gerenciar themes (ativar/desativar via painel)

@@ -1,6 +1,6 @@
 ---
-spec_version: "1.3"
-last_updated: "2026-07-12"
+spec_version: "1.4"
+last_updated: "2026-07-19"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "theme-engine"
@@ -40,7 +40,12 @@ feature: "theme-engine"
    - Settings namespaced como `--theme-setting-<key>`
    - State: Variáveis CSS prontas
 
-8. **Renderização com CSS isolado**
+8. **Sincronização do contexto dual-store**
+   - `getThemeStore()` → seta themeName e currentPost no store retornado
+   - `getReactStore()` → seta themeName e currentPost no React.cache (fallback seguro)
+   - State: Contexto sincronizado em ambas stores
+
+9. **Renderização com CSS isolado**
    - CSS do tema já embutido em `theme-styles.css` via `theme-styles.css` importado no `globals.css`
    - Isolamento por `.blacklotuscms-theme[data-bl-theme="id"]` (fallback) + `@scope` (Chrome 118+)
    - State: Página renderizada

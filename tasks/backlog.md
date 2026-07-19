@@ -1,6 +1,6 @@
 ---
 spec_version: "1.3"
-last_updated: "2026-07-13"
+last_updated: "2026-07-19"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -108,9 +108,13 @@ status: approved
 ## P10: WordPress-style Template Hierarchy (2026-07-15)
 - [x] **TASK-079:** Template hierarchy: post.{type} fallback chain no ThemeRenderer | est: 2h | depends: [] | feature: theme-engine
 
+## P11: SEO Fix & Theme Context Resilience (2026-07-19)
+- [x] **TASK-080:** Fix: property paths seoTitle→post.seo.title, add twitter cards, dynamic root layout metadata | est: 2h | depends: [] | feature: seo
+- [x] **TASK-081:** Fix: theme context lost during unstable_cache — dual-store sync (React.cache + ALS) | est: 2h | depends: [] | feature: theme-engine
+
 ## Métricas
-- Total de tasks: 79
-- Concluídas: 79
+- Total de tasks: 81
+- Concluídas: 81
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

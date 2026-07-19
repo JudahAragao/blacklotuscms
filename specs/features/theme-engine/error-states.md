@@ -1,6 +1,6 @@
 ---
-spec_version: "1.3"
-last_updated: "2026-07-12"
+spec_version: "1.4"
+last_updated: "2026-07-19"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "theme-engine"
@@ -44,3 +44,9 @@ feature: "theme-engine"
 - **Condition:** Pasta `themes/default/` não existe
 - **Código HTTP:** N/A (bloqueia build)
 - **Ação do sistema:** `themes:generate` lança erro — `default` é obrigatório
+
+## ERR-08: Theme Context Lost During Cache Hit
+- **Condition:** `unstable_cache` retorna resultado cacheado e o AsyncLocalStorage context é perdido
+- **Código HTTP:** N/A (conteúdo pode ficar vazio)
+- **Ação do sistema:** getThemeStore() prioriza React.cache (que sobrevive async boundaries) como fallback. page.tsx e ThemeRenderer sincronizam getReactStore() apos themeStorage.run()
+- **Status:** Resolvido em 2026-07-19 via dual-store synchronization
