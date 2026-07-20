@@ -46,6 +46,42 @@ themes/meu-tema/
 
 `themeApiVersion` indica a versão do contrato de temas. Atualmente apenas `1` é suportado.
 
+## Rotas customizadas (routes.json)
+
+Themes podem declarar rotas customizadas que resolvem parâmetros dinâmicos (ex: `/product/:slug`).
+
+```json
+{
+  "routes": {
+    "/checkout": "page.checkout",
+    "/cart": "page.cart",
+    "/account": "page.account",
+    "/product/:slug": "post.product",
+    "/user/:id/orders": "page.user-orders"
+  }
+}
+```
+
+**Convenção de naming:**
+- `page.{nome}` → `layouts/page.{nome}.tsx` (estilo página)
+- `post.{nome}` → `layouts/post.{nome}.tsx` (estilo post)
+
+**Params dinâmicos:**
+- `:slug` → extrai o valor da URL como `ctx.params.slug`
+- `:id` → extrai o valor como `ctx.params.id`
+- Múltiplos params suportados: `/user/:id/orders/:orderId`
+
+**Templates necessários:**
+Cada rota declarada precisa de um template correspondente em `layouts/`:
+- `/checkout` → precisa de `layouts/page.checkout.tsx`
+- `/product/:slug` → precisa de `layouts/post.product.tsx`
+
+**Resolução:**
+1. Plugin routes (via `bridge.routes.register`)
+2. Theme routes (`routes.json`)
+3. Default theme routes (fallback)
+4. Lógica padrão do CMS
+
 ## CSS puro, isolamento e assets
 
 Todo `style.css` entra na build e é isolado no root ativo:

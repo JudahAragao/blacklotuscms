@@ -206,7 +206,14 @@ if (user) {
 | Method | Returns | Permission Required |
 |--------|---------|---------------------|
 | `read(model, query)` | Array of records | `db.read.{model}` |
+| `findOne(model, where)` | Single record or null | `db.read.{model}` |
 | `create(model, data)` | Created record | `db.write.{model}` |
+| `update(model, where, data)` | Updated record | `db.write.{model}` |
+| `updateMany(model, where, data)` | `{ count }` | `db.write.{model}` |
+| `delete(model, where)` | Deleted record | `db.write.{model}` |
+| `deleteMany(model, where)` | `{ count }` | `db.write.{model}` |
+| `upsert(model, where, create, update)` | Created or updated record | `db.write.{model}` |
+| `transaction(callback)` | Callback return value | `db.write.*` |
 
 **Available Models:** User, Post, PostType, Media, Comment, Setting, etc.
 
@@ -217,10 +224,54 @@ const posts = await bridge.db.read('Post', {
   take: 10
 });
 
+// Find one post by slug
+const post = await bridge.db.findOne('Post', { slug: 'my-post' });
+
 // Create a setting
 await bridge.db.create('Setting', {
   key: 'my_plugin_setting',
   value: { enabled: true }
+});
+
+// Update a post
+const updated = await bridge.db.update('Post',
+  { id: 'post-uuid-here' },
+  { status: 'published', publishedAt: new Date().toISOString() }
+);
+
+// Update multiple records
+const { count } = await bridge.db.updateMany('Post',
+  { postTypeId: 'product-type-uuid' },
+  { status: 'archived' }
+);
+
+// Delete a comment
+await bridge.db.delete('Comment', { id: 'comment-uuid-here' });
+
+// Delete multiple comments
+const { count: deleted } = await bridge.db.deleteMany('Comment',
+  { postId: 'post-uuid-here', status: 'spam' }
+);
+
+// Upsert (create or update)
+const cart = await bridge.db.upsert('Setting',
+  { key: 'cart_user123' },
+  { key: 'cart_user123', value: { items: [] } },
+  { value: { items: [...existingItems, newItem] } }
+);
+
+// Transaction (atomic operations)
+await bridge.db.transaction(async (tx) => {
+  const post = await tx.findOne('Post', { id: postId });
+  await tx.update('Post', { id: postId }, { status: 'sold' });
+  await tx.updateMany('Post',
+    { id: { in: relatedIds } },
+    { status: 'archived' }
+  );
+  await tx.create('Setting', {
+    key: `order_${orderId}`,
+    value: { postId, timestamp: Date.now() }
+  });
 });
 ```
 
@@ -307,7 +358,7 @@ bridge.log('Body:', response.body);
 ```
 
 **Segurança:**
-- Domínios devem estar na whitelist configurada pelo admin
+- Domínios devem estar na whitelist configurada pelo admin; se não estiver, o sistema cria automaticamente uma permissão pendente `http.domain.{hostname}` que o admin pode aprovar
 - Bloqueio de IPs internos (127.0.0.1, 10.*, 192.168.*, etc.)
 - Rate limit separado: 20 req/s (configurável)
 - Timeout: 10s default, max 30s
@@ -346,8 +397,146 @@ bridge.webhook.on('user.registered', async (payload) => {
 **Endpoint gerado:** `POST /api/v1/webhooks/:pluginName/:eventId`
 **Segurança:**
 - Verificação HMAC-SHA256 (se webhookSecret configurado)
-- Tamanho máximo de payload: 512KB
+- Tamanho máximo de payload: 2MB
 - Retry automático com exponential backoff (até 3 tentativas)
+
+### bridge.routes (Dynamic Routes)
+
+Registra rotas customizadas que o CMS resolve antes da lógica padrão. Requer permissão `system.route.register`.
+
+| Method | Returns | Permission Required |
+|--------|---------|---------------------|
+| `register(config)` | void | `system.route.register` |
+
+```javascript
+// Register a static route
+bridge.routes.register({
+  path: '/checkout',
+  template: 'page.checkout',
+  handler: async (ctx) => {
+    // ctx.params = {} (no params for static routes)
+    // ctx.userId = current user ID (if logged in)
+    const cart = await bridge.storage.get(`cart_${ctx.userId}`);
+    const user = ctx.userId
+      ? await bridge.db.findOne('User', { id: ctx.userId })
+      : null;
+    return { cart, user };
+  }
+});
+
+// Register a dynamic route with params
+bridge.routes.register({
+  path: '/product/:slug',
+  template: 'post.product',
+  handler: async (ctx) => {
+    // ctx.params = { slug: "camisa-azul" }
+    const product = await bridge.db.findOne('Post', { slug: ctx.params.slug });
+    return { product };
+  }
+});
+
+// Register a route with multiple params
+bridge.routes.register({
+  path: '/user/:id/orders',
+  template: 'page.user-orders',
+  handler: async (ctx) => {
+    // ctx.params = { id: "user-uuid" }
+    const orders = await bridge.db.read('Post', {
+      where: { authorId: ctx.params.id, postTypeId: 'order' }
+    });
+    return { orders };
+  }
+});
+```
+
+**Route resolution order:**
+1. Plugin routes (registered via `bridge.routes.register`)
+2. Theme routes (declared in `routes.json`)
+3. Default theme routes (fallback)
+4. Existing CMS logic (single post, archive, etc.)
+
+**Handler context (`ctx`):**
+| Property | Type | Description |
+|----------|------|-------------|
+| `params` | `Record<string, string>` | Extracted route params (e.g., `{ slug: "camisa-azul" }`) |
+| `userId` | `string \| undefined` | Current user ID (if authenticated) |
+| `role` | `{ name: string; capabilities: any } \| null` | User's role with capabilities (if authenticated) |
+
+**Template naming convention:**
+- `page.checkout` → `layouts/page.checkout.tsx` (page-style route)
+- `post.product` → `layouts/post.product.tsx` (post-style route)
+- Follows existing theme engine hierarchy: `page.{name}` or `post.{name}`
+
+### Customer Auth Pattern (Option B)
+
+Plugins de e-commerce podem criar autenticação de cliente separada usando a Bridge API:
+
+```javascript
+// 1. Create Customer role on plugin activation
+bridge.hooks.addAction('plugin.activated', async () => {
+  const existing = await bridge.db.findOne('Role', { name: 'Customer' });
+  if (!existing) {
+    await bridge.db.create('Role', {
+      name: 'Customer',
+      capabilities: {
+        order: { read: true, create: true },
+        address: { manage: true },
+        profile: { update: true }
+      }
+    });
+  }
+});
+
+// 2. Register login/register routes
+bridge.routes.register({
+  path: '/login',
+  template: 'page.login',
+  handler: async (ctx) => {
+    if (ctx.userId) return { redirect: '/account' };
+    return {};
+  }
+});
+
+// 3. Use ctx.role to check permissions in any route
+bridge.routes.register({
+  path: '/account',
+  template: 'page.account',
+  handler: async (ctx) => {
+    if (!ctx.userId) return { redirect: '/login' };
+
+    // Check if user is a Customer
+    if (ctx.role?.name !== 'Customer') {
+      return { error: 'Access denied' };
+    }
+
+    const user = await bridge.db.findOne('User', { id: ctx.userId });
+    const orders = await bridge.db.read('Post', {
+      where: { authorId: ctx.userId, postTypeId: 'order' }
+    });
+    return { user, orders };
+  }
+});
+
+// 4. Full user data with role include
+bridge.routes.register({
+  path: '/profile',
+  template: 'page.profile',
+  handler: async (ctx) => {
+    if (!ctx.userId) return { redirect: '/login' };
+
+    // ctx.role already has role info, but for full user data:
+    const user = await bridge.db.findOne('User', { id: ctx.userId });
+    // user includes all fields except passwordHash (sanitized)
+    return { user, role: ctx.role };
+  }
+});
+```
+
+**Key points:**
+- `ctx.role` is automatically populated — no extra query needed for role checks
+- `ctx.role.capabilities` contains the JSON capabilities object for fine-grained permission checks
+- Plugins can create their own Roles via `bridge.db.create('Role', ...)`
+- `bridge.db.findOne('User', { id })` returns user data with role info (passwordHash is sanitized)
 
 ### bridge.permissions
 | Method | Description |

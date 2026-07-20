@@ -9,6 +9,10 @@ import { themeStorage, getReactStore } from '@/lib/theme-context';
 import { ThemeService } from '@/core/services/ThemeService';
 import { HookService } from '@/core/services/HookService';
 import { themeRegistry } from '@/generated/theme-registry';
+import { themeRoutes } from '@/generated/theme-routes';
+import { routeService } from '@/core/services/RouteService';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 interface PublicPageProps {
   params: { slug?: string[] };
@@ -55,6 +59,16 @@ export async function generateMetadata({ params, searchParams }: PublicPageProps
     }
     const themeName = safePreviewTheme || await ThemeService.getActiveTheme();
     const manifest = await ThemeService.getThemeManifest(themeName);
+
+    // Initialize theme routes
+    routeService.setAllThemeRoutes(themeRoutes);
+
+    // Check registered routes for SEO override
+    const routeMatch = routeService.matchRoute(fullPath, themeName);
+    if (routeMatch && routeMatch.route.source === 'plugin') {
+      // Plugin routes can provide SEO via the route_access hook
+      // Fall through to default SEO if no override
+    }
 
     // 2. Identify target post or context based on Reading Settings
     let post = null;
@@ -183,6 +197,9 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
     const reactStore = getReactStore();
     reactStore.themeName = themeName;
 
+    // Initialize theme routes in RouteService
+    routeService.setAllThemeRoutes(themeRoutes);
+
     try {
       const settings = await SettingService.getAll();
       const readingSettings = settings.reading || { show_on_front: 'posts' };
@@ -191,6 +208,38 @@ export default async function PublicPage({ params, searchParams }: PublicPagePro
       const fullPath = safeSlug.join('/')
       const isHome = safeSlug.length === 0
       const lastSlug = isHome ? '' : safeSlug[safeSlug.length - 1]
+
+      // 0.5. Check registered routes (plugin routes + theme routes)
+      const routeMatch = routeService.matchRoute(fullPath, themeName);
+      if (routeMatch) {
+        let handlerData: any = {};
+        if (routeMatch.route.handler) {
+          // Plugin route — execute handler to get data
+          const session = await getServerSession(authOptions);
+          let userRole: { name: string; capabilities: any } | null = null;
+          if (session?.user?.id) {
+            const { prisma } = await import('@/lib/prisma');
+            const user = await prisma.user.findUnique({
+              where: { id: session.user.id },
+              select: { role: { select: { name: true, capabilities: true } } }
+            });
+            userRole = user?.role || null;
+          }
+          handlerData = await routeMatch.route.handler({
+            params: routeMatch.params,
+            userId: session?.user?.id,
+            role: userRole,
+          });
+        }
+        return (
+          <ThemeRenderer
+            context={routeMatch.route.template}
+            data={{ ...handlerData, routeParams: routeMatch.params }}
+            routeParams={routeMatch.params}
+            previewTheme={safePreviewTheme}
+          />
+        );
+      }
 
       // 1. Special Case: Global Search
       if (fullPath === 'search') {

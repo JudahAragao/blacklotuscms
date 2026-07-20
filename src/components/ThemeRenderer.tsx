@@ -10,6 +10,7 @@ interface ThemeRendererProps {
   context: 'single' | 'search' | 'archive' | '404' | string;
   data: any;
   previewTheme?: string;
+  routeParams?: Record<string, string>;
 }
 
 const LAYOUT_MAP: Record<string, string> = {
@@ -20,7 +21,7 @@ const LAYOUT_MAP: Record<string, string> = {
   blog: 'blog',
 };
 
-export default async function ThemeRenderer({ context, data, previewTheme }: ThemeRendererProps) {
+export default async function ThemeRenderer({ context, data, previewTheme, routeParams }: ThemeRendererProps) {
   const rawThemeName = previewTheme || await ThemeService.getActiveTheme();
   const requestedThemeName = sanitizePath(rawThemeName);
   const themeName = themeRegistry[requestedThemeName] ? requestedThemeName : 'default';
@@ -69,7 +70,7 @@ export default async function ThemeRenderer({ context, data, previewTheme }: The
     <div data-bl-theme={themeName} className="blacklotuscms-theme min-h-screen" style={themeSettings}>
       
       {themeStorage.run({ themeName, currentPost: safeData }, () => (
-        <Layout data={safeData} context={context} />
+        <Layout data={safeData} context={context} routeParams={routeParams} />
       ))}
     </div>
   );

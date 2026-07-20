@@ -15,7 +15,8 @@ export type ErrorCode =
   | 'INSTALL_REQUIRED'
   | 'SANDBOX_TIMEOUT'
   | 'PLUGIN_ERROR'
-  | 'THEME_PERMISSION_DENIED';
+  | 'THEME_PERMISSION_DENIED'
+  | 'DOMAIN_BLOCKED';
 
 /**
  * Custom error class for BlackLotusCMS.

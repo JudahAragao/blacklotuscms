@@ -112,9 +112,24 @@ status: approved
 - [x] **TASK-080:** Fix: property paths seoTitle→post.seo.title, add twitter cards, dynamic root layout metadata | est: 2h | depends: [] | feature: seo
 - [x] **TASK-081:** Fix: theme context lost during unstable_cache — dual-store sync (React.cache + ALS) | est: 2h | depends: [] | feature: theme-engine
 
+## P12: Bridge API CRUD Expansion (2026-07-20)
+- [x] **TASK-082:** Bridge API full CRUD: findOne, updateMany, deleteMany, upsert, transaction | est: 4h | depends: [TASK-015] | feature: plugin-system
+- [x] **TASK-083:** Webhook payload limit 512KB → 2MB | est: 0.5h | depends: [] | feature: plugin-system
+- [x] **TASK-084:** HTTP outbound auto-request permissão de domínio na whitelist | est: 1h | depends: [TASK-015] | feature: plugin-system
+
+## P13: Dynamic Routes System (2026-07-20)
+- [x] **TASK-085:** RouteService: pattern matching, plugin routes, theme routes, params extraction | est: 3h | depends: [] | feature: plugin-system
+- [x] **TASK-086:** Bridge API routes.register() com handler server-side e template mapping | est: 2h | depends: [TASK-085] | feature: plugin-system
+- [x] **TASK-087:** Theme routes via routes.json + generate-theme-registry.mjs + theme-routes.ts | est: 2h | depends: [TASK-085] | feature: theme-engine
+- [x] **TASK-088:** Catch-all page.tsx: route matching step + ThemeRenderer routeParams prop | est: 2h | depends: [TASK-085, TASK-086] | feature: theme-engine
+
+## P14: Customer Auth Context (2026-07-20)
+- [x] **TASK-089:** RouteContext ctx.role (name + capabilities) auto-populated from session | est: 1h | depends: [TASK-085] | feature: plugin-system
+- [x] **TASK-090:** Customer auth pattern docs (Option B: plugin-based, Role creation, ctx.role usage) | est: 1h | depends: [TASK-089] | feature: docs
+
 ## Métricas
-- Total de tasks: 81
-- Concluídas: 81
+- Total de tasks: 90
+- Concluídas: 90
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

@@ -7,7 +7,7 @@ const HTTP_RATE_LIMIT_DEFAULT = 20;
 const HTTP_TIMEOUT_DEFAULT = 10000; // 10s
 const HTTP_TIMEOUT_MAX = 30000; // 30s
 const HTTP_MAX_RESPONSE_SIZE = 1024 * 1024; // 1MB
-const WEBHOOK_MAX_PAYLOAD = 512 * 1024; // 512KB
+const WEBHOOK_MAX_PAYLOAD = 2 * 1024 * 1024; // 2MB
 
 // Internal/private IP ranges to block (SSRF protection)
 const BLOCKED_HOSTS = new Set([
@@ -113,9 +113,9 @@ export class NetworkService {
 
       if (!isAllowed) {
         throw new BlackLotusCMSError(
-          `Domain '${hostname}' is not in the allowed domains whitelist. Request permission from admin.`,
+          `Domain '${hostname}' is not in the allowed domains whitelist.`,
           403,
-          "AUTH_FORBIDDEN"
+          "DOMAIN_BLOCKED"
         );
       }
     }

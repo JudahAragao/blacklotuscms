@@ -16,6 +16,15 @@ Suporte a upload de arquivos não-imagem (PDF, DOCX, XLSX) com validação de ti
 
 ## Tasks
 - [x] **TASK-075:** Upload de arquivos não-imagem + validação de tipos aceitos | priority: P1 | est: 6h | feature: media-management
+- [x] **TASK-082:** Bridge API full CRUD: findOne, updateMany, deleteMany, upsert, transaction | priority: P1 | est: 4h | feature: plugin-system
+- [x] **TASK-083:** Webhook payload limit 512KB → 2MB | priority: P2 | est: 0.5h | feature: plugin-system
+- [x] **TASK-084:** HTTP outbound auto-request permissão de domínio na whitelist | priority: P2 | est: 1h | feature: plugin-system
+- [x] **TASK-085:** RouteService: pattern matching, plugin routes, theme routes, params extraction | priority: P1 | est: 3h | feature: plugin-system
+- [x] **TASK-086:** Bridge API routes.register() com handler server-side e template mapping | priority: P1 | est: 2h | feature: plugin-system
+- [x] **TASK-087:** Theme routes via routes.json + generate-theme-registry.mjs + theme-routes.ts | priority: P1 | est: 2h | feature: theme-engine
+- [x] **TASK-088:** Catch-all page.tsx: route matching step + ThemeRenderer routeParams prop | priority: P1 | est: 2h | feature: theme-engine
+- [x] **TASK-089:** RouteContext ctx.role (name + capabilities) auto-populated from session | priority: P1 | est: 1h | feature: plugin-system
+- [x] **TASK-090:** Customer auth pattern docs (Option B: plugin-based, Role creation, ctx.role usage) | priority: P2 | est: 1h | feature: docs
 
 ## Review Notes
 - MediaService agora detecta se o arquivo é imagem (mimeType) e faz branch: sharp→WebP→thumbnail para imagens, upload direto para arquivos genéricos

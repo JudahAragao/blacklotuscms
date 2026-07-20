@@ -1,6 +1,6 @@
 ---
-spec_version: "1.2"
-last_updated: "2026-07-06"
+spec_version: "1.4"
+last_updated: "2026-07-20"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "plugin-system"
@@ -15,6 +15,11 @@ Sistema de plugins com installation via ZIP, execution em sandbox isolado (isola
 - **REQ-01:** Instalacao de plugins via upload de ZIP
 - **REQ-02:** Execucao em isolate-vm com limite de memória e timeout
 - **REQ-03:** Bridge API: log, auth, db, storage, hooks, permissions
+- **REQ-03b:** Bridge API db: read, findOne, create, update, updateMany, delete, deleteMany, upsert, transaction (full CRUD + atomic operations)
+- **REQ-03c:** HTTP outbound auto-request de permissão de domínio quando bloqueado pela whitelist
+- **REQ-03d:** Webhook inbound payload máximo de 2MB
+- **REQ-03e:** Bridge API routes: register() para rotas dinâmicas com params (:slug, :id) e handler server-side
+- **REQ-03f:** RouteContext inclui `role` (name + capabilities) do user autenticado para plugins de e-commerce
 - **REQ-04:** Sistema de permissions (requesterPlugin, providerPlugin, capability)
 - **REQ-05:** Rate limit de 50 queries/segundo por plugin (aplicado antes de hasPermission, como proteção contra abuso de recursos)
 - **REQ-05b:** Jitter aleatório de 1-5ms entre chamadas da Bridge API para mitigar thundering herd

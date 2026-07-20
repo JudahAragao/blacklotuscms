@@ -3,6 +3,7 @@ import { PluginSandbox } from '../sandbox/PluginSandbox';
 import { hookService } from './HookService';
 import { pluginDataService } from './PluginDataService';
 import { networkService } from './NetworkService';
+import { routeService } from './RouteService';
 import { logger } from '@/lib/logger';
 import { BlackLotusCMSError } from '@/lib/errors';
 import { fileService } from './FileService';
@@ -113,6 +114,11 @@ export class PluginService {
           const results = await (this.db as any)[model].findMany(query);
           return this.sanitizeData(results);
         },
+        findOne: async (model: string, where: any) => {
+          await checkPermission('read', model);
+          const result = await (this.db as any)[model].findFirst({ where });
+          return this.sanitizeData(result);
+        },
         create: async (model: string, data: any) => {
           await checkPermission('write', model);
           let finalData = { ...data };
@@ -122,6 +128,129 @@ export class PluginService {
           }
           const result = await (this.db as any)[model].create({ data: finalData });
           return this.sanitizeData(result);
+        },
+        update: async (model: string, where: any, data: any) => {
+          await checkPermission('write', model);
+          let finalData = { ...data };
+          if (model === 'User' && finalData.password) {
+            finalData.passwordHash = await bcrypt.hash(finalData.password, 12);
+            delete finalData.password;
+          }
+          const result = await (this.db as any)[model].update({ where, data: finalData });
+          return this.sanitizeData(result);
+        },
+        updateMany: async (model: string, where: any, data: any) => {
+          await checkPermission('write', model);
+          const result = await (this.db as any)[model].updateMany({ where, data });
+          return { count: result.count };
+        },
+        delete: async (model: string, where: any) => {
+          await checkPermission('write', model);
+          const result = await (this.db as any)[model].delete({ where });
+          return this.sanitizeData(result);
+        },
+        deleteMany: async (model: string, where: any) => {
+          await checkPermission('write', model);
+          const result = await (this.db as any)[model].deleteMany({ where });
+          return { count: result.count };
+        },
+        upsert: async (model: string, where: any, create: any, update: any) => {
+          await checkPermission('write', model);
+          let finalCreate = { ...create };
+          let finalUpdate = { ...update };
+          if (model === 'User') {
+            if (finalCreate.password) {
+              finalCreate.passwordHash = await bcrypt.hash(finalCreate.password, 12);
+              delete finalCreate.password;
+            }
+            if (finalUpdate.password) {
+              finalUpdate.passwordHash = await bcrypt.hash(finalUpdate.password, 12);
+              delete finalUpdate.password;
+            }
+          }
+          const result = await (this.db as any)[model].upsert({ where, create: finalCreate, update: finalUpdate });
+          return this.sanitizeData(result);
+        },
+        transaction: async (callback: (tx: any) => Promise<any>) => {
+          return this.db.$transaction(async (prismaTx: any) => {
+            const tx = {
+              read: async (model: string, query: any) => {
+                await checkPermission('read', model);
+                const results = await prismaTx[model].findMany(query);
+                return tx.sanitizeData(results);
+              },
+              findOne: async (model: string, where: any) => {
+                await checkPermission('read', model);
+                const result = await prismaTx[model].findFirst({ where });
+                return tx.sanitizeData(result);
+              },
+              create: async (model: string, data: any) => {
+                await checkPermission('write', model);
+                let finalData = { ...data };
+                if (model === 'User' && finalData.password) {
+                  finalData.passwordHash = await bcrypt.hash(finalData.password, 12);
+                  delete finalData.password;
+                }
+                const result = await prismaTx[model].create({ data: finalData });
+                return tx.sanitizeData(result);
+              },
+              update: async (model: string, where: any, data: any) => {
+                await checkPermission('write', model);
+                let finalData = { ...data };
+                if (model === 'User' && finalData.password) {
+                  finalData.passwordHash = await bcrypt.hash(finalData.password, 12);
+                  delete finalData.password;
+                }
+                const result = await prismaTx[model].update({ where, data: finalData });
+                return tx.sanitizeData(result);
+              },
+              updateMany: async (model: string, where: any, data: any) => {
+                await checkPermission('write', model);
+                const result = await prismaTx[model].updateMany({ where, data });
+                return { count: result.count };
+              },
+              delete: async (model: string, where: any) => {
+                await checkPermission('write', model);
+                const result = await prismaTx[model].delete({ where });
+                return tx.sanitizeData(result);
+              },
+              deleteMany: async (model: string, where: any) => {
+                await checkPermission('write', model);
+                const result = await prismaTx[model].deleteMany({ where });
+                return { count: result.count };
+              },
+              upsert: async (model: string, where: any, createData: any, updateData: any) => {
+                await checkPermission('write', model);
+                let finalCreate = { ...createData };
+                let finalUpdate = { ...updateData };
+                if (model === 'User') {
+                  if (finalCreate.password) {
+                    finalCreate.passwordHash = await bcrypt.hash(finalCreate.password, 12);
+                    delete finalCreate.password;
+                  }
+                  if (finalUpdate.password) {
+                    finalUpdate.passwordHash = await bcrypt.hash(finalUpdate.password, 12);
+                    delete finalUpdate.password;
+                  }
+                }
+                const result = await prismaTx[model].upsert({ where, create: finalCreate, update: finalUpdate });
+                return tx.sanitizeData(result);
+              },
+              sanitizeData: (data: any): any => {
+                if (!data) return data;
+                if (Array.isArray(data)) return data.map(item => tx.sanitizeData(item));
+                if (typeof data === 'object') {
+                  const sanitized = { ...data };
+                  for (const field of FORBIDDEN_FIELDS) {
+                    delete sanitized[field];
+                  }
+                  return sanitized;
+                }
+                return data;
+              }
+            };
+            return callback(tx);
+          });
         }
       },
       http: {
@@ -134,7 +263,19 @@ export class PluginService {
               403, 'AUTH_FORBIDDEN'
             );
           }
-          return networkService.makeRequest(pluginId, config);
+          try {
+            return await networkService.makeRequest(pluginId, config);
+          } catch (err: any) {
+            if (err.code === 'DOMAIN_BLOCKED') {
+              const hostname = new URL(config.url).hostname;
+              await pluginDataService.requestPermission(pluginName, 'system', `http.domain.${hostname}`);
+              throw new BlackLotusCMSError(
+                `Domain '${hostname}' is not whitelisted. Permission request sent to admin.`,
+                403, 'DOMAIN_BLOCKED'
+              );
+            }
+            throw err;
+          }
         }
       },
       webhook: {
@@ -207,6 +348,26 @@ export class PluginService {
             }
           });
         }
+      },
+      routes: {
+        register: async (config: { path: string; handler: any; template: string }) => {
+          const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', 'system.route.register');
+          if (!hasAccess) {
+            await pluginDataService.requestPermission(pluginName, 'system', 'system.route.register');
+            throw new BlackLotusCMSError(
+              `Plugin '${pluginName}' does not have system.route.register permission.`,
+              403, 'AUTH_FORBIDDEN'
+            );
+          }
+          const ivmMod = await import('isolated-vm');
+          const pluginHandler = config.handler;
+          const wrappedHandler = async (ctx: any) => {
+            return await pluginHandler.apply(undefined, [
+              new ivmMod.ExternalCopy(ctx).copyInto()
+            ], { result: { copy: true } });
+          };
+          routeService.registerPluginRoute(config.path, wrappedHandler, config.template, pluginId);
+        }
       }
     };
   }
@@ -262,6 +423,9 @@ export class PluginService {
 
     // Clean up webhook handlers for this plugin
     networkService.removeAllWebhookHandlers(pluginId);
+
+    // Clean up registered routes for this plugin
+    routeService.removePluginRoutes(pluginId);
 
     await this.db.plugin.update({ where: { id: pluginId }, data: { isActive: false } });
     this.log.warn(`Plugin deactivated: ${pluginId}`);
