@@ -128,7 +128,7 @@ export async function generateMetadata({ params, searchParams }: PublicPageProps
       },
       icons: {
         icon: manifest?.favicon 
-          ? `/api/themes/${themeName}/assets/${manifest.favicon}`
+          ? `/api/themes/${themeName}/${manifest.favicon}`
           : '/favicon.ico',
       },
     };

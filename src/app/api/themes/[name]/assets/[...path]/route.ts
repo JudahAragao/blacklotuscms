@@ -23,7 +23,7 @@ export async function GET(
   const themeName = sanitizePath(name);
   const assetPath = assetPathArray.map(p => sanitizePath(p)).join('/');
   
-  const fullPath = path.join(process.cwd(), 'themes', themeName, 'assets', assetPath);
+  const fullPath = path.join(process.cwd(), 'themes', themeName, assetPath);
 
   try {
     const fileBuffer = await fs.readFile(fullPath);
