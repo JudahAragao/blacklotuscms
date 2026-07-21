@@ -5,7 +5,7 @@ import { approvePermissionAction, denyPermissionAction, activatePluginAction, de
 import { Shield, Database, Check, X, Package, Plug } from 'lucide-react';
 import PluginImportButton from '@/components/admin/PluginImportButton';
 
-async function getCompiledPlugins() {
+async function getCompiledPlugins(): Promise<{ name: string; manifest: any; isActive: boolean; hasDbRecord: boolean }[]> {
   try {
     const { pluginRegistry, compiledPluginNames } = await import('@/generated/plugin-registry');
     const dbPlugins = await prisma.plugin.findMany();
