@@ -7,6 +7,11 @@ export const PluginManifestSchema = z.object({
   author: z.string().optional(),
   entry: z.string().default('index.js'),
   permissions: z.array(z.string()).optional(),
+  type: z.enum(['isolated', 'compiled']).default('isolated'),
+  npmDependencies: z.array(z.object({
+    name: z.string(),
+    version: z.string().regex(/^[\^~]?[\d]+\.[\d]+\.[\d]+(-[\w.]+)?$/, 'Invalid semver range'),
+  })).optional(),
 });
 
 export type PluginManifestInput = z.infer<typeof PluginManifestSchema>;

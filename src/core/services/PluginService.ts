@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { PluginSandbox } from '../sandbox/PluginSandbox';
+import { CompiledPluginLoader } from '../sandbox/CompiledPluginLoader';
 import { hookService } from './HookService';
 import { pluginDataService } from './PluginDataService';
 import { networkService } from './NetworkService';
@@ -485,11 +486,117 @@ export class PluginService {
     }
   }
 
+  // --- Compiled Plugins (built-in, compiled with Next.js) ---
+
+  async activateCompiled(pluginName: string, user: any) {
+    if (!canPerformAction(user, 'plugin.manage')) {
+      throw new BlackLotusCMSError('No permission to activate plugins', 403, 'AUTH_FORBIDDEN');
+    }
+
+    const { pluginRegistry } = await import('@/generated/plugin-registry');
+    const entry = pluginRegistry[pluginName];
+    if (!entry) {
+      throw new BlackLotusCMSError(`Compiled plugin "${pluginName}" not found`, 404, 'RESOURCE_NOT_FOUND');
+    }
+
+    const manifest = entry.manifest;
+
+    // Upsert plugin in DB
+    const plugin = await this.db.plugin.upsert({
+      where: { name: pluginName },
+      update: { version: manifest.version, manifest: manifest as any, isActive: true },
+      create: {
+        name: pluginName,
+        version: manifest.version,
+        manifest: manifest as any,
+        isActive: true,
+      },
+    });
+
+    // Check if all permissions are approved
+    const missingPermissions: string[] = [];
+    for (const cap of (manifest.permissions || [])) {
+      const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', cap);
+      if (!hasAccess) {
+        missingPermissions.push(cap);
+        await pluginDataService.requestPermission(pluginName, 'system', cap);
+      }
+    }
+
+    if (missingPermissions.length > 0) {
+      // Mark as inactive until permissions are approved
+      await this.db.plugin.update({ where: { id: plugin.id }, data: { isActive: false } });
+      throw new BlackLotusCMSError(
+        `Plugin "${pluginName}" requires permissions: ${missingPermissions.join(', ')}. Requests sent to admin.`,
+        403, 'AUTH_FORBIDDEN'
+      );
+    }
+
+    // Load the compiled plugin
+    await CompiledPluginLoader.load(pluginName, plugin.id, manifest);
+
+    this.log.info(`Compiled plugin activated: ${pluginName}`);
+  }
+
+  async deactivateCompiled(pluginName: string, user: any) {
+    if (!canPerformAction(user, 'plugin.manage')) {
+      throw new BlackLotusCMSError('No permission to deactivate plugins', 403, 'AUTH_FORBIDDEN');
+    }
+
+    const plugin = await this.db.plugin.findUnique({ where: { name: pluginName } });
+    if (!plugin) throw new BlackLotusCMSError('Plugin not found', 404, 'RESOURCE_NOT_FOUND');
+
+    // Clean up hooks, webhooks, routes
+    networkService.removeAllWebhookHandlers(plugin.id);
+    routeService.removePluginRoutes(plugin.id);
+
+    await this.db.plugin.update({ where: { id: plugin.id }, data: { isActive: false } });
+    this.log.warn(`Compiled plugin deactivated: ${pluginName}`);
+  }
+
+  async bootCompiledPlugins() {
+    try {
+      const { pluginRegistry, compiledPluginNames } = await import('@/generated/plugin-registry');
+
+      for (const pluginName of compiledPluginNames) {
+        const entry = pluginRegistry[pluginName];
+        if (!entry) continue;
+
+        // Check if plugin is active in DB
+        const plugin = await this.db.plugin.findUnique({ where: { name: pluginName } });
+        if (!plugin || !plugin.isActive) continue;
+
+        try {
+          // Verify all permissions are still approved
+          let allApproved = true;
+          for (const cap of (entry.manifest.permissions || [])) {
+            const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', cap);
+            if (!hasAccess) { allApproved = false; break; }
+          }
+
+          if (!allApproved) {
+            this.log.warn(`Compiled plugin "${pluginName}" has unapproved permissions, skipping boot`);
+            continue;
+          }
+
+          await CompiledPluginLoader.load(pluginName, plugin.id, entry.manifest);
+        } catch (err: any) {
+          this.log.error(`Failed to boot compiled plugin ${pluginName}`, { err: err.message });
+        }
+      }
+    } catch {
+      // plugin-registry.ts doesn't exist yet (first build) — skip
+    }
+  }
+
   // --- Static Proxy ---
   static async activate(id: string, user: any) { return pluginService.activate(id, user); }
   static async deactivate(id: string, user: any) { return pluginService.deactivate(id, user); }
   static async boot() { return pluginService.boot(); }
   static async installPlugin(b: Buffer, n: string, user: any) { return pluginService.installPlugin(b, n, user); }
+  static async activateCompiled(name: string, user: any) { return pluginService.activateCompiled(name, user); }
+  static async deactivateCompiled(name: string, user: any) { return pluginService.deactivateCompiled(name, user); }
+  static async bootCompiledPlugins() { return pluginService.bootCompiledPlugins(); }
 }
 
 export const pluginService = new PluginService();

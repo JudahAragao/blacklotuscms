@@ -1,9 +1,93 @@
 # Plugin Development Guide
 
 ## Overview
-Plugins extend BlackLotusCMS via isolated sandbox execution (isolated-vm) com a secure Bridge API.
 
-## Plugin Structure
+BlackLotusCMS supports two types of plugins:
+
+1. **Compiled Plugins** — live in `plugins/`, compiled alongside Next.js, can use npm packages
+2. **Imported Plugins** — uploaded via ZIP, run in isolated-vm sandbox, JS puro (no npm)
+
+## Compiled Plugins (Recommended)
+
+Compiled plugins are part of the codebase and compiled at build time. They can use any npm package already in the project.
+
+### Plugin Structure
+```
+plugins/
+└── my-plugin/
+    ├── plugin.json         # Manifest (required)
+    └── index.ts            # Entry point (TypeScript)
+```
+
+### plugin.json Manifest
+```json
+{
+  "name": "email-manager",
+  "version": "1.0.0",
+  "description": "Email management with Resend",
+  "permissions": ["db.read.post", "db.write.post", "http.outbound.request"],
+  "npmDependencies": [
+    { "name": "resend", "version": "^4.0.0" },
+    { "name": "lodash", "version": "^4.17.21" }
+  ]
+}
+```
+
+**Fields:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Unique kebab-case identifier |
+| `version` | string | Yes | Semver (x.y.z) |
+| `description` | string | No | Short description |
+| `permissions` | string[] | No | Required Bridge API permissions |
+| `npmDependencies` | `{ name, version }[]` | No | npm packages used with semver ranges (informational) |
+
+### Entry Point (index.ts)
+
+The default export is a function that receives the `bridge` object:
+
+```typescript
+import { Resend } from 'resend';
+
+export default async function init(bridge: any) {
+  // Use bridge.db, bridge.http, bridge.storage, bridge.hooks, etc.
+
+  bridge.hooks.addAction('post.created', async (post: any) => {
+    const user = await bridge.db.findOne('User', { id: post.authorId });
+    const apiKey = await bridge.storage.get('api_key');
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from: 'noreply@site.com',
+      to: user.email,
+      subject: `New post: ${post.title}`,
+      html: `<h1>${post.title}</h1>`
+    });
+  });
+
+  return { name: 'email-manager', version: '1.0.0' };
+}
+```
+
+### Build & Activation
+
+1. Add plugin to `plugins/my-plugin/` with `plugin.json` + `index.ts`
+2. Run `npm run build` (or `npm run dev`) — plugin is compiled automatically
+3. Go to Admin > Plugins
+4. Click "Ativar" on the compiled plugin
+5. Approve required permissions in "Solicitacoes de Acesso"
+
+### How It Works
+
+- `scripts/generate-plugin-registry.mjs` discovers plugins and generates `src/generated/plugin-registry.ts`
+- Next.js compiles the plugin alongside the CMS at build time
+- `CompiledPluginLoader` loads the plugin with a Proxy-based bridge
+- The bridge controls all access (db, http, storage, hooks, etc.)
+
+## Imported Plugins (isolated-vm)
+
+Imported plugins are uploaded as ZIP files and run in an isolated V8 sandbox. They cannot use npm packages — only pure JavaScript + the Bridge API.
+
+### Plugin Structure
 ```
 plugins/
 └── my-plugin/
@@ -12,7 +96,7 @@ plugins/
     └── package.json        # Optional dependencies info
 ```
 
-## plugin.json Manifest
+### plugin.json Manifest
 ```json
 {
   "name": "seo-optimizer",

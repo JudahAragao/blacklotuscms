@@ -20,6 +20,10 @@ Sistema de plugins com installation via ZIP, execution em sandbox isolado (isola
 - **REQ-03d:** Webhook inbound payload máximo de 2MB
 - **REQ-03e:** Bridge API routes: register() para rotas dinâmicas com params (:slug, :id) e handler server-side
 - **REQ-03f:** RouteContext inclui `role` (name + capabilities) do user autenticado para plugins de e-commerce
+- **REQ-10:** Compiled plugins: plugins TypeScript compilados junto com Next.js, com Proxy-based bridge
+- **REQ-10b:** generate-plugin-registry.mjs: script que descobre plugins em plugins/, gera plugin-registry.ts com imports estáticos
+- **REQ-10c:** CompiledPluginLoader: carrega plugins compilados com bridge Proxy, controla acesso a db/http/storage/hooks/webhook/routes
+- **REQ-10d:** Compiled plugins permissions: permissões declaradas no plugin.json, solicitadas na ativação, admin aprova no painel
 - **REQ-04:** Sistema de permissions (requesterPlugin, providerPlugin, capability)
 - **REQ-05:** Rate limit de 50 queries/segundo por plugin (aplicado antes de hasPermission, como proteção contra abuso de recursos)
 - **REQ-05b:** Jitter aleatório de 1-5ms entre chamadas da Bridge API para mitigar thundering herd

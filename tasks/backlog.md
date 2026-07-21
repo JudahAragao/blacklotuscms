@@ -127,9 +127,17 @@ status: approved
 - [x] **TASK-089:** RouteContext ctx.role (name + capabilities) auto-populated from session | est: 1h | depends: [TASK-085] | feature: plugin-system
 - [x] **TASK-090:** Customer auth pattern docs (Option B: plugin-based, Role creation, ctx.role usage) | est: 1h | depends: [TASK-089] | feature: docs
 
+## P15: Compiled Plugins System (2026-07-20)
+- [x] **TASK-091:** generate-plugin-registry.mjs: script de descoberta + geração de plugin-registry.ts | est: 2h | depends: [] | feature: plugin-system
+- [x] **TASK-092:** CompiledPluginLoader: Proxy-based bridge com permissões por método | est: 4h | depends: [TASK-091] | feature: plugin-system
+- [x] **TASK-093:** PluginService: activateCompiled/deactivateCompiled/bootCompiledPlugins | est: 2h | depends: [TASK-092] | feature: plugin-system
+- [x] **TASK-094:** Admin UI: seção compiled plugins + imported plugins + permissions modal | est: 2h | depends: [TASK-093] | feature: plugin-system
+- [x] **TASK-095:** Plugin schema: type (isolated/compiled) + npmDependencies fields | est: 0.5h | depends: [] | feature: plugin-system
+- [x] **TASK-096:** Docs: compiled plugins guide no PLUGINS.md | est: 1h | depends: [TASK-092] | feature: docs
+
 ## Métricas
-- Total de tasks: 90
-- Concluídas: 90
+- Total de tasks: 96
+- Concluídas: 96
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

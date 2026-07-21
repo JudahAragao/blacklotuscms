@@ -67,3 +67,27 @@ export async function importPluginAction(formData: FormData) {
   revalidatePath("/admin/plugins");
   return { success: true };
 }
+
+export async function activateCompiledPluginAction(pluginName: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) throw new Error('Unauthorized');
+    await pluginService.activateCompiled(pluginName, session.user);
+    revalidatePath("/admin/plugins");
+    return { success: true };
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+export async function deactivateCompiledPluginAction(pluginName: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) throw new Error('Unauthorized');
+    await pluginService.deactivateCompiled(pluginName, session.user);
+    revalidatePath("/admin/plugins");
+    return { success: true };
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
