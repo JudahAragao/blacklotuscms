@@ -127,8 +127,8 @@ export async function generateMetadata({ params, searchParams }: PublicPageProps
         'semrush-site-verification': seoSettings.semrush_site_verification || undefined,
       },
       icons: {
-        icon: manifest?.favicon 
-          ? `/api/themes/${themeName}/${manifest.favicon}`
+        icon: manifest?.favicon
+          ? `/api/themes/${themeName}/${manifest.favicon}?v=${manifest.version || '1'}`
           : '/favicon.ico',
       },
     };
