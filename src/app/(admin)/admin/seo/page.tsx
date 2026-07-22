@@ -2,7 +2,7 @@ import React from 'react';
 import { prisma } from '@/lib/prisma';
 import { SettingService } from '@/core/services/SettingService';
 import { revalidatePath } from 'next/cache';
-import { Globe, Save, Search, Share2, ExternalLink } from 'lucide-react';
+import { Globe, Save, Search, Share2, ExternalLink, BarChart3 } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { hasCapability } from '@/lib/auth-utils';
@@ -37,6 +37,7 @@ export default async function SEOSettingsPage() {
     majestic_site_verification: '',
     ahrefs_site_verification: '',
     semrush_site_verification: '',
+    google_analytics_id: '',
   };
 
   const sitemapPostTypes = (settings.sitemap_post_types as string[] | null) ?? null;
@@ -65,6 +66,7 @@ export default async function SEOSettingsPage() {
       majestic_site_verification: formData.get('majestic_site_verification'),
       ahrefs_site_verification: formData.get('ahrefs_site_verification'),
       semrush_site_verification: formData.get('semrush_site_verification'),
+      google_analytics_id: formData.get('google_analytics_id'),
     };
     await SettingService.set('seo', seoData, session?.user);
 
@@ -185,6 +187,18 @@ export default async function SEOSettingsPage() {
               <div className="flex flex-col gap-1">
                 <label className="label-field-muted">Imagem Social Padrao</label>
                 <MediaPickerInput name="og_image" defaultValue={seoSettings.og_image} />
+              </div>
+            </section>
+
+            <section className="pt-5 border-t border-border-default space-y-4">
+              <div className="flex items-center gap-2 mb-3">
+                <BarChart3 size={16} className="text-action" />
+                <h3 className="font-semibold text-sm text-text-heading">Analytics</h3>
+              </div>
+              <p className="text-xs text-text-muted">Configure o Google Analytics para rastrear visitantes.</p>
+              <div className="flex flex-col gap-1">
+                <label className="label-field-muted">Google Analytics ID</label>
+                <input name="google_analytics_id" defaultValue={seoSettings.google_analytics_id} className="field-input font-mono text-xs" placeholder="G-XXXXXXXXXX" />
               </div>
             </section>
 
