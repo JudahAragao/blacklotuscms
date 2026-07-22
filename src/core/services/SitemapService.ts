@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { settingService } from './SettingService';
+import { ThemeService } from './ThemeService';
+import { themeRoutes } from '@/generated/theme-routes';
 import { logger } from '@/lib/logger';
 
 export class SitemapService {
@@ -7,6 +9,29 @@ export class SitemapService {
     private readonly db = prisma,
     private readonly log = logger
   ) {}
+
+  /**
+   * Resolves a post URL using theme routes when available.
+   * Falls back to the default pattern: /{postTypeSlug}/{slug}
+   */
+  private resolvePostUrl(postTypeSlug: string, postSlug: string, routes: Record<string, string>): string {
+    if (postTypeSlug === 'page') return `/${postSlug}`;
+
+    // Find a route pattern that maps to this post type's layout
+    // e.g. "/blog/:slug" → "post.blog" matches postType "blog"
+    // or "/projetos/:slug" → "post.projetos" matches postType "projetos"
+    for (const [pattern, layout] of Object.entries(routes)) {
+      const targetLayout = `post.${postTypeSlug}`;
+      if (layout === targetLayout || layout === 'post') {
+        // Convert Express-style pattern to URL: replace :slug with actual slug
+        const url = pattern.replace(':slug', postSlug);
+        if (url && !url.includes(':')) return url;
+      }
+    }
+
+    // Fallback to default pattern
+    return `/${postTypeSlug}/${postSlug}`;
+  }
 
   /**
    * Generates the complete Sitemap XML based on settings.
@@ -130,12 +155,14 @@ export class SitemapService {
       </url>`;
     }).join('');
 
+    // Resolve theme routes for dynamic URL generation
+    const activeTheme = await ThemeService.getActiveTheme();
+    const routes = themeRoutes[activeTheme] || themeRoutes['default'] || {};
+
     // Generate regular post URLs
     const postUrls = posts.map(post => {
-      const postTypeSlug = post.postType.slug;
-      const loc = postTypeSlug === 'page' 
-        ? `${baseUrl}/${post.slug}` 
-        : `${baseUrl}/${postTypeSlug}/${post.slug}`;
+      const path = this.resolvePostUrl(post.postType.slug, post.slug, routes);
+      const loc = `${baseUrl}${path}`;
       
       return `
       <url>
