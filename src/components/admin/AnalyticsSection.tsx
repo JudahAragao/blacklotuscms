@@ -33,7 +33,7 @@ export default function AnalyticsSection({
                 type="radio"
                 name="analytics_provider"
                 value="none"
-                checked={provider === 'none'}
+                defaultChecked={analyticsProvider === 'none'}
                 onChange={() => setProvider('none')}
                 className="check-field"
               />
@@ -44,7 +44,7 @@ export default function AnalyticsSection({
                 type="radio"
                 name="analytics_provider"
                 value="ga4"
-                checked={provider === 'ga4'}
+                defaultChecked={analyticsProvider === 'ga4'}
                 onChange={() => setProvider('ga4')}
                 className="check-field"
               />
@@ -55,7 +55,7 @@ export default function AnalyticsSection({
                 type="radio"
                 name="analytics_provider"
                 value="gtm"
-                checked={provider === 'gtm'}
+                defaultChecked={analyticsProvider === 'gtm'}
                 onChange={() => setProvider('gtm')}
                 className="check-field"
               />

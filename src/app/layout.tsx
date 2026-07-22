@@ -47,7 +47,7 @@ export default async function RootLayout({
   let analyticsProvider = 'none';
   try {
     const settings = await SettingService.getAll();
-    analyticsProvider = settings.seo?.analytics_provider || 'ga4';
+    analyticsProvider = settings.seo?.analytics_provider || 'none';
     gaId = settings.seo?.google_analytics_id || '';
     gtmId = settings.seo?.google_tag_manager_id || '';
     if (!gaId && !gtmId) analyticsProvider = 'none';
