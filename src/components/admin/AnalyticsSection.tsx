@@ -14,7 +14,7 @@ export default function AnalyticsSection({
   googleAnalyticsId,
   googleTagManagerId,
 }: AnalyticsSectionProps) {
-  const [provider, setProvider] = useState(analyticsProvider);
+  const [provider, setProvider] = useState(analyticsProvider || 'none');
 
   return (
     <section className="pt-5 border-t border-border-default space-y-4">
@@ -33,7 +33,7 @@ export default function AnalyticsSection({
                 type="radio"
                 name="analytics_provider"
                 value="none"
-                defaultChecked={analyticsProvider === 'none'}
+                defaultChecked={(analyticsProvider || 'none') === 'none'}
                 onChange={() => setProvider('none')}
                 className="check-field"
               />
@@ -44,7 +44,7 @@ export default function AnalyticsSection({
                 type="radio"
                 name="analytics_provider"
                 value="ga4"
-                defaultChecked={analyticsProvider === 'ga4'}
+                defaultChecked={(analyticsProvider || 'none') === 'ga4'}
                 onChange={() => setProvider('ga4')}
                 className="check-field"
               />
@@ -55,7 +55,7 @@ export default function AnalyticsSection({
                 type="radio"
                 name="analytics_provider"
                 value="gtm"
-                defaultChecked={analyticsProvider === 'gtm'}
+                defaultChecked={(analyticsProvider || 'none') === 'gtm'}
                 onChange={() => setProvider('gtm')}
                 className="check-field"
               />
