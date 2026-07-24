@@ -433,25 +433,77 @@ export class PluginService {
   }
 
   async boot() {
+    // 1. Load plugins registered in the database
     const plugins = await this.db.plugin.findMany({ where: { isActive: true } });
     for (const plugin of plugins) {
       try {
-        const pluginDir = path.join(process.cwd(), 'plugins', plugin.name);
         const manifest = plugin.manifest as any;
-        const entryPath = path.join(pluginDir, manifest.entry || 'index.js');
-        const realFs = fs;
-        const content = await realFs.readFile(entryPath, 'utf-8');
+        const useSandbox = manifest.sandbox !== false; // default: true
 
-        let sandbox = await PluginSandbox.create();
-        const bridge = this.createBridgeApi(plugin.id, manifest);
-        await sandbox.execute(content, bridge);
-        
-        this.activePlugins.set(plugin.id, sandbox);
-        this.sandboxPool.set(plugin.id, sandbox);
+        if (useSandbox) {
+          await this.loadSandboxed(plugin.id, plugin.name, manifest);
+        } else {
+          await this.loadCompiled(plugin.name, plugin.id, manifest);
+        }
       } catch (err: any) {
         this.log.error(`Failed to boot plugin ${plugin.name}`, { err: err.message });
       }
     }
+
+    // 2. Scan plugins/ directory for plugins not yet in the database
+    try {
+      const dirs = await fs.readdir(path.join(process.cwd(), 'plugins'));
+      for (const dir of dirs) {
+        const stat = await fs.stat(path.join(process.cwd(), 'plugins', dir)).catch(() => null);
+        if (!stat?.isDirectory()) continue;
+
+        const manifestPath = path.join(process.cwd(), 'plugins', dir, 'plugin.json');
+        const manifest = await this.fs.readJson<any>(manifestPath);
+        if (!manifest?.name || !manifest?.version) continue;
+
+        // Skip if already registered in DB
+        const exists = await this.db.plugin.findUnique({ where: { name: manifest.name } });
+        if (exists) continue;
+
+        // Auto-register in database
+        const plugin = await this.db.plugin.create({
+          data: {
+            name: manifest.name,
+            version: manifest.version,
+            manifest: manifest as any,
+            isActive: true,
+          },
+        });
+
+        this.log.info(`Auto-registered filesystem plugin: ${manifest.name}`);
+
+        const useSandbox = manifest.sandbox !== false;
+        if (useSandbox) {
+          await this.loadSandboxed(plugin.id, plugin.name, manifest);
+        } else {
+          await this.loadCompiled(plugin.name, plugin.id, manifest);
+        }
+      }
+    } catch {
+      // plugins/ directory may not exist — skip
+    }
+  }
+
+  private async loadSandboxed(pluginId: string, pluginName: string, manifest: any) {
+    const pluginDir = path.join(process.cwd(), 'plugins', pluginName);
+    const entryPath = path.join(pluginDir, manifest.entry || 'index.js');
+    const content = await fs.readFile(entryPath, 'utf-8');
+
+    const sandbox = await PluginSandbox.create();
+    const bridge = this.createBridgeApi(pluginId, manifest);
+    await sandbox.execute(content, bridge);
+
+    this.activePlugins.set(pluginId, sandbox);
+    this.sandboxPool.set(pluginId, sandbox);
+  }
+
+  private async loadCompiled(pluginName: string, pluginId: string, manifest: any) {
+    await CompiledPluginLoader.load(pluginName, pluginId, manifest);
   }
 
   async installPlugin(buffer: Buffer, originalName: string, user: any) {
@@ -474,7 +526,7 @@ export class PluginService {
 
       const plugin = await this.db.plugin.upsert({
         where: { name: manifest.name },
-        update: { version: manifest.version, manifest: manifest as any },
+        update: { version: manifest.version, manifest: manifest as any, isActive: manifest.sandbox !== false },
         create: { name: manifest.name, version: manifest.version, manifest: manifest as any, isActive: false }
       });
 
@@ -561,6 +613,9 @@ export class PluginService {
       for (const pluginName of compiledPluginNames) {
         const entry = pluginRegistry[pluginName];
         if (!entry) continue;
+
+        // Skip plugins that declare sandbox: true (they're loaded via PluginSandbox)
+        if (entry.manifest.sandbox === true) continue;
 
         // Check if plugin is active in DB
         const plugin = await this.db.plugin.findUnique({ where: { name: pluginName } });

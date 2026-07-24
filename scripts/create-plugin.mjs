@@ -66,6 +66,10 @@ if (permInput) {
   });
 }
 
+console.log('');
+const sandboxInput = (await ask('Use isolated-vm sandbox? (Y/n): ')).trim().toLowerCase();
+const sandbox = sandboxInput !== 'n' && sandboxInput !== 'no';
+
 rl.close();
 
 // Create directory
@@ -77,6 +81,7 @@ const manifest = {
   version,
   description: description || `${name} plugin`,
   permissions,
+  sandbox,
 };
 
 await fs.writeFile(
@@ -129,4 +134,10 @@ console.log('');
 console.log('  plugin.json');
 console.log('  index.ts');
 console.log('');
-console.log('Run "npm run generate" to add it to the plugin registry.');
+if (sandbox) {
+  console.log('  Type: sandboxed (isolated-vm)');
+  console.log('  The plugin will be auto-registered in the database on next boot.');
+} else {
+  console.log('  Type: compiled (direct Node.js)');
+  console.log('  Run "npm run generate" to add it to the plugin registry.');
+}

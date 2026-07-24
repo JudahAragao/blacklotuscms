@@ -46,6 +46,12 @@ for (const entry of entries.filter((e) => e.isDirectory()).sort((a, b) => a.name
     throw new Error(`Plugin "${id}" needs name and version in plugin.json.`);
   }
 
+  // Skip sandboxed plugins — they are loaded at runtime via PluginSandbox
+  if (manifest.sandbox === true) {
+    console.log(`Skipping "${id}": sandbox=true (loaded at runtime).`);
+    continue;
+  }
+
   // Detect entry point (index.ts or index.js)
   const hasTs = await fs.stat(path.join(directory, 'index.ts')).catch(() => null);
   const hasJs = await fs.stat(path.join(directory, 'index.js')).catch(() => null);
