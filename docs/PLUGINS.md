@@ -11,6 +11,25 @@ BlackLotusCMS supports two types of plugins:
 
 Compiled plugins are part of the codebase and compiled at build time. They can use any npm package already in the project.
 
+### Security Model
+
+Compiled plugins execute in the **same V8 context** as the Next.js application. This is intentional — it allows plugins to use npm packages and have full Node.js API access.
+
+**Trade-offs:**
+- ✅ Full access to npm packages (resend, stripe, etc.)
+- ✅ Native Node.js API access (fs, crypto, etc.)
+- ✅ No memory/timeout limits (bounded only by host resources)
+- ❌ No V8 sandbox isolation (code runs in main process)
+- ❌ Cannot contain malicious code (trust boundary = codebase)
+
+**Protection chain (same as imported plugins):**
+1. `checkRateLimit()` — 50 DB queries/second max
+2. `applyJitter()` — 1-5ms random delay
+3. `hasPermission()` — permission gate per capability
+4. `sanitizeData()` — forbidden fields removed from responses
+
+**If you need V8 sandbox isolation**, use imported plugins (ZIP upload) instead.
+
 ### Plugin Structure
 ```
 plugins/

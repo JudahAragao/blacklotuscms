@@ -8,6 +8,8 @@ import { BlackLotusCMSError } from '@/lib/errors';
 import bcrypt from 'bcryptjs';
 
 const FORBIDDEN_FIELDS = ['passwordHash', 'password', 'secret', 'apiKey', 'token'];
+const DB_RATE_LIMIT = 50;
+const RATE_LIMIT_WINDOW = 1000;
 
 function sanitizeData(data: any): any {
   if (!data) return data;
@@ -23,6 +25,29 @@ function sanitizeData(data: any): any {
 }
 
 export class CompiledPluginLoader {
+  private static pluginStats: Map<string, { requests: number; lastReset: number }> = new Map();
+
+  private static checkRateLimit(pluginId: string) {
+    const now = Date.now();
+    const stats = this.pluginStats.get(pluginId) || { requests: 0, lastReset: now };
+
+    if (now - stats.lastReset > RATE_LIMIT_WINDOW) {
+      stats.requests = 1;
+      stats.lastReset = now;
+    } else {
+      stats.requests++;
+    }
+
+    this.pluginStats.set(pluginId, stats);
+    if (stats.requests > DB_RATE_LIMIT) {
+      throw new BlackLotusCMSError('Database rate limit exceeded by plugin', 429, 'RATE_LIMIT_EXCEEDED');
+    }
+  }
+
+  private static async applyJitter() {
+    const delay = Math.floor(Math.random() * 5) + 1;
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
 
   /**
    * Loads a compiled plugin and executes its init function with a proxied bridge.
@@ -47,6 +72,9 @@ export class CompiledPluginLoader {
     const dbMethods = ['read', 'findOne', 'create', 'update', 'updateMany', 'delete', 'deleteMany', 'upsert', 'transaction'];
 
     const checkPermission = async (action: string, model: string) => {
+      this.checkRateLimit(pluginId);
+      await this.applyJitter();
+
       const capability = `db.${action}.${model.toLowerCase()}`;
       const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', capability);
       if (!hasAccess) {
@@ -60,6 +88,31 @@ export class CompiledPluginLoader {
 
     return {
       log: (...args: any[]) => logger.info(`[CompiledPlugin:${pluginName}]`, { args }),
+
+      auth: {
+        getUser: async () => {
+          const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', 'system.auth.read');
+          if (!hasAccess) {
+            await pluginDataService.requestPermission(pluginName, 'system', 'system.auth.read');
+            return null;
+          }
+          const { getServerSession } = await import('next-auth');
+          const { authOptions } = await import('@/lib/auth');
+          const session = await getServerSession(authOptions);
+          return session?.user || null;
+        },
+        isAuthenticated: async () => {
+          const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', 'system.auth.read');
+          if (!hasAccess) {
+            await pluginDataService.requestPermission(pluginName, 'system', 'system.auth.read');
+            return false;
+          }
+          const { getServerSession } = await import('next-auth');
+          const { authOptions } = await import('@/lib/auth');
+          const session = await getServerSession(authOptions);
+          return !!session?.user;
+        }
+      },
 
       db: new Proxy({}, {
         get(_, method: string) {
@@ -257,6 +310,15 @@ export class CompiledPluginLoader {
             return async (hookName: string, callback: any) => {
               hookService.addFilter(hookName, async (data: any) => {
                 try {
+                  if (hookName === 'route_access') {
+                    const capability = `system.hook.filter.${hookName}`;
+                    const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', capability);
+                    if (!hasAccess) {
+                      await pluginDataService.requestPermission(pluginName, 'system', capability);
+                      logger.warn(`Plugin '${pluginName}' attempted to use sensitive hook '${hookName}' without permission.`);
+                      return data;
+                    }
+                  }
                   return await callback(data);
                 } catch (err) {
                   logger.error(`Error in filter ${hookName} of compiled plugin ${pluginName}`, { err });
@@ -267,6 +329,13 @@ export class CompiledPluginLoader {
           }
           if (method === 'registerComponent') {
             return async (slot: string, component: any, priority: number = 10) => {
+              if (slot.startsWith('public.route')) {
+                const hasAccess = await pluginDataService.hasPermission(pluginName, 'system', 'system.ui.register.public_route');
+                if (!hasAccess) {
+                  await pluginDataService.requestPermission(pluginName, 'system', 'system.ui.register.public_route');
+                  return;
+                }
+              }
               hookService.registerComponent(slot, component, pluginId, priority);
             };
           }
