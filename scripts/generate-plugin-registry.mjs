@@ -84,6 +84,7 @@ const registry = [
   '  name: string;',
   '  version: string;',
   '  description?: string;',
+  '  sandbox?: boolean;',
   '  permissions: string[];',
   '}',
   '',
