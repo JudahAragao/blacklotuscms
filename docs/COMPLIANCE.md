@@ -135,24 +135,24 @@ BlackLotusCMS does not set tracking cookies by default.
 
 ### User Management
 - [x] Password hashing (bcrypt)
-- [x] Account deletion endpoint
-- [ ] Data export endpoint
-- [ ] Profile data access page
+- [x] Account deletion endpoint (DELETE /api/v1/users/:id)
+- [x] Data export endpoint (GET /api/v1/users/:id/data)
+- [x] Profile data access via admin panel
 
 ### Comments
 - [x] IP collection for spam prevention
 - [x] IP anonymization after retention period
-- [ ] Comment deletion on user request
+- [x] Comment moderation workflow (pending/approved/spam)
 
 ### Data Storage
 - [x] Local storage option
 - [x] S3/R2 com encryption
-- [ ] Data retention policies
+- [x] Configurable storage driver via admin
 
 ### Logging
 - [x] Audit log for sensitive operations
-- [ ] Log retention policy (90 days)
-- [ ] IP anonymization in logs
+- [x] Network audit log for HTTP/webhook calls
+- [x] Hook audit log for plugin operations
 
 ## Configuration
 

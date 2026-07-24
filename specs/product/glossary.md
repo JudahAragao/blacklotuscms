@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-13"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -31,6 +31,14 @@ status: approved
 - **G20 Sub-field:** Campo filho armazenado dentro de um Repeater ou Flexible Content. Pode ser criado via drag-and-drop (movendo um campo-raiz para dentro do container) ou via clique na zona de drop. Mantém todas as configurações (tipo, validação, lógica condicional) ao mudar de nível.
 - **G21 Unified Field System:** Sistema onde campos-raiz e sub-compartilham a mesma estrutura e podem se mover livremente entre níveis via drag-and-drop, similar ao ACF (Advanced Custom Fields).
 - **G22 Icon (Field Type):** Campo que permite selecionar ícones de duas fontes: lib lucide-react (1000+ ícones SVG vetoriais) ou SVG customizado com sanitização de segurança. Armazenado como objeto { iconSource, iconName, iconSvg, iconColor, iconSize }.
+- **G23 Compiled Plugin:** Plugin TypeScript compilado junto com Next.js, com bridge Proxy-based e suporte a npm packages. Diferente de Imported Plugins (ZIP upload, isolated-vm).
+- **G24 NetworkService:** Serviço que gerencia HTTP outbound (whitelist de domínios, rate limit), webhooks inbound (HMAC-SHA256 verification, retry) e audit log para plugins.
+- **G25 RouteService:** Serviço de pattern matching que resolve URLs para templates + params, com cadeia de resolução: plugin routes → theme routes → default theme routes → CMS padrão.
+- **G26 ShortcodeService:** Serviço de processamento de macros registráveis por plugins no conteúdo. Suporta atributos e conteúdo encerrado. Output é sanitizado com DOMPurify.
+- **G27 Reading Settings:** Configurações de leitura: page_on_front (home page), page_for_posts (posts page), posts_per_page. Afeta sitemap e renderização de temas.
+- **G28 IconPicker:** Componente de seleção de ícones com duas fontes: lib lucide-react (1000+ ícones) ou SVG customizado com sanitização.
+- **G29 NetworkAuditLog:** Registro de todas as chamadas HTTP outbound e webhooks inbound de plugins, com timestamp, URL, method, status e error.
+- **G30 PluginNetworkConfig:** Configuração de rede por plugin: allowedDomains (whitelist), httpRateLimit, webhookSecret (HMAC), isActive.
 
 ## Relacionamentos
 
@@ -40,4 +48,9 @@ status: approved
 - Post contains MetaValues (fields customizeds preenchidos)
 - Term contains MetaValues (fields customizeds de taxonomias)
 - Plugin executed em PluginSandbox com Bridge API
+- Plugin Compiled Plugin executado via CompiledPluginLoader com Bridge Proxy
 - Theme acessa data via ThemeDataService com validação de ThemePermission
+- Plugin acessa rede via NetworkService (HTTP outbound, webhooks)
+- RouteService resolve URLs para templates de plugins e themes
+- ShortcodeService processa macros no conteúdo
+- Reading Settings afeta sitemap e renderização de temas

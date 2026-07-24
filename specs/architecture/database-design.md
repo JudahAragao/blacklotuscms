@@ -26,6 +26,9 @@ erDiagram
     Post ||--o{ Comment : has
     Comment ||--o{ Comment : replies
     Plugin ||--o{ PluginData : stores
+    Plugin ||--o{ PluginNetworkConfig : has
+    Plugin ||--o{ WebhookEndpoint : registers
+    Plugin ||--o{ NetworkAuditLog : logs
     Menu ||--o{ MenuItem : contains
     MenuItem ||--o{ MenuItem : hierarchy
 ```
@@ -209,4 +212,34 @@ erDiagram
 - `status`: String (default: "pending") - approved, pending, spam
 - `ip`: String?
 - `parentId`: UUID? (FK -> Comment, auto-relacionamento)
+- `createdBy`: String?
 - `createdAt`: DateTime
+
+### PluginNetworkConfig
+- `id`: UUID (PK)
+- `pluginId`: UUID (FK -> Plugin, unique, onDelete: Cascade)
+- `allowedDomains`: String[] — whitelist de domínios para HTTP outbound
+- `httpRateLimit`: Int (default: 20) — req/s para HTTP externo
+- `webhookSecret`: String? — HMAC-SHA256 secret para webhooks
+- `isActive`: Boolean (default: true)
+- `createdAt`, `updatedAt`: DateTime
+
+### WebhookEndpoint
+- `id`: UUID (PK)
+- `pluginId`: UUID (FK -> Plugin, onDelete: Cascade)
+- `eventId`: String — ex: "payment.completed"
+- `url`: String — gerado: `/api/v1/webhooks/:pluginName/:eventId`
+- `isActive`: Boolean (default: true)
+- `createdAt`: DateTime
+- Unique: [pluginId, eventId]
+
+### NetworkAuditLog
+- `id`: UUID (PK)
+- `pluginId`: UUID (FK -> Plugin, onDelete: Cascade)
+- `pluginName`: String
+- `type`: String — "http.outbound" | "webhook.inbound"
+- `url`: String?
+- `method`: String?
+- `status`: Int?
+- `error`: String?
+- `timestamp`: DateTime (default: now())

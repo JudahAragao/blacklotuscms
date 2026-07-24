@@ -1,6 +1,6 @@
 ---
 spec_version: "1.3"
-last_updated: "2026-07-15"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "media-management"
@@ -32,6 +32,8 @@ Sistema de gerenciamento de midia com upload de imagens (WebP + thumbnails) e ar
 - **C04:** Metadata (width, height, format) armazenada no banco para imagens
 - **C05:** Arquivos nao-imagem sao salvos com mimeType original e sem thumbnail
 - **C06:** MediaPicker accept attribute e dinamico baseado no field config validation.accept
+- **C07:** URLs de campos file/image/gallery são convertidas para absolutas no page route
+- **C08:** Deleção gerenciada via server actions admin (não REST API)
 
 ## Dependencies
 - **Depends on:** Storage Driver, Authentication

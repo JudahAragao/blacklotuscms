@@ -1,6 +1,6 @@
 ---
-spec_version: "1.3"
-last_updated: "2026-07-19"
+spec_version: "1.4"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -135,9 +135,17 @@ status: approved
 - [x] **TASK-095:** Plugin schema: type (isolated/compiled) + npmDependencies fields | est: 0.5h | depends: [] | feature: plugin-system
 - [x] **TASK-096:** Docs: compiled plugins guide no PLUGINS.md | est: 1h | depends: [TASK-092] | feature: docs
 
+## P16: Documentation Overhaul (2026-07-23)
+- [x] **TASK-097:** Create missing specs: NetworkService, RouteService, ShortcodeService, CompiledPlugins, ReadingSettings, Analytics | est: 6h | depends: [] | feature: docs
+- [x] **TASK-098:** Update outdated specs: database-design, system-design, plugin-system, comments, search, media, installation, auth, menu, integrations, security | est: 4h | depends: [] | feature: docs
+- [x] **TASK-099:** Fix docs: API_REST (endpoints faltando), API_GRAPHQL (incompleto), PLUGINS, THEMES, COMPLIANCE, onboarding, coding-standards, README | est: 4h | depends: [] | feature: docs
+- [x] **TASK-100:** Update glossary with missing terms (G23-G30) | est: 1h | depends: [] | feature: docs
+- [x] **TASK-101:** Update tasks/backlog.md and verify sprint alignment | est: 1h | depends: [] | feature: docs
+- [x] **TASK-102:** Sync all updated docs/specs/tasks to portfolio project | est: 2h | depends: [TASK-097, TASK-098, TASK-099, TASK-100, TASK-101] | feature: docs
+
 ## Métricas
-- Total de tasks: 96
-- Concluídas: 96
+- Total de tasks: 102
+- Concluídas: 102
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

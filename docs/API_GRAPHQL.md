@@ -42,9 +42,32 @@ type PostType {
   id: ID!
   slug: String!
   label: String!
+  hierarchical: Boolean!
   posts: [Post!]!
+  taxonomies: [Taxonomy!]!
   # Note: fieldGroups are no longer directly linked to PostType
   # Use FieldGroup locations to determine which fields apply
+}
+```
+
+### Taxonomy
+```graphql
+type Taxonomy {
+  id: ID!
+  slug: String!
+  label: String!
+  postType: PostType!
+  terms: [Term!]!
+}
+```
+
+### Term
+```graphql
+type Term {
+  id: ID!
+  slug: String!
+  name: String!
+  taxonomy: Taxonomy!
 }
 ```
 
@@ -53,6 +76,53 @@ type PostType {
 type User {
   id: ID!
   email: String  # Requires user.manage capability
+  image: String
+  role: Role
+}
+```
+
+### Role
+```graphql
+type Role {
+  id: ID!
+  name: String!
+  capabilities: JSON
+}
+```
+
+### Comment
+```graphql
+type Comment {
+  id: ID!
+  postId: ID!
+  author: String!
+  email: String!
+  content: String!
+  status: String!
+  parentId: ID
+  replies: [Comment!]!
+  createdAt: DateTime!
+}
+```
+
+### Menu
+```graphql
+type Menu {
+  id: ID!
+  name: String!
+  slug: String!
+  items: [MenuItem!]!
+}
+```
+
+### MenuItem
+```graphql
+type MenuItem {
+  id: ID!
+  label: String!
+  url: String!
+  order: Int!
+  children: [MenuItem!]!
 }
 ```
 
@@ -98,6 +168,114 @@ query PostBySlug($slug: String!) {
 - `slug` (String, required): Post slug
 
 **Auth:** Public (published only)
+
+### postTypes
+```graphql
+query PostTypes {
+  postTypes {
+    id
+    slug
+    label
+    hierarchical
+    posts {
+      id
+      title
+    }
+  }
+}
+```
+**Auth:** Public
+
+### taxonomies
+```graphql
+query Taxonomies($postTypeSlug: String!) {
+  taxonomies(postTypeSlug: $postTypeSlug) {
+    id
+    slug
+    label
+    terms {
+      id
+      slug
+      name
+    }
+  }
+}
+```
+**Auth:** Public
+
+### menus
+```graphql
+query Menus {
+  menus {
+    id
+    name
+    slug
+    items {
+      id
+      label
+      url
+      order
+      children {
+        id
+        label
+        url
+      }
+    }
+  }
+}
+```
+**Auth:** Public
+
+---
+
+## Mutations
+
+### createPost
+```graphql
+mutation CreatePost($input: CreatePostInput!) {
+  createPost(input: $input) {
+    id
+    title
+    slug
+    status
+  }
+}
+```
+**Auth:** Required | **RBAC:** `post.create`
+
+### updatePost
+```graphql
+mutation UpdatePost($id: ID!, $input: UpdatePostInput!) {
+  updatePost(id: $id, input: $input) {
+    id
+    title
+    slug
+    status
+  }
+}
+```
+**Auth:** Required | **RBAC:** `post.update`
+
+### deletePost
+```graphql
+mutation DeletePost($id: ID!) {
+  deletePost(id: $id)
+}
+```
+**Auth:** Required | **RBAC:** `post.delete`
+
+### createComment
+```graphql
+mutation CreateComment($input: CreateCommentInput!) {
+  createComment(input: $input) {
+    id
+    author
+    content
+    status
+  }
+}
+```
+**Auth:** Public
 
 ---
 

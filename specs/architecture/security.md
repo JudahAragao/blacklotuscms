@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -46,9 +46,13 @@ status: approved
 ## 6. Infrastructure Security
 
 - **Security Headers:** HSTS, X-Frame-Options (SAMEORIGIN), X-Content-Type-Options (nosniff), Referrer-Policy
+- **CSP Nonce:** Habilitado via `CSP_NONCE_ENABLED=true` em produção
 - **Docker:** Container roda como user nextjs (non-root), multi-stage build
 - **Standalone Output:** Next.js standalone minimiza superfície de ataque
 - **SSL:** Suporte a sslmode=verify-full para PostgreSQL
+- **NEXTAUTH_SECRET obrigatório:** App falha se não configurado
+- **ADMIN_PASSWORD validado:** Rejeita defaults fracos em produção
+- **API Key re-validada:** Headers injetados não são confiados diretamente
 
 ## 7. Plugin Security
 

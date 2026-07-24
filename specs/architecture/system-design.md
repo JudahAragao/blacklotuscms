@@ -1,6 +1,6 @@
 ---
 spec_version: "1.4"
-last_updated: "2026-07-19"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -78,18 +78,22 @@ O contexto do tema é mantido em duas stores para resiliência:
 
 1. **Proxy Layer (src/proxy.ts):** Intercepta todas as requisições, valida instalação, autenticação, API keys e rate limiting
 2. **App Router (src/app/):** Rotas organizadas em (admin), (public), api, auth, install
-3. **Services (src/core/services/):** 20 serviços de negócio com RBAC integrado
+3. **Services (src/core/services/):** 23+ serviços de negócio com RBAC integrado (PostService, UserService, PluginService, NetworkService, RouteService, ShortcodeService, etc.)
 4. **GraphQL (src/app/api/graphql/):** Apollo Server com Pothos schema
 5. **REST API (src/app/api/v1/):** Endpoints REST com withApiAuth middleware
-6. **Plugin Sandbox (src/core/sandbox/):** isolated-vm com Bridge API
+6. **Plugin Sandbox (src/core/sandbox/):** isolated-vm (imported) + CompiledPluginLoader (compiled) com Bridge API
 7. **Theme Renderer (src/components/ThemeRenderer.tsx):** Import estático de layouts via registry gerado + CSS isolado
+8. **Route Service (src/core/services/RouteService.ts):** Pattern matching para rotas dinâmicas de plugins e themes
+9. **Network Service (src/core/services/NetworkService.ts):** HTTP outbound, webhooks inbound, audit log
 
 ## Data Flow
 
 1. **Request -> Proxy:** Todas as requisições passam pelo proxy que valida instalação e autenticação
-2. **Proxy -> Route Handler:** Requisições autenticadas chegam às rotas
-3. **Route -> Service:** Rotas delegam lógica de negócio aos serviços
-4. **Service -> Prisma:** Serviços acessam o banco via Prisma proxy
-5. **Service -> HookService:** Serviços disparam actions/filters para plugins
-6. **Theme -> ThemeDataService:** Themes acessam data via permissão validada
-7. **Plugin -> PluginSandbox:** Plugins executam código isolado com Bridge API
+2. **Route Matching:** RouteService verifica plugin routes → theme routes → default → CMS padrão
+3. **Route Handler:** Requisições chegam às rotas (admin, public, api, auth)
+4. **Route -> Service:** Rotas delegam lógica de negócio aos serviços
+5. **Service -> Prisma:** Serviços acessam o banco via Prisma proxy
+6. **Service -> HookService:** Serviços disparam actions/filters para plugins
+7. **Theme -> ThemeDataService:** Themes acessam data via permissão validada
+8. **Plugin -> CompiledPluginLoader/Sandbox:** Plugins executam com Bridge API proxy
+9. **Plugin -> NetworkService:** HTTP outbound e webhooks inbound passam pelo NetworkService

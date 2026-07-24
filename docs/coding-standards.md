@@ -1,6 +1,6 @@
 ---
 spec_version: "1.4"
-last_updated: "2026-07-19"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -115,8 +115,49 @@ await HookService.doAction('post.created', post);
 ## 8. File Organization
 - `src/lib/` — Shared utilities, config, auth
 - `src/core/services/` — Business logic
-- `src/core/sandbox/` — Plugin isolation
+- `src/core/sandbox/` — Plugin isolation (isolated-vm + compiled)
 - `src/schemas/` — Zod schemas
 - `src/types/` — TypeScript DTOs
 - `src/app/` — Routes
 - `src/components/` — React components
+- `plugins/` — Compiled plugins (TypeScript)
+- `themes/` — Theme source code
+- `specs/` — SDD documentation
+- `docs/` — Developer documentation
+- `tasks/` — Task management
+
+## 9. Compiled Plugins Pattern
+Plugins compilados seguem o padrão:
+```typescript
+// plugins/my-plugin/index.ts
+export default async function init(bridge: any) {
+  bridge.hooks.addAction('post.created', async (post) => {
+    // Plugin logic
+  });
+  return { name: 'my-plugin', version: '1.0.0' };
+}
+```
+
+## 10. Route Registration Pattern
+Rotas dinâmicas de plugins:
+```typescript
+bridge.routes.register({
+  path: '/product/:slug',
+  template: 'post.product',
+  handler: async (ctx) => {
+    // ctx.params = { slug: "..." }
+    // ctx.userId = current user (if authenticated)
+    // ctx.role = { name, capabilities } (if authenticated)
+    return { product };
+  }
+});
+```
+
+## 11. Webhook Pattern
+Webhooks inbound para plugins:
+```typescript
+bridge.webhook.on('payment.completed', async (payload) => {
+  // payload = { eventId, data, signature, timestamp, source }
+  return { success: true };
+});
+```

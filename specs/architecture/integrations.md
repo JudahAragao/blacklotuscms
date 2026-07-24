@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -69,3 +69,24 @@ status: approved
 - **Usage:** Hash de senhas de users (cost factor 12)
 - **Auth Flow:** N/A
 - **Fallback:** N/A
+
+## 10. isolated-vm (Plugin Sandbox)
+
+- **Method:** Lib Node.js para execução isolada de código
+- **Usage:** Sandbox para imported plugins (ZIP upload)
+- **Auth Flow:** Bridge API com permissões por método
+- **Fallback:** Compiled plugins (sem sandbox, mas com Bridge API proxy)
+
+## 11. Redis (Optional)
+
+- **Method:** redis v6 client
+- **Usage:** Cache distribuído para rate limiting multi-container (recomendado para produção)
+- **Auth Flow:** Connection string via .secrets.json
+- **Fallback:** In-memory cache (funcional para single-container)
+
+## 12. Sharp (Image Processing)
+
+- **Method:** Lib nativa Node.js
+- **Usage:** Conversão WebP, thumbnails 300x300, extração de metadata
+- **Auth Flow:** N/A (lib local)
+- **Fallback:** Upload sem processamento se Sharp falhar

@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "authentication"
@@ -18,6 +18,9 @@ Sistema de authentication JWT via NextAuth com RBAC capability-based, suporte a 
 - **REQ-04:** Rate limiting dinamico por API Key
 - **REQ-05:** Middleware proxy que valida authentication em todas as rotas protegidas
 - **REQ-06:** Roles default: Administrador, Editor, Autor, Contributor, Assinante
+- **REQ-07:** Proxy com installation gate (redireciona para /install se .installed não existe)
+- **REQ-08:** withApiAuth middleware consolidado (verifica session NextAuth ou API Key header)
+- **REQ-09:** hasCapability com suporte a verificação `.own` para recursos pessoais
 
 ## User Roles
 - **Administrador:** Acesso full, bypass de todas as checks

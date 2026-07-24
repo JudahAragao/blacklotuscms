@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 ---
@@ -27,10 +27,10 @@ Bem-vindo ao BlackLotusCMS. Um CMS moderno e extensivel construido com Next.js 1
 - **RBAC:** Capability-based permissions em JSON
 
 ## Development Workflow
-1. `pnpm install`
+1. `bun install`
 2. `touch .secrets.json .installed`
-3. `pnpm prisma generate`
-4. `pnpm dev`
+3. `bunx prisma generate`
+4. `bun run dev`
 5. Acessar `/install` para configuracao inicial
 
 ## Key Files & Directories

@@ -1,6 +1,6 @@
 ---
 spec_version: "1.2"
-last_updated: "2026-07-06"
+last_updated: "2026-07-23"
 author: "BlackLotusCMS Team"
 status: approved
 feature: "installation"
@@ -22,6 +22,8 @@ Sistema de installation web-based com wizard de configuration, criacao de schema
 - **REQ-08:** Criacao de usuario administrador
 - **REQ-09:** Flag .installed para bloquear re-installation
 - **REQ-10:** Instalacao gate no proxy (redireciona para /install)
+- **REQ-11:** Auto-install de taxonomias default (category hierárquica, post_tag flat) para post type "post"
+- **REQ-12:** Auto-install via init.ts quando banco está vazio (sem roles existentes)
 
 ## Constraints
 - **C01:** Instalacao e one-time (bloqueada apos conclusao)

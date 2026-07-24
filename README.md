@@ -76,6 +76,10 @@ Open `http://localhost:3000/install` and follow the setup wizard.
 | `bun run start` | Start production server |
 | `bun run lint` | Run ESLint |
 | `bun run test` | Run unit tests (Vitest) |
+| `bun run test:watch` | Run tests in watch mode |
+| `bun run test:coverage` | Run tests with coverage report |
+| `bun run test:e2e` | Run E2E tests (Playwright) |
+| `bun run test:e2e:ui` | Run E2E tests with UI |
 | `bunx prisma generate` | Generate Prisma client |
 | `bunx prisma db push` | Push schema to database |
 | `bunx prisma studio` | Open Prisma Studio |
@@ -95,8 +99,8 @@ blacklotuscms/
 │   ├── components/            # React components
 │   │   └── admin/             # Admin UI components
 │   ├── core/
-│   │   ├── sandbox/           # Plugin sandbox (isolated-vm)
-│   │   └── services/          # Business logic (20+ services)
+│   │   ├── sandbox/           # Plugin sandbox (isolated-vm + compiled)
+│   │   └── services/          # Business logic (23+ services)
 │   ├── lib/                   # Shared utilities
 │   │   ├── auth.ts            # NextAuth configuration
 │   │   ├── builder.ts         # Pothos GraphQL builder

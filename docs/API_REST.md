@@ -90,6 +90,12 @@ GET /api/v1/media?page=1
 ```
 **Auth:** Required
 
+### Get Media by ID
+```
+GET /api/v1/media/:id
+```
+**Auth:** Required
+
 ### Upload Media
 ```
 POST /api/v1/media
@@ -175,6 +181,87 @@ GET /api/v1/public/search?q=query
 ```
 **Auth:** Public
 **Min query length:** 3 characters
+
+---
+
+## Users
+
+### Get User
+```
+GET /api/v1/users/:id
+```
+**Auth:** Required | **RBAC:** `user.manage` ou self
+
+**Response 200:**
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "image": null,
+  "role": { "id": "uuid", "name": "Autor", "capabilities": {} },
+  "createdAt": "2026-01-01T00:00:00Z"
+}
+```
+
+### Export User Data (LGPD)
+```
+GET /api/v1/users/:id/data
+```
+**Auth:** Required | **RBAC:** `user.manage` ou self
+
+**Response 200:**
+```json
+{
+  "profile": { "email": "...", "role": "...", "image": "...", "createdAt": "..." },
+  "posts": [...],
+  "apiKeys": [{ "name": "...", "createdAt": "...", "lastUsedAt": "..." }]
+}
+```
+
+### Delete User Account (LGPD)
+```
+DELETE /api/v1/users/:id
+```
+**Auth:** Required | **RBAC:** `user.manage` ou self
+**Note:** Cascade delete: postTerms → metaValues → comments → posts → apiKeys → user. Cannot delete last Administrador.
+
+---
+
+## Webhooks
+
+### Receive Webhook
+```
+POST /api/v1/webhooks/:pluginName/:eventId
+```
+**Auth:** Public (HMAC-SHA256 signature verification if configured)
+
+**Request:**
+```json
+{
+  "data": { "orderId": "123", "amount": 100 },
+  "signature": "hmac-sha256-hash",
+  "timestamp": "2026-01-01T00:00:00Z"
+}
+```
+
+**Response 200:**
+```json
+{ "received": true, "message": "Webhook queued for 1 handler(s)" }
+```
+
+**Note:** Retry automático com exponential backoff (1s → 2s → 4s, max 3 tentativas).
+
+---
+
+## Sitemap
+
+### Generate Sitemap
+```
+GET /api/sitemap.xml
+```
+**Auth:** Public
+
+**Response 200:** XML sitemap
 
 ---
 
