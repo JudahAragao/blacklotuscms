@@ -37,6 +37,10 @@ Sistema de plugins com installation via ZIP, execution em sandbox isolado (isola
 - **REQ-14:** Plugins instalados persistidos em volume compartilhado (`/opt/apps/shared/plugins`)
 - **REQ-15:** RouteService para rotas dinâmicas de plugins com params (:slug, :id)
 - **REQ-16:** Auto-request de permissão de domínio quando bloqueado pela whitelist
+- **REQ-17:** Campo `sandbox` no plugin.json controla modo de execução (`true` = isolated-vm, `false` = compiled)
+- **REQ-18:** Filesystem auto-registration: plugins em `plugins/` sem registro no banco são auto-registrados no boot
+- **REQ-19:** `bun run create-plugin` — script interativo para scaffold de plugins com geração de plugin.json + index.ts
+- **REQ-20:** `setup_dev.sh` — script idempotente de setup local (verifica prerequisitos, PostgreSQL, deps, prisma, registries)
 
 ## User Roles
 - **Administrador:** Install, activate, desactivate plugins, manage permissions

@@ -5,7 +5,9 @@
 BlackLotusCMS supports two types of plugins:
 
 1. **Compiled Plugins** — live in `plugins/`, compiled alongside Next.js, can use npm packages
-2. **Imported Plugins** — uploaded via ZIP, run in isolated-vm sandbox, JS puro (no npm)
+2. **Sandboxed Plugins** — uploaded via ZIP or placed manually, run in isolated-vm sandbox, JS puro (no npm)
+
+Both types use the same `plugin.json` manifest format. The `sandbox` field controls execution mode.
 
 ## Compiled Plugins (Recommended)
 
@@ -44,6 +46,7 @@ plugins/
   "name": "email-manager",
   "version": "1.0.0",
   "description": "Email management with Resend",
+  "sandbox": false,
   "permissions": ["db.read.post", "db.write.post", "http.outbound.request"],
   "npmDependencies": [
     { "name": "resend", "version": "^4.0.0" },
@@ -53,13 +56,14 @@ plugins/
 ```
 
 **Fields:**
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Unique kebab-case identifier |
-| `version` | string | Yes | Semver (x.y.z) |
-| `description` | string | No | Short description |
-| `permissions` | string[] | No | Required Bridge API permissions |
-| `npmDependencies` | `{ name, version }[]` | No | npm packages used with semver ranges (informational) |
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `name` | string | Yes | - | Unique kebab-case identifier |
+| `version` | string | Yes | - | Semver (x.y.z) |
+| `description` | string | No | - | Short description |
+| `sandbox` | boolean | No | `true` | `false` = compiled (direct Node.js), `true` = sandboxed (isolated-vm) |
+| `permissions` | string[] | No | - | Required Bridge API permissions |
+| `npmDependencies` | `{ name, version }[]` | No | - | npm packages used with semver ranges (informational) |
 
 ### Entry Point (index.ts)
 
@@ -95,6 +99,28 @@ export default async function init(bridge: any) {
 4. Click "Ativar" on the compiled plugin
 5. Approve required permissions in "Solicitacoes de Acesso"
 
+### Creating a Plugin (Scaffold)
+
+Use the interactive script to generate a plugin scaffold:
+
+```bash
+bun run create-plugin
+```
+
+The script asks for name, version, description, permissions, and whether to use isolated-vm sandbox. It generates `plugin.json` + `index.ts` in `plugins/<name>/`.
+
+### Filesystem Auto-Registration
+
+Plugins placed manually in `plugins/` are auto-registered on next boot:
+
+- `PluginService.boot()` scans the `plugins/` directory
+- If a plugin has `plugin.json` + `index.ts` but no database record, it's auto-registered
+- The `sandbox` field in `plugin.json` determines loading mode:
+  - `sandbox: true` (default) → loaded via `PluginSandbox` (isolated-vm)
+  - `sandbox: false` → loaded via `CompiledPluginLoader` (direct Node.js)
+
+For compiled plugins (`sandbox: false`), run `npm run generate` after adding the plugin to update the registry.
+
 ### How It Works
 
 - `scripts/generate-plugin-registry.mjs` discovers plugins and generates `src/generated/plugin-registry.ts`
@@ -102,17 +128,16 @@ export default async function init(bridge: any) {
 - `CompiledPluginLoader` loads the plugin with a Proxy-based bridge
 - The bridge controls all access (db, http, storage, hooks, etc.)
 
-## Imported Plugins (isolated-vm)
+## Sandboxed Plugins (isolated-vm)
 
-Imported plugins are uploaded as ZIP files and run in an isolated V8 sandbox. They cannot use npm packages — only pure JavaScript + the Bridge API.
+Sandboxed plugins run in an isolated V8 sandbox. They cannot use npm packages — only pure JavaScript + the Bridge API.
 
 ### Plugin Structure
 ```
 plugins/
 └── my-plugin/
-    ├── plugin.json         # Manifest (required)
-    ├── index.js            # Entry point
-    └── package.json        # Optional dependencies info
+    ├── plugin.json         # Manifest (required, sandbox: true)
+    └── index.js            # Entry point
 ```
 
 ### plugin.json Manifest
@@ -121,11 +146,25 @@ plugins/
   "name": "seo-optimizer",
   "version": "1.0.0",
   "description": "Automatically optimize SEO metadata for posts",
+  "sandbox": true,
   "author": "Developer Name",
   "entry": "index.js",
   "permissions": ["db.read.post", "db.write.post"]
 }
 ```
+
+### Installation Methods
+
+**Via ZIP Upload:**
+1. Admin > Plugins > IMPORT EXTENSION
+2. Select `.zip` file
+3. Plugin extracted to `plugins/<name>/`
+4. Activate via Admin > Plugins
+
+**Via Manual Placement:**
+1. Create `plugins/my-plugin/` with `plugin.json` + `index.js`
+2. On next boot, `PluginService.boot()` auto-registers it in the database
+3. Activate via Admin > Plugins
 
 ## Real Examples
 

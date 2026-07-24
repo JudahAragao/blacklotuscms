@@ -56,11 +56,14 @@ status: approved
 
 ## 7. Plugin Security
 
-- **isolated-vm:** Plugins executam em VM isolada com limite de memória e timeout
+- **Sandboxed Plugins (isolated-vm):** Executam em VM isolada com limite de memória e timeout
+- **Compiled Plugins (Node.js):** Executam no mesmo processo do Next.js, sem isolamento V8
+- **Campo `sandbox`:** plugin.json controla qual metodo de carga usar
 - **Permission Gate:** Acesso a data e hooks requer permissão aprovada
-- **Rate Limit DB:** Limite de 50 queries/segundo por plugin
+- **Rate Limit DB:** Limite de 50 queries/segundo por plugin (ambos os modos)
 - **Jitter:** Delay aleatório entre requisições de plugins
 - **Forbidden Fields:** passwordHash, secret, apiKey, token sempre removidos
+- **Auto-registration:** Plugins no filesystem sem registro no banco são auto-registrados no boot
 
 ## 8. Theme Security
 

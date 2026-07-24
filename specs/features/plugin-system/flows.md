@@ -155,8 +155,23 @@ feature: "plugin-system"
 
 ## Boot na Inicializacao
 
-1. **PluginService.boot() busca plugins ativos**
-   - State: Plugin list
+1. **PluginService.boot() busca plugins ativos no banco**
+   - State: Plugin list from database
 
-2. **Para cada plugin: ler entry, criar sandbox, executar**
-   - State: Plugins loaded
+2. **Para cada plugin: verifica manifest.sandbox**
+   - `sandbox: true` (ou ausente) → carrega via PluginSandbox (isolated-vm)
+   - `sandbox: false` → carrega via CompiledPluginLoader (Node.js direto)
+   - State: Plugin loaded
+
+3. **PluginService.boot() escaneia diretorio plugins/**
+   - Para cada pasta com plugin.json + index.ts:
+   - Se nao existe no banco → auto-registra (isActive: true)
+   - Verifica manifest.sandbox para metodo de carga
+   - State: Filesystem plugins registered
+
+4. **PluginService.bootCompiledPlugins() carrega plugins compiled**
+   - Importa pluginRegistry de src/generated/plugin-registry.ts
+   - Pula plugins com sandbox: true (ja carregados pelo boot)
+   - Verifica se esta ativo no banco e permissoes aprovadas
+   - Carrega via CompiledPluginLoader.load()
+   - State: Compiled plugins loaded

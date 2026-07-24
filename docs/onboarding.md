@@ -27,11 +27,27 @@ Bem-vindo ao BlackLotusCMS. Um CMS moderno e extensivel construido com Next.js 1
 - **RBAC:** Capability-based permissions em JSON
 
 ## Development Workflow
+1. `bash setup_dev.sh` — configura tudo automaticamente (idempotente)
+2. `bun run dev` — inicia o servidor de desenvolvimento
+
+O setup_dev.sh faz:
+- Verifica pré-requisitos (bun, docker, node, python3, make, g++)
+- Cria `.env` com secrets gerados automaticamente
+- Sobe PostgreSQL via Docker
+- Instala dependencias e compila isolated-vm
+- Gera Prisma client e aplica schema no banco
+- Gera registros de themes e plugins
+- Cria diretorio uploads/
+
+### Manual Setup (Fallback)
 1. `bun install`
-2. `touch .secrets.json .installed`
-3. `bunx prisma generate`
-4. `bun run dev`
-5. Acessar `/install` para configuracao inicial
+2. `npm rebuild isolated-vm`
+3. `cp .env.example .env` (editar configuracoes)
+4. `docker run -d --name blacklotus-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=blacklotuscms -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:15-alpine`
+5. `bunx prisma generate && bunx prisma db push`
+6. `npm run generate`
+7. `mkdir -p uploads`
+8. `bun run dev`
 
 ## Key Files & Directories
 - `src/proxy.ts` — Middleware/reverse proxy (auth, installation gate)

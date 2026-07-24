@@ -81,7 +81,7 @@ O contexto do tema é mantido em duas stores para resiliência:
 3. **Services (src/core/services/):** 23+ serviços de negócio com RBAC integrado (PostService, UserService, PluginService, NetworkService, RouteService, ShortcodeService, etc.)
 4. **GraphQL (src/app/api/graphql/):** Apollo Server com Pothos schema
 5. **REST API (src/app/api/v1/):** Endpoints REST com withApiAuth middleware
-6. **Plugin Sandbox (src/core/sandbox/):** isolated-vm (imported) + CompiledPluginLoader (compiled) com Bridge API
+6. **Plugin System (src/core/sandbox/ + src/core/services/PluginService.ts):** Dual-mode loading — `sandbox: true` via `PluginSandbox` (isolated-vm), `sandbox: false` via `CompiledPluginLoader` (Node.js). Filesystem auto-registration for plugins not in database.
 7. **Theme Renderer (src/components/ThemeRenderer.tsx):** Import estático de layouts via registry gerado + CSS isolado
 8. **Route Service (src/core/services/RouteService.ts):** Pattern matching para rotas dinâmicas de plugins e themes
 9. **Network Service (src/core/services/NetworkService.ts):** HTTP outbound, webhooks inbound, audit log

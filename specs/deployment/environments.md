@@ -8,28 +8,31 @@ status: approved
 # Environments
 
 ## Development
-- **Database:** Local PostgreSQL ou Docker
-- **Storage:** Local (./public/uploads)
-- **Secrets:** .secrets.json na raiz
-- **Command:** `pnpm dev`
+- **Database:** PostgreSQL via Docker (container: blacklotus-postgres)
+- **Storage:** Local (./uploads)
+- **Secrets:** .env (auto-gerado por setup_dev.sh)
+- **Setup:** `bash setup_dev.sh` (idempotente)
+- **Command:** `bun run dev`
 
-## Production (Docker)
-- **Database:** PostgreSQL container (postgres:15-alpine)
+## Production (Docker + Blue/Green)
+- **Database:** PostgreSQL container (postgres:15-alpine, compartilhado)
 - **Storage:** Local (container volume) ou S3/R2
-- **Secrets:** .secrets.json montado como volume
-- **Command:** `docker compose up -d --build`
+- **Secrets:** .env por ambiente (blue/green)
+- **Command:** `docker compose up -d` (via GitHub Actions deploy.yml)
 
 ## Required Environment Variables
 ```bash
-# Nao usa .env — configuration via .secrets.json
-# Variaveis internas definidas pelo SecretsService:
-DATABASE_URL=postgresql://...
-NEXTAUTH_SECRET=hex_string
+DATABASE_URL=postgresql://postgres:PASSWORD@localhost:5432/blacklotuscms
+NEXTAUTH_SECRET=hex_string (auto-gerado pelo setup_dev.sh)
 NEXTAUTH_URL=http://localhost:3000
-STORAGE_DRIVER=local|s3|r2
-UPLOAD_DIR=./public/uploads
+DOMAIN=localhost
+CSP_NONCE_ENABLED=false
+STORAGE_DRIVER=local
+UPLOAD_DIR=./uploads
 SANDBOX_MEMORY_LIMIT=512
 SANDBOX_TIMEOUT=30
+ADMIN_EMAIL=admin@blacklotuscms.com
+ADMIN_PASSWORD=CHANGE_ME
 ```
 
 ## Security Headers (next.config.ts)

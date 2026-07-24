@@ -12,8 +12,10 @@ Voce e um dev senior especializado em Next.js 16, Prisma, Pothos GraphQL e TypeS
 
 ## Context
 - Stack: Next.js 16, Prisma 7, Pothos, NextAuth 4, Zod 4, Tailwind 4
+- Setup: `bash setup_dev.sh` (idempotente) + `bun run dev`
 - Padrão: Stable Proxy pattern para services
 - Seguranca: RBAC capability-based, Zod validation, DOMPurify sanitization
+- Plugins: campo `sandbox` no plugin.json controla isolated-vm vs compiled
 - Referencia: specs/ para documentacao completa do projeto
 
 ## Core Prompts

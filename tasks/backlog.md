@@ -143,9 +143,17 @@ status: approved
 - [x] **TASK-101:** Update tasks/backlog.md and verify sprint alignment | est: 1h | depends: [] | feature: docs
 - [x] **TASK-102:** Sync all updated docs/specs/tasks to portfolio project | est: 2h | depends: [TASK-097, TASK-098, TASK-099, TASK-100, TASK-101] | feature: docs
 
+## P17: Dev Setup & Plugin Sandbox Control (2026-07-24)
+- [x] **TASK-103:** setup_dev.sh: script idempotente de setup local (prerequisitos, PostgreSQL, deps, prisma, registries) | est: 3h | depends: [] | feature: deployment
+- [x] **TASK-104:** Campo `sandbox` no plugin.json: controla isolated-vm vs compiled | est: 2h | depends: [] | feature: plugin-system
+- [x] **TASK-105:** Filesystem auto-registration: plugins em plugins/ sem banco são auto-registrados no boot | est: 2h | depends: [TASK-104] | feature: plugin-system
+- [x] **TASK-106:** create-plugin.mjs: script interativo para scaffold de plugins | est: 1.5h | depends: [] | feature: plugin-system
+- [x] **TASK-107:** Atualizar docs: PLUGINS.md, onboarding.md, specs (plugin-system, environments, infrastructure, security) | est: 2h | depends: [TASK-103, TASK-104, TASK-105, TASK-106] | feature: docs
+- [x] **TASK-108:** Sincronizar alterações para portfolio project | est: 1h | depends: [TASK-107] | feature: docs
+
 ## Métricas
-- Total de tasks: 102
-- Concluídas: 102
+- Total de tasks: 108
+- Concluídas: 108
 - Pendentes: 0
 - Bloqueadas: 0
 - Estimativa restante: 0h

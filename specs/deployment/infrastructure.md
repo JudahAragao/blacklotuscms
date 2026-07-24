@@ -15,6 +15,16 @@ status: approved
                            [S3/R2 (optional)]
 ```
 
+## Local Development
+
+```
+[bun run dev] → [Next.js :3000] → [Docker: blacklotus-postgres (:5432)]
+```
+
+- Setup: `bash setup_dev.sh` (verifica prerequisitos, sobe postgres, instala deps, gera prisma + registries)
+- uploads/ no filesystem local (symlink para public/uploads no Docker)
+- .env na raiz com DATABASE_URL apontando para localhost:5432
+
 ## VPS Layout (Blue/Green)
 
 ```
