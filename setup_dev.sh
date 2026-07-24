@@ -146,7 +146,15 @@ if [ -d "node_modules/isolated-vm" ]; then
   # Check if the native addon exists
   if ! find node_modules/isolated-vm -name "*.node" | head -1 | grep -q ".node"; then
     log "Rebuilding isolated-vm with npm (native compilation)..."
-    npm rebuild isolated-vm 2>/dev/null || warn "isolated-vm rebuild failed. Plugins sandbox may not work."
+    if ! npm rebuild isolated-vm 2>/dev/null; then
+      warn "isolated-vm rebuild failed. Plugins sandbox may not work."
+      echo ""
+      echo "  To fix this, install build tools and retry:"
+      echo "    Ubuntu/Debian: sudo apt-get install -y python3 make g++"
+      echo "    macOS:         xcode-select --install"
+      echo "    Then run:      npm rebuild isolated-vm"
+      echo ""
+    fi
   fi
 fi
 
