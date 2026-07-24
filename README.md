@@ -32,38 +32,38 @@ BlackLotusCMS is a modern, high-performance, and extensible Content Management S
 
 ## Instalacao
 
-### 1. Clone and install
 ```bash
-git clone https://github.com/your-org/blacklotuscms.git
+git clone https://github.com/JudahAragao/blacklotuscms.git
 cd blacklotuscms
-bun install
-```
-
-### 2. Start PostgreSQL
-```bash
-# Using Docker (optional)
-docker run -d --name postgres -e POSTGRES_DB=blacklotuscms -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:15-alpine
-
-# Or use your existing PostgreSQL instance
-```
-
-### 3. Initialize configuration
-```bash
-touch .secrets.json .installed
-```
-
-### 4. Generate Prisma client
-```bash
-bunx prisma generate
-```
-
-### 5. Start development server
-```bash
+bash setup_dev.sh
 bun run dev
 ```
 
-### 6. Complete installation
-Open `http://localhost:3000/install` and follow the setup wizard.
+Pronto. O `setup_dev.sh` faz tudo automaticamente:
+
+- Verifica pré-requisitos (bun, docker, node, python3, make, g++)
+- Cria `.env` com secrets gerados automaticamente
+- Sobe PostgreSQL via Docker e aguarda ficar pronto
+- Instala dependencias e compila `isolated-vm`
+- Gera Prisma client e aplica o schema no banco
+- Gera registros de themes e plugins
+- Cria diretorio `uploads/`
+- Cria `.secrets.json` e `.installed`
+
+O script e idempotente — pode rodar quantas vezes quiser. Na primeira vez faz tudo; nas proximas pula etapas ja completadas.
+
+> Para setup manual passo a passo, veja a secao [Setup manual](#setup-manual) no final deste README.
+
+### Credenciais padrao
+
+Apos o setup, o auto-install cria o usuario admin com as credenciais definidas no `.env`:
+
+| Campo | Valor padrao |
+|-------|-------------|
+| Email | `admin@blacklotuscms.com` |
+| Password | valor de `ADMIN_PASSWORD` no `.env` |
+
+> **Importante:** O auto-install cria roles, post types (post/page), taxonomias (categories/tags), e o usuario admin automaticamente na primeira execucao.
 
 ---
 
@@ -71,6 +71,7 @@ Open `http://localhost:3000/install` and follow the setup wizard.
 
 | Command | Description |
 |---------|-------------|
+| `bash setup_dev.sh` | Setup local dev environment (idempotent) |
 | `bun run dev` | Start development server |
 | `bun run build` | Build for production |
 | `bun run start` | Start production server |
@@ -291,11 +292,40 @@ bunx prisma generate
 ```
 
 **Database connection failed**
-Check `.secrets.json` for correct `DATABASE_URL`.
+Check `.env` for correct `DATABASE_URL`. Ensure PostgreSQL is running:
+```bash
+docker ps | grep blacklotus-postgres
+```
+
+**isolated-vm compilation error**
+The `isolated-vm` module requires native compilation tools:
+```bash
+# Ubuntu/Debian
+sudo apt-get install -y python3 make g++
+
+# macOS
+xcode-select --install
+
+# Then rebuild
+npm rebuild isolated-vm
+```
 
 **Port 3000 in use**
 ```bash
 lsof -ti:3000 | xargs kill -9
+```
+
+**Schema drift (tables exist but schema changed)**
+```bash
+bunx prisma db push
+```
+
+**Reset database completely**
+```bash
+docker exec blacklotus-postgres dropdb -U postgres blacklotuscms
+docker exec blacklotus-postgres createdb -U postgres blacklotuscms
+bunx prisma db push
+bun run dev  # auto-install will seed defaults
 ```
 
 ---
@@ -517,6 +547,42 @@ ls -la /home/deploy/portfolio/uploads/
 # Deve mostrar: -rw-r--r-- 1001 1001 (arquivos) e drwxr-xr-x 1001 1001 (pasta)
 stat /home/deploy/portfolio/uploads/
 # Deve mostrar: Access: (0755/drwxr-xr-x) e UID 1001
+```
+
+---
+
+## Setup manual
+
+Se por algum motivo o `setup_dev.sh` nao funcionar, configure manualmente:
+
+```bash
+# 1. Instalar dependencias
+bun install
+
+# 2. Compilar modulo nativo
+npm rebuild isolated-vm
+
+# 3. Criar .env
+cp .env.example .env
+# Edite NEXTAUTH_SECRET, DATABASE_URL, ADMIN_PASSWORD
+
+# 4. PostgreSQL
+docker run -d --name blacklotus-postgres \
+  -e POSTGRES_USER=postgres -e POSTGRES_DB=blacklotuscms \
+  -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:15-alpine
+
+# 5. Banco de dados
+bunx prisma generate
+bunx prisma db push
+
+# 6. Registries
+npm run generate
+
+# 7. Diretorio de uploads
+mkdir -p uploads
+
+# 8. Iniciar
+bun run dev
 ```
 
 ---
