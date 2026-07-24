@@ -8,6 +8,7 @@
     "themes:generate": "node scripts/generate-theme-registry.mjs",
     "plugins:generate": "node scripts/generate-plugin-registry.mjs",
     "generate": "npm run themes:generate && npm run plugins:generate",
+    "create-plugin": "node scripts/create-plugin.mjs",
     "predev": "npm run generate",
     "prebuild": "npm run generate",
     "pretest": "npm run generate",
