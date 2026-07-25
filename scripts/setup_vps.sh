@@ -45,7 +45,7 @@ echo ""
 read -rp "GitHub username (para GHCR image): " GITHUB_USER
 [ -z "$GITHUB_USER" ] && error "GitHub username é obrigatório."
 
-read -rp "Domínio do site (ex: judahdearagao.pro): " DOMAIN
+read -rp "Domínio do site (ex: blacklotuscms.com): " DOMAIN
 [ -z "$DOMAIN" ] && error "Domínio é obrigatório."
 
 read -rp "Senha do PostgreSQL (deixe vazio para gerar automaticamente): " PG_PASSWORD

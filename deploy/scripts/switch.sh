@@ -49,7 +49,7 @@ upstream backend {
 
 server {
     listen 80;
-    server_name judahdearagao.pro www.judahdearagao.pro;
+    server_name blacklotuscms.com www.blacklotuscms.com;
 
     client_max_body_size 64M;
 
@@ -89,5 +89,5 @@ echo "$TARGET" > /opt/apps/current
 
 echo ""
 echo "✅ Switched to $TARGET (port $PORT)"
-echo "🌐 https://judahdearagao.pro"
+echo "🌐 https://blacklotuscms.com"
 echo ""

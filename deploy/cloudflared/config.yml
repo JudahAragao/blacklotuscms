@@ -2,8 +2,8 @@ tunnel: 095aa876-284e-4f53-b1f2-b099a15715a7
 credentials-file: /etc/cloudflared/credentials.json
 
 ingress:
-  - hostname: judahdearagao.pro
+  - hostname: blacklotuscms.com
     service: http://localhost:80
-  - hostname: www.judahdearagao.pro
+  - hostname: www.blacklotuscms.com
     service: http://localhost:80
   - service: http_status:404

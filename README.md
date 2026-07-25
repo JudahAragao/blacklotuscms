@@ -389,7 +389,7 @@ Cada ambiente (blue/green) precisa de um arquivo `.env` em `/opt/apps/<ambiente>
 GITHUB_USER=seu-usuario-github          # Usado para acessar a imagem no GHCR
 DATABASE_URL=postgresql://postgres:SENHA@blacklotus-postgres:5432/blacklotuscms
 NEXTAUTH_SECRET=seu_secret_hex_aqui
-NEXTAUTH_URL=https://judahdearagao.pro
+NEXTAUTH_URL=https://blacklotuscms.com
 
 # Opcional (defaults sensatos)
 STORAGE_DRIVER=local
