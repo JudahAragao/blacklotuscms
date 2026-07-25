@@ -88,6 +88,11 @@ export default async function proxy(req: NextRequest, event: any) {
 
   const response = NextResponse.next();
 
+  if (path.startsWith('/admin')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+  }
+
   if (CSP_NONCE_ENABLED) {
     const nonce = generateNonce();
     response.headers.set('x-nonce', nonce);

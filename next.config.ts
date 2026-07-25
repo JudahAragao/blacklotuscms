@@ -48,6 +48,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  cacheLife: {
+    max: { revalidate: 900, expire: 3600 },
+  },
   async headers() {
     return [
       {
