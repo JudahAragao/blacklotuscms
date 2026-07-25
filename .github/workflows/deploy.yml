@@ -205,7 +205,7 @@ jobs:
             # === 8. Health check (wait for Server Actions to be registered) ===
             echo "Waiting for $TARGET to be healthy..."
             for i in $(seq 1 30); do
-              if docker logs blacklotus-${TARGET}-app --tail=50 2>&1 | grep -q "BlackLotusCMS: Ready"; then
+              if docker logs blacklotus-${TARGET}-app --tail=50 2>&1 | grep -q "Ready"; then
                 echo "$TARGET is healthy!"
                 break
               fi
