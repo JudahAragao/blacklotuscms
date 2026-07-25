@@ -9,49 +9,49 @@ feature: "plugin-system"
 # Plugin System Specification
 
 ## Description
-Sistema de plugins com installation via ZIP, execution em sandbox isolado (isolated-vm), Bridge API secure e sistema de permissions.
+Plugin system with installation via ZIP, execution in isolated sandbox (isolated-vm), secure Bridge API, and permissions system.
 
 ## Requirements
-- **REQ-01:** Instalacao de plugins via upload de ZIP
-- **REQ-02:** Execucao em isolate-vm com limite de memória e timeout
+- **REQ-01:** Plugin installation via ZIP upload
+- **REQ-02:** Execution in isolate-vm with memory limit and timeout
 - **REQ-03:** Bridge API: log, auth, db, storage, hooks, permissions
 - **REQ-03b:** Bridge API db: read, findOne, create, update, updateMany, delete, deleteMany, upsert, transaction (full CRUD + atomic operations)
-- **REQ-03c:** HTTP outbound auto-request de permissão de domínio quando bloqueado pela whitelist
-- **REQ-03d:** Webhook inbound payload máximo de 2MB
-- **REQ-03e:** Bridge API routes: register() para rotas dinâmicas com params (:slug, :id) e handler server-side
-- **REQ-03f:** RouteContext inclui `role` (name + capabilities) do user autenticado para plugins de e-commerce
-- **REQ-04:** Sistema de permissions (requesterPlugin, providerPlugin, capability)
-- **REQ-05:** Rate limit de 50 queries/segundo por plugin (aplicado antes de hasPermission, como proteção contra abuso de recursos)
-- **REQ-05b:** Jitter aleatório de 1-5ms entre chamadas da Bridge API para mitigar thundering herd
-- **REQ-06:** Sanitization de data retornados ao plugin
-- **REQ-07:** Boot automatico de plugins ativos na inicializacao
-- **REQ-08:** Hooks (Actions + Filters) para extensibilidade
-- **REQ-09:** HTTP outbound via bridge.http.request() com whitelist de domínios
-- **REQ-10:** Compiled plugins: plugins TypeScript compilados junto com Next.js, com Proxy-based bridge
-- **REQ-10b:** generate-plugin-registry.mjs: script que descobre plugins em plugins/, gera plugin-registry.ts com imports estáticos
-- **REQ-10c:** CompiledPluginLoader: carrega plugins compilados com bridge Proxy, controla acesso a db/http/storage/hooks/webhook/routes
-- **REQ-10d:** Compiled plugins permissions: permissões declaradas no plugin.json, solicitadas na ativação, admin aprova no painel
-- **REQ-11:** Webhook inbound via bridge.webhook.on() com signature verification (HMAC-SHA256)
-- **REQ-12:** Network audit log para todas as chamadas HTTP e webhooks
-- **REQ-13:** Rate limit separado para HTTP outbound (20 req/s, configurável por plugin)
-- **REQ-14:** Plugins instalados persistidos em volume compartilhado (`/opt/apps/shared/plugins`)
-- **REQ-15:** RouteService para rotas dinâmicas de plugins com params (:slug, :id)
-- **REQ-16:** Auto-request de permissão de domínio quando bloqueado pela whitelist
-- **REQ-17:** Campo `sandbox` no plugin.json controla modo de execução (`true` = isolated-vm, `false` = compiled)
-- **REQ-18:** Filesystem auto-registration: plugins em `plugins/` sem registro no banco são auto-registrados no boot
-- **REQ-19:** `bun run create-plugin` — script interativo para scaffold de plugins com geração de plugin.json + index.ts
-- **REQ-20:** `setup_dev.sh` — script idempotente de setup local (verifica prerequisitos, PostgreSQL, deps, prisma, registries)
+- **REQ-03c:** HTTP outbound auto-request of domain permission when blocked by whitelist
+- **REQ-03d:** Webhook inbound maximum payload of 2MB
+- **REQ-03e:** Bridge API routes: register() for dynamic routes with params (:slug, :id) and server-side handler
+- **REQ-03f:** RouteContext includes `role` (name + capabilities) of authenticated user for e-commerce plugins
+- **REQ-04:** Permissions system (requesterPlugin, providerPlugin, capability)
+- **REQ-05:** Rate limit of 50 queries/second per plugin (applied before hasPermission, as protection against resource abuse)
+- **REQ-05b:** Random jitter of 1-5ms between Bridge API calls to mitigate thundering herd
+- **REQ-06:** Data sanitization returned to plugin
+- **REQ-07:** Automatic boot of active plugins on startup
+- **REQ-08:** Hooks (Actions + Filters) for extensibility
+- **REQ-09:** HTTP outbound via bridge.http.request() with domain whitelist
+- **REQ-10:** Compiled plugins: TypeScript plugins compiled together with Next.js, with Proxy-based bridge
+- **REQ-10b:** generate-plugin-registry.mjs: script that discovers plugins in plugins/, generates plugin-registry.ts with static imports
+- **REQ-10c:** CompiledPluginLoader: loads compiled plugins with bridge Proxy, controls access to db/http/storage/hooks/webhook/routes
+- **REQ-10d:** Compiled plugins permissions: permissions declared in plugin.json, requested on activation, admin approves in panel
+- **REQ-11:** Webhook inbound via bridge.webhook.on() with signature verification (HMAC-SHA256)
+- **REQ-12:** Network audit log for all HTTP calls and webhooks
+- **REQ-13:** Separate rate limit for HTTP outbound (20 req/s, configurable per plugin)
+- **REQ-14:** Installed plugins persisted in shared volume (`/opt/apps/shared/plugins`)
+- **REQ-15:** RouteService for dynamic plugin routes with params (:slug, :id)
+- **REQ-16:** Auto-request of domain permission when blocked by whitelist
+- **REQ-17:** `sandbox` field in plugin.json controls execution mode (`true` = isolated-vm, `false` = compiled)
+- **REQ-18:** Filesystem auto-registration: plugins in `plugins/` without database record are auto-registered on boot
+- **REQ-19:** `bun run create-plugin` — interactive script for plugin scaffolding with plugin.json + index.ts generation
+- **REQ-20:** `setup_dev.sh` — idempotent local setup script (checks prerequisites, PostgreSQL, deps, prisma, registries)
 
 ## User Roles
-- **Administrador:** Install, activate, desactivate plugins, manage permissions
-- **Demais roles:** Sem acesso ao gerenciamento de plugins
+- **Administrator:** Install, activate, deactivate plugins, manage permissions
+- **Other roles:** No access to plugin management
 
 ## Constraints
-- **C01:** Plugins executam com SANDBOX_MEMORY_LIMIT (default 512MB)
-- **C02:** Timeout configuravel via SANDBOX_TIMEOUT (default 30s)
-- **C03:** Fields sensiveis (passwordHash, secret, etc.) sempre removidos
-- **C04:** Plugin Permission Gate verifica antes de cada acesso
-- **C05:** Cadeia de segurança: checkRateLimit() → applyJitter() → hasPermission() → query ao banco
+- **C01:** Plugins run with SANDBOX_MEMORY_LIMIT (default 512MB)
+- **C02:** Configurable timeout via SANDBOX_TIMEOUT (default 30s)
+- **C03:** Sensitive fields (passwordHash, secret, etc.) always removed
+- **C04:** Plugin Permission Gate checks before each access
+- **C05:** Security chain: checkRateLimit() → applyJitter() → hasPermission() → database query
 
 ## Dependencies
 - **Depends on:** Authentication, HookService

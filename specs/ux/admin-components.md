@@ -71,7 +71,7 @@ Renders appropriate input for each of 15 field types:
 | `tab` / `section` | — | Organizers only, no input rendered |
 
 #### 4. Repeater Support
-- Add/remove rows with "Adicionar Item" button
+- Add/remove rows with "Add Item" button
 - Each row renders its configured sub-fields
 - Sub-fields support all field types (recursive)
 - Layout options: `block` (default), `table`, `row`

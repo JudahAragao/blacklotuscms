@@ -6,9 +6,9 @@ status: approved
 feature: "search"
 ---
 
-# Busca Error States
+# Search Error States
 
-## ERR-01: Query Vazia ou Curta
+## ERR-01: Empty or Short Query
 - **Condition:** query.length < 3
-- **Código HTTP:** N/A (retorna [])
-- **Ação do sistema:** Retorna array vazio silenciosamente
+- **HTTP Code:** N/A (returns [])
+- **System action:** Returns empty array silently

@@ -8,243 +8,243 @@ feature: "post-management"
 
 # Post Management Acceptance Tests
 
-## AT-01: Criar Post como Administrador
+## AT-01: Create Post as Administrator
 - **GIVEN** an authenticated Administrator user
-- **WHEN** envia POST /api/v1/posts/post com titulo, slug, content, status="published"
-- **THEN** o post e criado com status "published" e publishedAt definido
-- **TEST DATA:** `{ "title": "Meu Post", "slug": "meu-post", "content": "Conteudo", "status": "published" }`
-- **Referencia:** FR05, BR04
+- **WHEN** sends POST /api/v1/posts/post with title, slug, content, status="published"
+- **THEN** the post is created with status "published" and publishedAt defined
+- **TEST DATA:** `{ "title": "My Post", "slug": "my-post", "content": "Content", "status": "published" }`
+- **Reference:** FR05, BR04
 
 ## AT-02: Contributor Draft Lock
-- **GIVEN** um usuario Contributor autenticado
-- **WHEN** envia POST com status="published"
-- **THEN** o post e criado com status "draft"
-- **TEST DATA:** `{ "title": "Post Contributor", "slug": "post-colab", "status": "published" }`
-- **Referencia:** FR05, BR02
+- **GIVEN** an authenticated Contributor user
+- **WHEN** sends POST with status="published"
+- **THEN** the post is created with status "draft"
+- **TEST DATA:** `{ "title": "Contributor Post", "slug": "contributor-post", "status": "published" }`
+- **Reference:** FR05, BR02
 
 ## AT-03: Duplicate Slug
-- **GIVEN** um post com slug "meu-post" ja existe
-- **WHEN** tenta criar outro post com mesmo slug
-- **THEN** retorna erro 409 ou erro de validacao
-- **Referencia:** FR05
+- **GIVEN** a post with slug "my-post" already exists
+- **WHEN** tries to create another post with the same slug
+- **THEN** returns 409 error or validation error
+- **Reference:** FR05
 
-## AT-04: Post Nao Visivel Publicamente
-- **GIVEN** um post com status "draft"
-- **WHEN** theme consulta PostService.getLeanPostsByType
-- **THEN** o post nao e retornado
-- **Referencia:** FR05, BR01
+## AT-04: Post Not Publicly Visible
+- **GIVEN** a post with status "draft"
+- **WHEN** theme queries PostService.getLeanPostsByType
+- **THEN** the post is not returned
+- **Reference:** FR05, BR01
 
-## AT-05: Post com Expiracao
-- **GIVEN** um post com expiresAt no passado
-- **WHEN** theme consulta publicamente
-- **THEN** o post nao e retornado
-- **Referencia:** FR05, BR01
+## AT-05: Post with Expiration
+- **GIVEN** a post with expiresAt in the past
+- **WHEN** theme queries publicly
+- **THEN** the post is not returned
+- **Reference:** FR05, BR01
 
-## AT-06: Editar Post de Outro Autor
-- **GIVEN** um Autor tentando editar post de outro usuario
-- **WHEN** envia update sem capability "post.manage"
-- **THEN** retorna erro 403
-- **Referencia:** FR05, BR04
+## AT-06: Edit Another Author's Post
+- **GIVEN** an Author trying to edit another user's post
+- **WHEN** sends update without "post.manage" capability
+- **THEN** returns 403 error
+- **Reference:** FR05, BR04
 
 ## AT-07: MetaFields Validation
-- **GIVEN** um post com FieldGroup configurado
-- **WHEN** envia metaFields com campo obrigatorio vazio
-- **THEN** retorna erro 422
-- **Referencia:** FR06
+- **GIVEN** a post with FieldGroup configured
+- **WHEN** sends metaFields with mandatory field empty
+- **THEN** returns 422 error
+- **Reference:** FR06
 
 ## AT-08: Cache Revalidation
-- **GIVEN** posts listados com cache
-- **WHEN** um post e criado ou atualizado
-- **THEN** revalidateTag('posts') e chamado e cache e invalidado
-- **Referencia:** FR05, NFR01
+- **GIVEN** posts listed with cache
+- **WHEN** a post is created or updated
+- **THEN** revalidateTag('posts') is called and cache is invalidated
+- **Reference:** FR05, NFR01
 
 ## AT-09: Tab and Section Field Types
-- **GIVEN** um PostType com campos Tab e Section configurados
-- **WHEN** usuario cria uma Aba "Dados Gerais" com campos abaixo, e uma Secao "Midia" com campos abaixo
-- **THEN** o editor de posts exibe navegacao por abas, com secao visual dentro da aba ativa
-- **AND** campos Tab/Section nao geram MetaValues nem validacao
-- **Referencia:** FR06
+- **GIVEN** a PostType with Tab and Section fields configured
+- **WHEN** user creates a "General Data" tab with fields below, and a "Media" section with fields below
+- **THEN** the post editor displays tab navigation, with visual section within the active tab
+- **AND** Tab/Section fields do not generate MetaValues nor validation
+- **Reference:** FR06
 
 ## AT-10: Tab Field Groups Correctly
-- **GIVEN** um PostType com 3 abas: "Geral", "SEO", "Avancado"
-- **WHEN** usuario navega entre as abas no editor
-- **THEN** cada aba exibe apenas seus campos (campos entre uma Tab e a proxima Tab)
-- **Referencia:** FR06
+- **GIVEN** a PostType with 3 tabs: "General", "SEO", "Advanced"
+- **WHEN** user navigates between tabs in the editor
+- **THEN** each tab displays only its fields (fields between one Tab and the next Tab)
+- **Reference:** FR06
 
 ## AT-11: Drag and Drop No Accidental Reorder
-- **GIVEN** um FieldGroup com campos customizados
-- **WHEN** usuario arrasta um campo e solta no mesmo lugar
-- **THEN** a ordem dos campos nao e alterada
-- **Referencia:** FR06
+- **GIVEN** a FieldGroup with custom fields
+- **WHEN** user drags a field and drops it in the same place
+- **THEN** the field order is not changed
+- **Reference:** FR06
 
 ## AT-12: Auto-Deduplicate Field Anchors
-- **GIVEN** um PostType com campo "Titulo" (anchor: titulo)
-- **WHEN** usuario cria outro campo com rotulo "Titulo"
-- **THEN** o anchor do segundo campo e "titulo_2"
-- **AND** terceiro "Titulo" gera "titulo_3"
-- **Referencia:** FR06
+- **GIVEN** a PostType with field "Title" (anchor: title)
+- **WHEN** user creates another field with label "Title"
+- **THEN** the second field's anchor is "title_2"
+- **AND** third "Title" generates "title_3"
+- **Reference:** FR06
 
 ## AT-13: Tab/Section Visual Distinction
-- **GIVEN** um FieldGroup com campos Tab, Section e campos de dados
-- **WHEN** usuario visualiza a lista de campos
-- **THEN** campos Tab e Section exibem fundo mais escuro e badge "aba"/"secao"
-- **Referencia:** FR06
+- **GIVEN** a FieldGroup with Tab, Section and data fields
+- **WHEN** user views the field list
+- **THEN** Tab and Section fields display darker background and "tab"/"section" badge
+- **Reference:** FR06
 
 ## AT-14: FieldGroup Location Rules
-- **GIVEN** um FieldGroup com location "Post Type = Post"
-- **WHEN** usuario cria um post no tipo "Post"
-- **THEN** os campos do FieldGroup aparecem no editor
-- **AND** posts em outros tipos NÃO mostram esses campos
-- **Referencia:** FR06
+- **GIVEN** a FieldGroup with location "Post Type = Post"
+- **WHEN** user creates a post in type "Post"
+- **THEN** the FieldGroup fields appear in the editor
+- **AND** posts in other types DO NOT show these fields
+- **Reference:** FR06
 
 ## AT-15: Multiple Location Rules
-- **GIVEN** um FieldGroup com locations "Post Type = Post" e "Post Type = Page"
-- **WHEN** usuario cria um post ou uma página
-- **THEN** os campos do FieldGroup aparecem em ambos
-- **Referencia:** FR06
+- **GIVEN** a FieldGroup with locations "Post Type = Post" and "Post Type = Page"
+- **WHEN** user creates a post or a page
+- **THEN** the FieldGroup fields appear in both
+- **Reference:** FR06
 
 ## AT-16: Taxonomy Field Groups
-- **GIVEN** um FieldGroup com location "Taxonomy = category"
-- **WHEN** usuario edita uma categoria
-- **THEN** os campos do FieldGroup aparecem na edição da categoria
-- **Referencia:** FR06
+- **GIVEN** a FieldGroup with location "Taxonomy = category"
+- **WHEN** user edits a category
+- **THEN** the FieldGroup fields appear in category editing
+- **Reference:** FR06
 
 ## AT-17: FieldGroups Admin Page
-- **GIVEN** um administrador
-- **WHEN** acessa /admin/settings/field-groups
-- **THEN** pode listar, criar, editar e excluir FieldGroups com locations
-- **Referencia:** FR06
+- **GIVEN** an administrator
+- **WHEN** accesses /admin/settings/field-groups
+- **THEN** can list, create, edit and delete FieldGroups with locations
+- **Reference:** FR06
 
 ## AT-18: Repeater Sub-Fields
-- **GIVEN** um FieldGroup com campo Repeater contendo sub-campos (text, image)
-- **WHEN** usuario adiciona itens no repeater
-- **THEN** cada linha exibe os sub-campos configurados
-- **AND** dados são salvos como array de objetos
-- **Referencia:** FR06
+- **GIVEN** a FieldGroup with Repeater field containing sub-fields (text, image)
+- **WHEN** user adds items in the repeater
+- **THEN** each row displays the configured sub-fields
+- **AND** data is saved as an array of objects
+- **Reference:** FR06
 
 ## AT-19: Flexible Content Layouts
-- **GIVEN** um FieldGroup com campo Flexible Content com 2 layouts (Hero, Texto)
-- **WHEN** usuario clica em "+ Hero" ou "+ Texto"
-- **THEN** um novo bloco é adicionado com os sub-campos daquele layout
-- **AND** usuario pode adicionar múltiplos blocos em qualquer ordem
-- **Referencia:** FR06
+- **GIVEN** a FieldGroup with Flexible Content field with 2 layouts (Hero, Text)
+- **WHEN** user clicks "+ Hero" or "+ Text"
+- **THEN** a new block is added with the sub-fields of that layout
+- **AND** user can add multiple blocks in any order
+- **Reference:** FR06
 
 ## AT-20: Sub-Fields Inline Layout
-- **GIVEN** um Repeater com sub-campos configurados
-- **WHEN** usuario visualiza os sub-campos no editor de field groups
-- **THEN** sub-campos aparecem em formato inline com #, Rótulo, Nome (âncora), Tipo
-- **AND** cada sub-campo tem botões de configuração (engrenagem) e remoção (lixeira)
-- **AND** ao clicar na engrenagem, painel com abas (Geral, Validação, Lógica Condicional) é expandido
-- **Referencia:** FR06
+- **GIVEN** a Repeater with configured sub-fields
+- **WHEN** user views the sub-fields in the field groups editor
+- **THEN** sub-fields appear in inline format with #, Label, Name (anchor), Type
+- **AND** each sub-field has configuration (gear) and removal (trash) buttons
+- **AND** when clicking the gear, a panel with tabs (General, Validation, Conditional Logic) is expanded
+- **Reference:** FR06
 
 ## AT-21: Repeater Layout Modes
-- **GIVEN** um campo Repeater com layout "Table" selecionado
-- **WHEN** usuario visualiza o repeater na página de edição do post
-- **THEN** os itens são exibidos em formato de tabela com colunas
-- **AND** layout "Block" exibe como cards e "Row" exibe em linha
-- **Referencia:** FR06
+- **GIVEN** a Repeater field with "Table" layout selected
+- **WHEN** user views the repeater on the post editing page
+- **THEN** items are displayed in table format with columns
+- **AND** "Block" layout displays as cards and "Row" layout displays in a row
+- **Reference:** FR06
 
 ## AT-22: Drag Field to Repeater (Root → Sub-field)
-- **GIVEN** um FieldGroup com campo-raiz "Text" e campo Repeater com sub-campos
-- **WHEN** usuario arrasta o campo "Text" para a zona de drop dentro do Repeater
-- **THEN** o campo "Text" é removido da lista de campos-raiz
-- **AND** o campo "Text" é adicionado como sub-campo do Repeater
-- **AND** toda configuração do campo (tipo, validação, etc.) é preservada
-- **Referencia:** REQ-03a
+- **GIVEN** a FieldGroup with root field "Text" and Repeater field with sub-fields
+- **WHEN** user drags the "Text" field to the drop zone inside the Repeater
+- **THEN** the "Text" field is removed from the root field list
+- **AND** the "Text" field is added as a Repeater sub-field
+- **AND** all field configuration (type, validation, etc.) is preserved
+- **Reference:** REQ-03a
 
 ## AT-23: Drag Sub-field to Root (Sub-field → Root)
-- **GIVEN** um Repeater com sub-campo "Email"
-- **WHEN** usuario arrasta o sub-campo "Email" para a lista de campos-raiz
-- **THEN** o sub-campo "Email" é removido do Repeater
-- **AND** o campo "Email" é adicionado como campo-raiz
-- **AND** toda configuração do campo é preservada
-- **Referencia:** REQ-03a
+- **GIVEN** a Repeater with sub-field "Email"
+- **WHEN** user drags the "Email" sub-field to the root field list
+- **THEN** the "Email" sub-field is removed from the Repeater
+- **AND** the "Email" field is added as a root field
+- **AND** all field configuration is preserved
+- **Reference:** REQ-03a
 
 ## AT-24: Drag Between Repeaters
-- **GIVEN** dois Repeaters: "Repeater A" com sub-campo "Name" e "Repeater B"
-- **WHEN** usuario arrasta "Name" de "Repeater A" para "Repeater B"
-- **THEN** o sub-campo "Name" é removido de "Repeater A"
-- **AND** o sub-campo "Name" é adicionado em "Repeater B"
-- **Referencia:** REQ-03a
+- **GIVEN** two Repeaters: "Repeater A" with sub-field "Name" and "Repeater B"
+- **WHEN** user drags "Name" from "Repeater A" to "Repeater B"
+- **THEN** the "Name" sub-field is removed from "Repeater A"
+- **AND** the "Name" sub-field is added to "Repeater B"
+- **Reference:** REQ-03a
 
 ## AT-25: Drag to Flexible Content Layout
-- **GIVEN** um campo Flexible Content com layout "Hero" e campo-raiz "Image"
-- **WHEN** usuario arrasta "Image" para a zona de drop dentro do layout "Hero"
-- **THEN** o campo "Image" é removido da lista de campos-raiz
-- **AND** o campo "Image" é adicionado como sub-campo do layout "Hero"
-- **Referencia:** REQ-03a
+- **GIVEN** a Flexible Content field with layout "Hero" and root field "Image"
+- **WHEN** user drags "Image" to the drop zone inside the "Hero" layout
+- **THEN** the "Image" field is removed from the root field list
+- **AND** the "Image" field is added as a sub-field of the "Hero" layout
+- **Reference:** REQ-03a
 
 ## AT-26: Drop Zone Visual Feedback
-- **GIVEN** um Repeater ou Flexible Content Layout
-- **WHEN** usuario arrasta um campo sobre a zona de drop
-- **THEN** a zona de drop exibe feedback visual (borda tracejada azul, texto "Soltar aqui")
-- **AND** ao soltar, o campo é movido para o destino correto
-- **Referencia:** REQ-03a
+- **GIVEN** a Repeater or Flexible Content Layout
+- **WHEN** user drags a field over the drop zone
+- **THEN** the drop zone displays visual feedback (dashed blue border, "Drop here" text)
+- **AND** when dropped, the field is moved to the correct destination
+- **Reference:** REQ-03a
 
 ## AT-27: Sub-Field Config Tabs
-- **GIVEN** um sub-campo expandido no editor de field groups
-- **WHEN** usuario clica na engrenagem do sub-campo
-- **THEN** painel de configuração é expandido com abas: Geral, Validação, Lógica Condicional
-- **AND** aba Geral mostra: Tipo (FieldTypeSelector), Largura, Instruções, Obrigatório
-- **AND** aba Validação mostra: Min, Max
-- **AND** aba Lógica Condicional mostra: Status (Ativo/Inativo) e regras
-- **Referencia:** REQ-03
+- **GIVEN** an expanded sub-field in the field groups editor
+- **WHEN** user clicks the gear on the sub-field
+- **THEN** configuration panel is expanded with tabs: General, Validation, Conditional Logic
+- **AND** General tab shows: Type (FieldTypeSelector), Width, Instructions, Mandatory
+- **AND** Validation tab shows: Min, Max
+- **AND** Conditional Logic tab shows: Status (Active/Inactive) and rules
+- **Reference:** REQ-03
 
 ## AT-28: FieldTypeSelector for Sub-Fields
-- **GIVEN** um sub-campo com aba Geral expandida
-- **WHEN** usuario clica no seletor de tipo
-- **THEN** dropdown aberto com ícones, categorias e busca
-- **AND** mesmo comportamento do seletor de campos-raiz
-- **Referencia:** REQ-03
+- **GIVEN** a sub-field with General tab expanded
+- **WHEN** user clicks the type selector
+- **THEN** dropdown opens with icons, categories and search
+- **AND** same behavior as the root field selector
+- **Reference:** REQ-03
 
 ## AT-29: Click to Add Sub-Field
-- **GIVEN** um Repeater ou Flexible Content Layout
-- **WHEN** usuario clica na zona de drop "Arraste ou clique para adicionar sub-campo"
-- **THEN** um novo sub-campo é adicionado ao repeater/layout
-- **AND** sub-campo é criado com tipo "text" e configurações padrão
-- **Referencia:** REQ-03
+- **GIVEN** a Repeater or Flexible Content Layout
+- **WHEN** user clicks the "Drag or click to add sub-field" drop zone
+- **THEN** a new sub-field is added to the repeater/layout
+- **AND** sub-field is created with type "text" and default settings
+- **Reference:** REQ-03
 
 ## AT-30: Save Button Stays on Page
-- **GIVEN** um FieldGroup sendo editado
-- **WHEN** usuario clica em "Salvar Configuração"
-- **THEN** mensagem de sucesso é exibida
-- **AND** usuario permanece na mesma página de edição (não redireciona para lista)
-- **Referencia:** REQ-03
+- **GIVEN** a FieldGroup being edited
+- **WHEN** user clicks "Save Configuration"
+- **THEN** success message is displayed
+- **AND** user remains on the same editing page (does not redirect to list)
+- **Reference:** REQ-03
 
 ## AT-31: Sub-Field Name Auto-Generation
-- **GIVEN** um sub-campo com rótulo "Telefone Comercial"
-- **WHEN** usuario digita o rótulo
-- **THEN** nome âncora é gerado automaticamente como "telefone_comercial"
-- **AND** nome âncora é atualizado sempre que o rótulo muda
-- **AND** campo de nome âncora é editável para personalização manual
-- **Referencia:** REQ-03
+- **GIVEN** a sub-field with label "Business Phone"
+- **WHEN** user types the label
+- **THEN** anchor name is automatically generated as "business_phone"
+- **AND** anchor name is updated whenever the label changes
+- **AND** anchor name field is editable for manual customization
+- **Reference:** REQ-03
 
 ## AT-32: Icon Field with Lucide Library
-- **GIVEN** um FieldGroup com campo do tipo "Ícone" configurado com source "lib de ícones"
-- **WHEN** usuario clica no seletor de ícone
-- **THEN** dropdown aberto com busca e categorias de ícones
-- **AND** usuario pode buscar ícone por nome (ex: "star", "heart", "home")
-- **AND** ícone selecionado é salvo como objeto { iconSource: 'lucide', iconName: 'star' }
-- **Referencia:** REQ-10
+- **GIVEN** a FieldGroup with "Icon" type field configured with source "icon library"
+- **WHEN** user clicks the icon selector
+- **THEN** dropdown opens with search and icon categories
+- **AND** user can search for icons by name (e.g., "star", "heart", "home")
+- **AND** selected icon is saved as object { iconSource: 'lucide', iconName: 'star' }
+- **Reference:** REQ-10
 
 ## AT-33: Icon Field with Custom SVG
-- **GIVEN** um FieldGroup com campo do tipo "Ícone" configurado com source "SVG Customizado"
-- **WHEN** usuario cola um SVG válido no textarea
-- **THEN** preview do ícone é exibido abaixo do textarea
-- **AND** SVG é sanitizado (script tags, event handlers removidos)
-- **AND** ícone é salvo como objeto { iconSource: 'custom', iconSvg: '<svg>...</svg>' }
-- **Referencia:** REQ-10
+- **GIVEN** a FieldGroup with "Icon" type field configured with source "Custom SVG"
+- **WHEN** user pastes a valid SVG in the textarea
+- **THEN** icon preview is displayed below the textarea
+- **AND** SVG is sanitized (script tags, event handlers removed)
+- **AND** icon is saved as object { iconSource: 'custom', iconSvg: '<svg>...</svg>' }
+- **Reference:** REQ-10
 
 ## AT-34: SVG Sanitization Security
-- **GIVEN** um SVG com conteúdo malicioso (script tag, onclick handler, javascript: protocol)
-- **WHEN** usuario tenta salvar o SVG customizado
-- **THEN** conteúdo malicioso é removido
-- **AND** SVG sanitizado é salvo sem comprometer segurança
-- **Referencia:** REQ-10
+- **GIVEN** an SVG with malicious content (script tag, onclick handler, javascript: protocol)
+- **WHEN** user tries to save the custom SVG
+- **THEN** malicious content is removed
+- **AND** sanitized SVG is saved without compromising security
+- **Reference:** REQ-10
 
 ## AT-35: Icon Field in Theme Rendering
-- **GIVEN** um post com campo de ícone preenchido
-- **WHEN** tema renderiza o post usando renderIcon()
-- **THEN** ícone é renderizado com segurança (lucide-react ou SVG sanitizado)
-- **AND** ícone respeita cor e tamanho configurados
-- **Referencia:** REQ-10
+- **GIVEN** a post with a filled icon field
+- **WHEN** theme renders the post using renderIcon()
+- **THEN** icon is rendered safely (lucide-react or sanitized SVG)
+- **AND** icon respects configured color and size
+- **Reference:** REQ-10

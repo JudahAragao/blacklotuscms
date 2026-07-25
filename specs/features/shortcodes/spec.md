@@ -9,15 +9,15 @@ feature: "shortcodes"
 # Shortcodes Specification
 
 ## Description
-Sistema de macros registráveis por plugins e nativas, processadas no conteúdo. Inspirado nos shortcodes do WordPress.
+Registerable macro system for plugins and native shortcodes, processed in content. Inspired by WordPress shortcodes.
 
 ## Requirements
-- **REQ-01:** Registro de shortcodes via `shortcodeService.register(tag, handler)`
-- **REQ-02:** Processamento de conteúdo via `shortcodeService.parse(content)`
-- **REQ-03:** Suporte a atributos: `[tag attr="value"]`
-- **REQ-04:** Suporte a conteúdo encerrado: `[tag]content[/tag]`
-- **REQ-05:** Sanitização automática do output via `sanitizeHTML()`
-- **REQ-06:** Shortcodes nativos: `[button]` e `[youtube]`
+- **REQ-01:** Shortcode registration via `shortcodeService.register(tag, handler)`
+- **REQ-02:** Content processing via `shortcodeService.parse(content)`
+- **REQ-03:** Attribute support: `[tag attr="value"]`
+- **REQ-04:** Enclosed content support: `[tag]content[/tag]`
+- **REQ-05:** Automatic output sanitization via `sanitizeHTML()`
+- **REQ-06:** Native shortcodes: `[button]` and `[youtube]`
 
 ## Syntax
 ```
@@ -30,8 +30,8 @@ Sistema de macros registráveis por plugins e nativas, processadas no conteúdo.
 
 ### [button]
 ```html
-[button url="/contact"]Fale Conosco[/button]
-<!-- Output: <a href="/contact" class="btn-shortcode">Fale Conosco</a> -->
+[button url="/contact"]Contact Us[/button]
+<!-- Output: <a href="/contact" class="btn-shortcode">Contact Us</a> -->
 ```
 
 ### [youtube]
@@ -41,11 +41,11 @@ Sistema de macros registráveis por plugins e nativas, processadas no conteúdo.
 ```
 
 ## Constraints
-- **C01:** Output é sempre sanitizado com DOMPurify
-- **C02:** Shortcodes não registrados são ignorados (mantidos no conteúdo)
-- **C03:** Handler pode ser síncrono ou async
+- **C01:** Output is always sanitized with DOMPurify
+- **C02:** Unregistered shortcodes are ignored (kept in content)
+- **C03:** Handler can be synchronous or async
 
 ## Dependencies
 - **Depends on:** DOMPurify (sanitization)
 - **Blocks:** NONE
-- **Related to:** Plugin System (plugins podem registrar shortcodes)
+- **Related to:** Plugin System (plugins can register shortcodes)

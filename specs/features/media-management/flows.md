@@ -7,65 +7,65 @@ status: approved
 
 # Media Management Flows
 
-## Upload de Media (Imagem)
+## Media Upload (Image)
 
-1. **User seleciona arquivo**
-   - Entrada: File object via FormData
+1. **User selects file**
+   - Input: File object via FormData
    - State: File received
 
 2. **RBAC check**
-   - Verifica: canPerformAction(user, 'media.upload')
+   - Checks: canPerformAction(user, 'media.upload')
    - State: Authorized
 
-3. **Deteccao de tipo**
-   - Verifica: file.type.startsWith('image/')
+3. **Type detection**
+   - Checks: file.type.startsWith('image/')
    - State: Is image = true
 
-4. **Conversao WebP via Sharp**
-   - Processa: buffer -> webp quality 80
-   - State: Imagem processada
+4. **WebP conversion via Sharp**
+   - Processes: buffer -> webp quality 80
+   - State: Image processed
 
-5. **Geracao de Thumbnail**
-   - Processa: resize 300x300 cover -> webp quality 70
-   - State: Thumbnail gerado
+5. **Thumbnail generation**
+   - Processes: resize 300x300 cover -> webp quality 70
+   - State: Thumbnail generated
 
-6. **Upload para Storage Driver**
-   - Local: salva em ./public/uploads/
+6. **Upload to Storage Driver**
+   - Local: saves to ./public/uploads/
    - S3/R2: upload via AWS SDK
-   - State: Files salvos
+   - State: Files saved
 
-7. **Registro no banco**
-   - Cria Media com url, thumbnail, mimeType='image/webp', size, metadata (width, height, format)
-   - State: Registro criado
+7. **Database record**
+   - Creates Media with url, thumbnail, mimeType='image/webp', size, metadata (width, height, format)
+   - State: Record created
 
-## Upload de Media (Arquivo Generico)
+## Media Upload (Generic File)
 
-1. **User seleciona arquivo**
-   - Entrada: File object via FormData
+1. **User selects file**
+   - Input: File object via FormData
    - State: File received
 
 2. **RBAC check**
-   - Verifica: canPerformAction(user, 'media.upload')
+   - Checks: canPerformAction(user, 'media.upload')
    - State: Authorized
 
-3. **Deteccao de tipo**
-   - Verifica: file.type.startsWith('image/')
+3. **Type detection**
+   - Checks: file.type.startsWith('image/')
    - State: Is image = false
 
-4. **Upload para Storage Driver**
-   - Salva arquivo original com mimeType real
-   - Local: salva em ./public/uploads/
+4. **Upload to Storage Driver**
+   - Saves original file with real mimeType
+   - Local: saves to ./public/uploads/
    - S3/R2: upload via AWS SDK
-   - State: File salvo
+   - State: File saved
 
-5. **Registro no banco**
-   - Cria Media com url, thumbnail=null, mimeType=original, size, metadata (extension)
-   - State: Registro criado
+5. **Database record**
+   - Creates Media with url, thumbnail=null, mimeType=original, size, metadata (extension)
+   - State: Record created
 
-## Exclusao de Media
+## Media Deletion
 
 1. **RBAC check** (media.manage)
-2. **Busca Media no banco**
-3. **Exclui arquivo principal do storage**
-4. **Exclui thumbnail do storage** (se existir)
-5. **Exclui registro do banco**
+2. **Fetch Media from database**
+3. **Deletes main file from storage**
+4. **Deletes thumbnail from storage** (if exists)
+5. **Deletes record from database**

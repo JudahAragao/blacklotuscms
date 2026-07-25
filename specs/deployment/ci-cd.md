@@ -8,30 +8,30 @@ status: approved
 # CI/CD Pipeline — Deploy Workflow
 
 ## Overview
-Deploy automatizado via GitHub Actions com estratégia **Blue/Green** para zero-downtime.
+Automated deploy via GitHub Actions with **Blue/Green** strategy for zero-downtime.
 
-- **Trigger:** Push para `main`
+- **Trigger:** Push to `main`
 - **Registry:** GitHub Container Registry (ghcr.io)
-- **Target:** VPS com Docker Compose + Nginx
+- **Target:** VPS with Docker Compose + Nginx
 
 ## Pipeline Stages
 
 ### 1. Build & Push (job: `build-and-push`)
-- Checkout do código
-- Docker Buildx com cache GHA
-- Build da imagem multi-stage (Dockerfile)
-- Push para `ghcr.io/<owner>/blacklotuscms:latest` e `:<sha>`
+- Code checkout
+- Docker Buildx with GHA cache
+- Multi-stage image build (Dockerfile)
+- Push to `ghcr.io/<owner>/blacklotuscms:latest` and `:<sha>`
 
 ### 2. Deploy (job: `deploy`, depends: build-and-push)
-- Sync dos docker-compose.yml (blue/green) via SCP para VPS
-- Determina ambiente alvo (alternância blue ↔ green)
-- Pull da nova imagem no ambiente alvo
+- Sync docker-compose.yml (blue/green) via SCP to VPS
+- Determine target environment (blue ↔ green toggle)
+- Pull new image in target environment
 - `docker compose up -d app`
-- `prisma db push --accept-data-loss` para sincronizar schema
-- Health check com retry (até 60s, 12 tentativas)
-- Reconfigura Nginx para apontar para o novo ambiente
+- `prisma db push --accept-data-loss` to synchronize schema
+- Health check with retry (up to 60s, 12 attempts)
+- Reconfigure Nginx to point to new environment
 - `nginx -t && systemctl reload nginx`
-- Atualiza flag `/opt/apps/current`
+- Update `/opt/apps/current` flag
 
 ## Blue/Green Architecture
 
@@ -44,38 +44,38 @@ Deploy automatizado via GitHub Actions com estratégia **Blue/Green** para zero-
 │   ├── green/
 │   │   ├── docker-compose.yml
 │   │   └── (app container: blacklotus-green-app, port 3002)
-│   └── current  ← "blue" ou "green"
+│   └── current  ← "blue" or "green"
 ├── nginx
-│   └── conf.d/app.conf  ← upstream aponta para porta do ambiente ativo
-└── postgres (container compartilhado)
+│   └── conf.d/app.conf  ← upstream points to active environment port
+└── postgres (shared container)
 ```
 
-**Fluxo de deploy:**
-1. Ambiente ativo = blue (porta 3001)
-2. Deploy sobe green (porta 3002)
-3. Health check OK → Nginx redireciona para green
-4. blue fica como rollback
+**Deploy flow:**
+1. Active environment = blue (port 3001)
+2. Deploy brings up green (port 3002)
+3. Health check OK → Nginx redirects to green
+4. blue stays as rollback
 
 ## Required GitHub Secrets
 
-| Secret | Descrição |
-|--------|-----------|
-| `VPS_HOST` | IP/hostname da VPS |
-| `VPS_USER` | Usuário SSH da VPS |
-| `VPS_SSH_KEY` | Chave SSH privada |
-| `GITHUB_TOKEN` | Token automático (GHCR push) |
+| Secret | Description |
+|--------|-------------|
+| `VPS_HOST` | VPS IP/hostname |
+| `VPS_USER` | VPS SSH user |
+| `VPS_SSH_KEY` | Private SSH key |
+| `GITHUB_TOKEN` | Automatic token (GHCR push) |
 
 ## Required VPS Structure
 
 ```
 /opt/apps/blue/docker-compose.yml
 /opt/apps/green/docker-compose.yml
-/opt/apps/current          ← contém "blue" ou "green"
+/opt/apps/current          ← contains "blue" or "green"
 /etc/nginx/conf.d/app.conf ← upstream backend
 ```
 
 ## Rollback
-Em caso de falha no health check, o deploy para e o ambiente anterior continua ativo. Para rollback manual:
+If health check fails, the deploy stops and the previous environment remains active. For manual rollback:
 ```bash
 echo "blue" | sudo tee /opt/apps/current
 sudo systemctl reload nginx

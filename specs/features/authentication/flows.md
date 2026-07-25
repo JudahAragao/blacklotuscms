@@ -10,16 +10,16 @@ feature: "authentication"
 
 ## Login
 
-1. **User acessa /auth/login**
+1. **User accesses /auth/login**
    - State: Form displayed
 
-2. **Envia credenciais (email + password)**
+2. **Sends credentials (email + password)**
    - State: Data received
 
 3. **NextAuth CredentialsProvider authorize()**
-   - Busca User por email
-   - Compara bcrypt hash
-   - State: Credentials validadas
+   - Searches User by email
+   - Compares bcrypt hash
+   - State: Credentials validated
 
 4. **JWT callback: token.id = user.id, token.role = user.role**
    - State: JWT token created
@@ -29,28 +29,28 @@ feature: "authentication"
 
 ## API Key Auth
 
-1. **Requisicao com header Authorization: Bearer bl_xxx**
+1. **Request with Authorization header: Bearer bl_xxx**
    - State: Header detected in proxy
 
 2. **ApiKeyService.validateKey()**
-   - Busca por SHA-256 hash
-   - Verifica expiracao
+   - Searches by SHA-256 hash
+   - Verifies expiration
    - State: Key validated
 
 3. **Rate limit check (in-memory cache)**
-   - State: Within limit ou erro 429
+   - State: Within limit or error 429
 
-4. **Headers injetados: x-api-user-id, x-api-user-role**
-   - State: Requisicao prossegue com identidade
+4. **Injected headers: x-api-user-id, x-api-user-role**
+   - State: Request proceeds with identity
 
 ## RBAC Check
 
 1. **withApiAuth middleware**
-   - Tenta NextAuth session
-   - Se nao, tenta API Key headers
+   - Tries NextAuth session
+   - If not, tries API Key headers
    - State: Identity obtained
 
 2. **hasCapability(role, capability)**
-   - Se Administrador: returns true
-   - Otherwise: verifica capability JSON (nested paths supported)
+   - If Administrator: returns true
+   - Otherwise: verifies capability JSON (nested paths supported)
    - State: Authorized or 403

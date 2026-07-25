@@ -33,7 +33,7 @@ erDiagram
     MenuItem ||--o{ MenuItem : hierarchy
 ```
 
-## Entidades
+## Entities
 
 ### User
 - `id`: UUID (PK)
@@ -46,13 +46,13 @@ erDiagram
 
 ### Role
 - `id`: UUID (PK)
-- `name`: String (unique) - ex: "Administrador", "Editor", "Autor", "Contributor", "Assinante"
-- `capabilities`: JSON - ex: `{ "post": { "create": true, "read": true } }`
+- `name`: String (unique) - e.g., "Administrator", "Editor", "Author", "Contributor", "Subscriber"
+- `capabilities`: JSON - e.g., `{ "post": { "create": true, "read": true } }`
 
 ### ApiKey
 - `id`: UUID (PK)
-- `name`: String - ex: "App Mobile"
-- `key`: String (unique) - SHA-256 hash da chave plain text
+- `name`: String - e.g., "Mobile App"
+- `key`: String (unique) - SHA-256 hash of plain text key
 - `userId`: UUID (FK -> User, onDelete: Cascade)
 - `rateLimit`: Int (default: 60 req/min)
 - `expiresAt`: DateTime?
@@ -61,8 +61,8 @@ erDiagram
 
 ### PostType
 - `id`: UUID (PK)
-- `slug`: String (unique) - ex: "post", "page"
-- `label`: String - ex: "Posts", "Pages"
+- `slug`: String (unique) - e.g., "post", "page"
+- `label`: String - e.g., "Posts", "Pages"
 - `hierarchical`: Boolean (default: false)
 - `showInRest`: Boolean (default: true)
 - `showInGraphql`: Boolean (default: true)
@@ -92,30 +92,30 @@ erDiagram
 - `id`: UUID (PK)
 - `fieldGroupId`: UUID (FK -> FieldGroup, onDelete: Cascade)
 - `locationType`: String - "post_type", "taxonomy", "post", "template", "post_status"
-- `locationValue`: String - ex: "post", "page", "category", "my-specific-post"
-- `locationParam`: String? - ex: "technology" (para taxonomy term específico)
+- `locationValue`: String - e.g., "post", "page", "category", "my-specific-post"
+- `locationParam`: String? - e.g., "technology" (for specific taxonomy term)
 - Unique: [fieldGroupId, locationType, locationValue, locationParam]
 
 ### Field
 - `id`: UUID (PK)
 - `fieldGroupId`: UUID (FK -> FieldGroup)
-- `name`: String - chave interna (ex: "telefone_contato")
-- `label`: String - nome exibido
+- `name`: String - internal key (e.g., "phone_contact")
+- `label`: String - display name
 - `type`: String - text, image, repeater, tab, section, etc. (tab/section are visual organizers, no MetaValue)
-- `config`: JSON - configurações do campo:
-  - Para campos simples: `{ width, required, validation: { min, max }, conditionalLogic: { status, rules }, instructions }`
-  - Para Repeater: `{ repeater: { fields: [...], layout: 'block'|'table'|'row', minItems, maxItems } }`
-  - Para Flexible Content: `{ flexibleContent: { layouts: [{ name, label, fields: [...], layout }], minItems, maxItems } }`
-  - Para Select: `{ options: [{ label, value }] }`
-  - Para Icon: `{ iconSource: 'lucide'|'custom', iconName: string, iconSvg: string, iconColor: string, iconSize: number }`
-  - Sub-campos são armazenados no config como array de objetos com mesma estrutura de Field
+- `config`: JSON - field configuration:
+  - For simple fields: `{ width, required, validation: { min, max }, conditionalLogic: { status, rules }, instructions }`
+  - For Repeater: `{ repeater: { fields: [...], layout: 'block'|'table'|'row', minItems, maxItems } }`
+  - For Flexible Content: `{ flexibleContent: { layouts: [{ name, label, fields: [...], layout }], minItems, maxItems } }`
+  - For Select: `{ options: [{ label, value }] }`
+  - For Icon: `{ iconSource: 'lucide'|'custom', iconName: string, iconSvg: string, iconColor: string, iconSize: number }`
+  - Sub-fields are stored in config as array of objects with same Field structure
 
 ### MetaValue
 - `id`: UUID (PK)
-- `postId`: UUID? (FK -> Post, onDelete: Cascade) - nullable para taxonomias
-- `termId`: UUID? (FK -> Term, onDelete: Cascade) - nullable para posts
+- `postId`: UUID? (FK -> Post, onDelete: Cascade) - nullable for taxonomies
+- `termId`: UUID? (FK -> Term, onDelete: Cascade) - nullable for posts
 - `fieldId`: UUID (FK -> Field)
-- `value`: JSON - o dado real
+- `value`: JSON - the actual data
 - Indexes: [postId], [fieldId], [termId]
 
 ### Taxonomy
@@ -133,14 +133,14 @@ erDiagram
 ### PostTerm
 - `postId`: UUID (FK -> Post)
 - `termId`: UUID (FK -> Term)
-- PK withposta: [postId, termId]
+- PK composite: [postId, termId]
 
 ### Plugin
 - `id`: UUID (PK)
 - `name`: String (unique)
 - `version`: String
 - `isActive`: Boolean (default: false)
-- `manifest`: JSON - conteudo do plugin.json
+- `manifest`: JSON - plugin.json content
 - `authorizedPermissions`: JSON?
 - `sandboxId`: String?
 
@@ -201,7 +201,7 @@ erDiagram
 - `label`: String
 - `url`: String
 - `order`: Int (default: 0)
-- `parentId`: UUID? (FK -> MenuItem, auto-relacionamento)
+- `parentId`: UUID? (FK -> MenuItem, self-referencing)
 
 ### Comment
 - `id`: UUID (PK)
@@ -211,24 +211,24 @@ erDiagram
 - `content`: Text
 - `status`: String (default: "pending") - approved, pending, spam
 - `ip`: String?
-- `parentId`: UUID? (FK -> Comment, auto-relacionamento)
+- `parentId`: UUID? (FK -> Comment, self-referencing)
 - `createdBy`: String?
 - `createdAt`: DateTime
 
 ### PluginNetworkConfig
 - `id`: UUID (PK)
 - `pluginId`: UUID (FK -> Plugin, unique, onDelete: Cascade)
-- `allowedDomains`: String[] — whitelist de domínios para HTTP outbound
-- `httpRateLimit`: Int (default: 20) — req/s para HTTP externo
-- `webhookSecret`: String? — HMAC-SHA256 secret para webhooks
+- `allowedDomains`: String[] — whitelist of domains for HTTP outbound
+- `httpRateLimit`: Int (default: 20) — req/s for external HTTP
+- `webhookSecret`: String? — HMAC-SHA256 secret for webhooks
 - `isActive`: Boolean (default: true)
 - `createdAt`, `updatedAt`: DateTime
 
 ### WebhookEndpoint
 - `id`: UUID (PK)
 - `pluginId`: UUID (FK -> Plugin, onDelete: Cascade)
-- `eventId`: String — ex: "payment.completed"
-- `url`: String — gerado: `/api/v1/webhooks/:pluginName/:eventId`
+- `eventId`: String — e.g., "payment.completed"
+- `url`: String — generated: `/api/v1/webhooks/:pluginName/:eventId`
 - `isActive`: Boolean (default: true)
 - `createdAt`: DateTime
 - Unique: [pluginId, eventId]

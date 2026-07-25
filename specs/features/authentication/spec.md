@@ -9,33 +9,33 @@ feature: "authentication"
 # Authentication Specification
 
 ## Description
-Sistema de authentication JWT via NextAuth com RBAC capability-based, suporte a API Keys e proxy middleware.
+JWT authentication system via NextAuth with capability-based RBAC, API Keys support, and proxy middleware.
 
 ## Requirements
-- **REQ-01:** Login via email/password com JWT
-- **REQ-02:** RBAC com capabilities JSON por role
-- **REQ-03:** API Key authentication com Bearer token
-- **REQ-04:** Rate limiting dinamico por API Key
-- **REQ-05:** Middleware proxy que valida authentication em todas as rotas protegidas
-- **REQ-06:** Roles default: Administrador, Editor, Autor, Contributor, Assinante
-- **REQ-07:** Proxy com installation gate (redireciona para /install se .installed não existe)
-- **REQ-08:** withApiAuth middleware consolidado (verifica session NextAuth ou API Key header)
-- **REQ-09:** hasCapability com suporte a verificação `.own` para recursos pessoais
+- **REQ-01:** Login via email/password with JWT
+- **REQ-02:** RBAC with JSON capabilities per role
+- **REQ-03:** API Key authentication with Bearer token
+- **REQ-04:** Dynamic rate limiting per API Key
+- **REQ-05:** Proxy middleware that validates authentication on all protected routes
+- **REQ-06:** Default roles: Administrator, Editor, Author, Contributor, Subscriber
+- **REQ-07:** Proxy with installation gate (redirects to /install if .installed does not exist)
+- **REQ-08:** Consolidated withApiAuth middleware (checks NextAuth session or API Key header)
+- **REQ-09:** hasCapability with support for `.own` verification for personal resources
 
 ## User Roles
-- **Administrador:** Acesso full, bypass de todas as checks
-- **Editor:** CRUD completo de conteudo e midia
-- **Autor:** CRUD proprio com publicacao
-- **Contributor:** Criacao limited (draft only)
-- **Assinante:** Leitura e perfil
+- **Administrator:** Full access, bypasses all checks
+- **Editor:** Complete CRUD for content and media
+- **Author:** Own CRUD with publishing
+- **Contributor:** Limited creation (draft only)
+- **Subscriber:** Reading and profile
 
 ## Constraints
-- **C01:** Administrador bypass automatic em todas as checks
-- **C02:** API Keys usam prefixo "bl_" e SHA-256 hash
-- **C03:** Rate limit window de 1 minuto por API Key
-- **C04:** JWT strategy com PrismaAdapter
+- **C01:** Administrator automatic bypass on all checks
+- **C02:** API Keys use "bl_" prefix and SHA-256 hash
+- **C03:** Rate limit window of 1 minute per API Key
+- **C04:** JWT strategy with PrismaAdapter
 
 ## Dependencies
-- **Depends on:** NONE (fundacao do sistema)
-- **Blocks:** Todas as features que requerem authentication
+- **Depends on:** NONE (system foundation)
+- **Blocks:** All features requiring authentication
 - **Related to:** API Keys, Proxy

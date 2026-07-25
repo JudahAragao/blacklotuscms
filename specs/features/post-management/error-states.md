@@ -8,37 +8,37 @@ feature: "post-management"
 
 # Post Management Error States
 
-## ERR-01: Post Nao Found
-- **Condition:** ID ou slug nao existe no banco
-- **Código HTTP:** 404
-- **Mensagem ao user:** "Post not found"
-- **Ação do sistema:** Retorna RESOURCE_NOT_FOUND
-- **TEST DATA:** `{ "trigger": "id_inexistente", "expected_code": 404, "expected_message": "Post not found" }`
+## ERR-01: Post Not Found
+- **Condition:** ID or slug does not exist in database
+- **HTTP Code:** 404
+- **User message:** "Post not found"
+- **System action:** Returns RESOURCE_NOT_FOUND
+- **TEST DATA:** `{ "trigger": "nonexistent_id", "expected_code": 404, "expected_message": "Post not found" }`
 
 ## ERR-02: Duplicate Slug
-- **Condition:** Tentativa de criar/atualizar com slug que ja existe
-- **Código HTTP:** 409 ou 400
-- **Mensagem ao user:** "Slug already in use"
-- **Ação do sistema:** Prisma unique constraint violation capturada
-- **TEST DATA:** `{ "trigger": "slug_duplicado", "expected_code": 409 }`
+- **Condition:** Attempt to create/update with slug that already exists
+- **HTTP Code:** 409 or 400
+- **User message:** "Slug already in use"
+- **System action:** Prisma unique constraint violation captured
+- **TEST DATA:** `{ "trigger": "duplicate_slug", "expected_code": 409 }`
 
-## ERR-03: PostType Nao Found
-- **Condition:** postTypeId fornecido nao corresponde a nenhum PostType
-- **Código HTTP:** 404
-- **Mensagem ao user:** "Post Type não encontrado"
-- **Ação do sistema:** Verificacao antes da criacao
-- **TEST DATA:** `{ "trigger": "postTypeId_invalido", "expected_code": 404 }`
+## ERR-03: PostType Not Found
+- **Condition:** provided postTypeId does not match any PostType
+- **HTTP Code:** 404
+- **User message:** "Post Type not found"
+- **System action:** Verification before creation
+- **TEST DATA:** `{ "trigger": "invalid_postTypeId", "expected_code": 404 }`
 
-## ERR-04: Sem Permission
-- **Condition:** User sem capability necessaria
-- **Código HTTP:** 403
-- **Mensagem ao user:** "No permission to create/update/delete posts"
-- **Ação do sistema:** canPerformAction retorna false
-- **TEST DATA:** `{ "trigger": "user_sem_permissao", "expected_code": 403 }`
+## ERR-04: No Permission
+- **Condition:** User without required capability
+- **HTTP Code:** 403
+- **User message:** "No permission to create/update/delete posts"
+- **System action:** canPerformAction returns false
+- **TEST DATA:** `{ "trigger": "user_without_permission", "expected_code": 403 }`
 
-## ERR-05: Validacao Zod
-- **Condition:** Dados de entrada invalidos
-- **Código HTTP:** 400
-- **Mensagem ao user:** Detalhes dos fields invalidos
-- **Ação do sistema:** ZodError flattened
-- **TEST DATA:** `{ "trigger": "titulo_vazio", "expected_code": 400 }`
+## ERR-05: Zod Validation
+- **Condition:** Invalid input data
+- **HTTP Code:** 400
+- **User message:** Invalid field details
+- **System action:** ZodError flattened
+- **TEST DATA:** `{ "trigger": "empty_title", "expected_code": 400 }`

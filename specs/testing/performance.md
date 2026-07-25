@@ -8,18 +8,18 @@ status: draft
 # Performance Testing
 
 ## Metrics
-- **TTFB:** < 500ms para paginas publicas (com cache)
-- **Plugin Sandbox:** < 100ms overhead por execution
-- **Media Upload:** < 5s para imagens ate 10MB
-- **Database Queries:** < 50ms para queries simples
+- **TTFB:** < 500ms for public pages (with cache)
+- **Plugin Sandbox:** < 100ms overhead per execution
+- **Media Upload:** < 5s for images up to 10MB
+- **Database Queries:** < 50ms for simple queries
 
 ## Stress Tests
-- 100 requests simultaneos na API publica
-- Upload de 50 imagens consecutivas
-- 50 plugins executando hooks simultaneamente
-- Cache hit rate > 90% para posts populares
+- 100 simultaneous requests on the public API
+- Upload of 50 consecutive images
+- 50 plugins executing hooks simultaneously
+- Cache hit rate > 90% for popular posts
 
 ## Caching Strategy
-- unstable_cache com TTL de 3600s para posts
-- Revalidation tags para invalidacao granular
+- unstable_cache with 3600s TTL for posts
+- Revalidation tags for granular invalidation
 - Prisma connection pooling via PrismaPg

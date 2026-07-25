@@ -9,34 +9,34 @@ feature: "seo"
 # SEO Specification
 
 ## Description
-Metadata de SEO por post com suporte a title, description, OG image e noIndex. SEO individual prevalece sobre configuracoes globais. Root layout utiliza generateMetadata dinamico para buscar settings do banco. Suporte a OpenGraph e Twitter Card para todos os social sharers. Suporte a 10 ferramentas de verificacao de webmaster.
+Per-post SEO metadata with support for title, description, OG image and noIndex. Individual SEO overrides global settings. Root layout uses dynamic generateMetadata to fetch settings from database. OpenGraph and Twitter Card support for all social sharers. Support for 10 webmaster verification tools.
 
 ## Requirements
 - **REQ-01:** seoTitle (max 70 chars)
 - **REQ-02:** seoDescription (max 160 chars)
-- **REQ-03:** ogImage para social sharing
-- **REQ-04:** noIndex flag para exclusao de indexacao
-- **REQ-05:** Integracao com sitemap (noIndex = excluded)
-- **REQ-06:** SEO individual do post prevalece sobre SEO global via encadeamento: post.seo.* > post.title > seoSettings > root layout metadata
-- **REQ-07:** Preview no PostEditor utiliza site_url configurado nas settings
-- **REQ-08:** Suporte a 10 ferramentas de verificacao via meta tag
-- **REQ-09:** Root layout exporta generateMetadata async buscando site_name, title_separator e meta_description do banco via SettingService
-- **REQ-10:** Twitter Card metadata (card: summary_large_image, title, description, images) gerada automaticamente junto com OpenGraph
-- **REQ-11:** Acesso aos campos SEO do post via post.seo.title, post.seo.description, post.seo.ogImage (nested no ThemePostDTO)
+- **REQ-03:** ogImage for social sharing
+- **REQ-04:** noIndex flag for indexing exclusion
+- **REQ-05:** Sitemap integration (noIndex = excluded)
+- **REQ-06:** Individual post SEO overrides global SEO via cascade: post.seo.* > post.title > seoSettings > root layout metadata
+- **REQ-07:** PostEditor preview uses site_url configured in settings
+- **REQ-08:** Support for 10 verification tools via meta tag
+- **REQ-09:** Root layout exports async generateMetadata fetching site_name, title_separator and meta_description from database via SettingService
+- **REQ-10:** Twitter Card metadata (card: summary_large_image, title, description, images) generated automatically alongside OpenGraph
+- **REQ-11:** Access to post SEO fields via post.seo.title, post.seo.description, post.seo.ogImage (nested in ThemePostDTO)
 
-## Cascata de Fallback (SEO)
+## Fallback Cascade (SEO)
 
-A metadata e resolvida na seguinte ordem de prioridade:
+Metadata is resolved in the following priority order:
 
 1. **Per-page SEO** — post.seo.title / post.seo.description / post.seo.ogImage
-2. **Post title** — post.title (quando seoTitle nao preenchido)
+2. **Post title** — post.title (when seoTitle not filled)
 3. **Global SEO** — seoSettings.site_name / seoSettings.meta_description / seoSettings.og_image
-4. **Root layout** — generateMetadata async do layout.tsx (busca do banco)
+4. **Root layout** — async generateMetadata from layout.tsx (database fetch)
 
-## Ferramentas de Verificacao Suportadas
+## Supported Verification Tools
 
-| Ferramenta | Meta Tag Name | Chave Settings |
-|------------|---------------|----------------|
+| Tool | Meta Tag Name | Settings Key |
+|------|---------------|--------------|
 | Google Search Console | `google-site-verification` | `google_site_verification` |
 | Bing Webmaster Tools | `msvalidate.01` | `bing_site_verification` |
 | Yandex Webmaster | `yandex-verification` | `yandex_site_verification` |
@@ -50,10 +50,10 @@ A metadata e resolvida na seguinte ordem de prioridade:
 
 ## Constraints
 - **C01:** seoTitle max 70, seoDescription max 160
-- **C02:** Campos de SEO vazios herdam do SEO global configurado em /admin/seo
-- **C03:** Meta tags so sao renderizadas quando o valor nao esta vazio
-- **C04:** Root layout metadata e dinamico (generateMetadata) — nunca hardcode
-- **C05:** Twitter Card e gerada automaticamente junto com OpenGraph (nunca separadamente)
+- **C02:** Empty SEO fields inherit from global SEO configured in /admin/seo
+- **C03:** Meta tags are only rendered when value is not empty
+- **C04:** Root layout metadata is dynamic (generateMetadata) — never hardcoded
+- **C05:** Twitter Card is generated automatically alongside OpenGraph (never separately)
 
 ## Dependencies
 - **Depends on:** Post Management

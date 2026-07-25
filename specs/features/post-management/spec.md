@@ -9,37 +9,37 @@ feature: "post-management"
 # Post Management Specification
 
 ## Description
-Sistema completo de gerenciamento de conteudo com Custom Post Types, MetaFields, Taxonomies e SEO integrado.
+Complete content management system with Custom Post Types, MetaFields, Taxonomies and integrated SEO.
 
 ## Requirements
-- **REQ-01:** CRUD completo de posts com validacao Zod
-- **REQ-02:** Suporte a Custom Post Types configuraveis
-- **REQ-03:** Fields customizeds (MetaFields) via FieldGroups independentes com location rules (post types, taxonomias, posts específicos, templates, status), incluindo tipos organizadores Tab e Section, com deduplicação automática de anchors
-- **REQ-03a:** Campos e subcampos são unificados - campos-raiz podem se tornar subcampos de repeater/flexible_content via drag and drop, e subcampos podem se tornar campos-raiz
-- **REQ-03b:** Toda configuração de campo (tipo, validação, lógica condicional, opções) é preservada ao mover entre níveis
-- **REQ-03c:** Campo file/image/gallery possui validacao de tipos aceitos via validation.accept
-- **REQ-04:** Taxonomys hierarquicas e flat
+- **REQ-01:** Complete CRUD posts with Zod validation
+- **REQ-02:** Support for configurable Custom Post Types
+- **REQ-03:** Custom fields (MetaFields) via independent FieldGroups with location rules (post types, taxonomies, specific posts, templates, status), including Tab and Section organizer types, with automatic anchor deduplication
+- **REQ-03a:** Fields and subfields are unified - root fields can become subfields of repeater/flexible_content via drag and drop, and subfields can become root fields
+- **REQ-03b:** All field configuration (type, validation, conditional logic, options) is preserved when moving between levels
+- **REQ-03c:** file/image/gallery field has accepted type validation via validation.accept
+- **REQ-04:** Hierarchical and flat taxonomies
 - **REQ-05:** SEO metadata (title, description, ogImage, noIndex)
-- **REQ-06:** Status de publicacao (draft, published, private)
-- **REQ-07:** Data de publicacao e expiracao
-- **REQ-08:** Cache com revalidation tags
-- **REQ-09:** Hooks para extensibilidade (post.created, post.updated, post.deleted)
-- **REQ-10:** Campo de Ícone com suporte a lib lucide-react (1000+ ícones) e SVG customizado com sanitização
+- **REQ-06:** Publication status (draft, published, private)
+- **REQ-07:** Publication and expiration date
+- **REQ-08:** Cache with revalidation tags
+- **REQ-09:** Hooks for extensibility (post.created, post.updated, post.deleted)
+- **REQ-10:** Icon field with lucide-react library support (1000+ icons) and custom SVG with sanitization
 
 ## User Roles
-- **Administrador:** Pode criar, editar, deletar e publicar qualquer post
-- **Editor:** Pode criar, editar, deletar e publicar posts
-- **Autor:** Pode criar, editar e publicar seus proprios posts
-- **Contributor:** Pode criar posts (sempre como draft)
-- **Assinante:** Apenas leitura
+- **Administrator:** Can create, edit, delete and publish any post
+- **Editor:** Can create, edit, delete and publish posts
+- **Author:** Can create, edit and publish their own posts
+- **Contributor:** Can create posts (always as draft)
+- **Subscriber:** Read only
 
 ## Constraints
-- **C01:** Slug deve ser unico e seguir regex ^[a-z0-9-]+$
-- **C02:** SEO title max 70 caracteres, description max 160
-- **C03:** Status draft e forçado para Contributores
-- **C04:** Posts so aparecem em queries publicas quando published e publishedAt <= now
+- **C01:** Slug must be unique and follow regex ^[a-z0-9-]+$
+- **C02:** SEO title max 70 characters, description max 160
+- **C03:** Draft status is forced for Contributors
+- **C04:** Posts only appear in public queries when published and publishedAt <= now
 
 ## Dependencies
 - **Depends on:** Authentication, RBAC
-- **Blocks:** Theme rendering, Busca, Sitemap
+- **Blocks:** Theme rendering, Search, Sitemap
 - **Related to:** Media, Comments, Menus

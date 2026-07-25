@@ -6,22 +6,22 @@ status: approved
 feature: "search"
 ---
 
-# Busca Flows
+# Search Flows
 
-## Busca Global
+## Global Search
 
-1. **Theme/usuario envia query**
+1. **Theme/user sends query**
    - State: Query received
 
-2. **Validacao: query.length >= 3**
+2. **Validation: query.length >= 3**
    - State: Valid query
 
-3. **Prisma query com OR**
+3. **Prisma query with OR**
    - title contains (insensitive)
    - content contains (insensitive)
    - metaValues value array_contains
-   - Filtro: status = "published"
+   - Filter: status = "published"
    - State: Results obtained
 
-4. **Mapeamento para ThemePostDTO**
+4. **Mapping to ThemePostDTO**
    - State: Data formatted

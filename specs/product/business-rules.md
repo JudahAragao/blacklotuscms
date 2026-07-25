@@ -8,138 +8,138 @@ status: approved
 # Business Rules - BlackLotusCMS
 
 ## BR01: Post Visibility
-- **SE** um post has status "draft" OU publishedAt no futuro
-- **ENTÃO** ele não aparece em queries publics nem no sitemap
-- **SENÃO** se expiresAt é definido e menor que now(), o post também fica oculto
-- **Referência:** FR05, FR17
+- **IF** a post has status "draft" OR publishedAt in the future
+- **THEN** it does not appear in public queries nor in the sitemap
+- **OTHERWISE** if expiresAt is defined and less than now(), the post is also hidden
+- **Reference:** FR05, FR17
 
 ## BR02: Contributor Draft Lock
-- **SE** o user has role "Contributor"
-- **ENTÃO** todo post criado recebe status "draft" independente do input
-- **SENÃO** o status respeitado é o fornecido
-- **Referência:** FR05, FR22
+- **IF** the user has role "Contributor"
+- **THEN** every post created receives status "draft" regardless of input
+- **OTHERWISE** the provided status is respected
+- **Reference:** FR05, FR22
 
-## BR03: Admin Full Acesso
-- **SE** o user has role "Administrador"
-- **ENTÃO** todas as verificações de capability retornam true
-- **SENÃO** a verificação segue a hierarquia JSON de capabilities
-- **Referência:** FR02
+## BR03: Admin Full Access
+- **IF** the user has role "Administrator"
+- **THEN** all capability checks return true
+- **OTHERWISE** the check follows the JSON capabilities hierarchy
+- **Reference:** FR02
 
 ## BR04: Own Resource Protection
-- **SE** um user tenta editar/deletar um post de outro autor
-- **ENTÃO** ele precisa da capability "post.manage"
-- **SENÃO** com "post.own.update", pode editar seus próprios posts
-- **Referência:** FR05, FR22
+- **IF** a user tries to edit/delete a post by another author
+- **THEN** they need the "post.manage" capability
+- **OTHERWISE** with "post.own.update", they can edit their own posts
+- **Reference:** FR05, FR22
 
 ## BR05: Plugin Sandboxing
-- **SE** um plugin é ativado
-- **ENTÃO** seu código roda em isolate-vm com limite de memória e timeout
-- **SENÃO** se exceder os limites, o plugin é desativado e erro logado
-- **Referência:** FR10
+- **IF** a plugin is activated
+- **THEN** its code runs in isolate-vm with memory and timeout limits
+- **OTHERWISE** if limits are exceeded, the plugin is deactivated and error is logged
+- **Reference:** FR10
 
 ## BR06: Plugin Permission Gate
-- **SE** um plugin tenta acessar data ou hooks sensíveis
-- **ENTÃO** o sistema verifica permissão aprovada para aquela capability
-- **SENÃO** permissão é solicitada e acesso bloqueado até aprovação
-- **Referência:** FR10, FR12
+- **IF** a plugin tries to access sensitive data or hooks
+- **THEN** the system checks for approved permission for that capability
+- **OTHERWISE** permission is requested and access is blocked until approval
+- **Reference:** FR10, FR12
 
 ## BR07: Theme Permission Validation
-- **SE** um theme tenta acessar data do sistema
-- **ENTÃO** o ThemeDataService valida permissão aprovada
-- **SENÃO** permissão é solicitada e acesso bloqueado
-- **Referência:** FR11
+- **IF** a theme tries to access system data
+- **THEN** the ThemeDataService validates approved permission
+- **OTHERWISE** permission is requested and access is blocked
+- **Reference:** FR11
 
 ## BR08: API Key Rate Limiting
-- **SE** uma requisição via API Key excede o rate limit configurado
-- **ENTÃO** retorna 429 com código RATE_LIMIT_EXCEEDED
-- **SENÃO** o contador de requisições é incrementado na janela de 1 minuto
-- **Referência:** FR03, FR24
+- **IF** a request via API Key exceeds the configured rate limit
+- **THEN** returns 429 with code RATE_LIMIT_EXCEEDED
+- **OTHERWISE** the request counter is incremented in the 1-minute window
+- **Reference:** FR03, FR24
 
 ## BR09: Comment Anti-Spam
-- **SE** um comentário contains mais de 2 URLs ou palavras da blacklist
-- **ENTÃO** o status é definido como "spam" automaticamente
-- **SENÃO** se auto_approve_comments está ativo, o status é "approved"
-- **Referência:** FR14, FR15
+- **IF** a comment contains more than 2 URLs or blacklist words
+- **THEN** the status is set to "spam" automatically
+- **OTHERWISE** if auto_approve_comments is active, the status is "approved"
+- **Reference:** FR14, FR15
 
-## BR10: Instalacao Gate
-- **SE** o sistema não está instalado (sem .installed file)
-- **ENTÃO** todas as rotas redirecionam para /install exceto /assets
-- **SENÃO** a rota /install redireciona para /auth/login
-- **Referência:** FR20
+## BR10: Installation Gate
+- **IF** the system is not installed (no .installed file)
+- **THEN** all routes redirect to /install except /assets
+- **OTHERWISE** the /install route redirects to /auth/login
+- **Reference:** FR20
 
 ## BR11: HTML Sanitization
-- **SE** um hook filter processa conteúdo (title, content, body, etc.)
-- **ENTÃO** o resultado é sanitizado com DOMPurify automaticamente
-- **SENÃO** o conteúdo é passado sem sanitização
-- **Referência:** FR25
+- **IF** a hook filter processes content (title, content, body, etc.)
+- **THEN** the result is sanitized with DOMPurify automatically
+- **OTHERWISE** the content is passed without sanitization
+- **Reference:** FR25
 
 ## BR12: Sensitive Data Masking
-- **SE** data são passados para themes ou APIs publics
-- **ENTÃO** fields sensíveis (passwordHash, secret, token, etc.) são removidos
-- **SENÃO** os data são preservados como estão
-- **Referência:** FR25
+- **IF** data are passed to themes or public APIs
+- **THEN** sensitive fields (passwordHash, secret, token, etc.) are removed
+- **OTHERWISE** the data are preserved as they are
+- **Reference:** FR25
 
 ## BR13: Post Expiration
-- **SE** um post tem `expiresAt` definido E `expiresAt < now()`
-- **ENTÃO** ele não aparece em queries públicas, sitemap, nem busca
-- **SENÃO** o post é visível normalmente (se status = "published" e publishedAt <= now())
-- **Referência:** FR05, FR17
-- **Implementação:** `PostService.ts` — queries filtram por `expiresAt: null OR expiresAt >= now()`
+- **IF** a post has `expiresAt` defined AND `expiresAt < now()`
+- **THEN** it does not appear in public queries, sitemap, or search
+- **OTHERWISE** the post is visible normally (if status = "published" and publishedAt <= now())
+- **Reference:** FR05, FR17
+- **Implementation:** `PostService.ts` — queries filter by `expiresAt: null OR expiresAt >= now()`
 
 ## BR14: LGPD Data Export (Art. 15, 20)
-- **SE** um user solicita exportação de dados
-- **ENTÃO** o sistema retorna: profile (email, role, image, dates), posts criados, metadados de API keys (nome, data de criação, último uso — nunca a chave em si)
-- **SENÃO** apenas admins podem exportar dados de outros users
-- **Referência:** FR22, COMPLIANCE.md
-- **Implementação:** `UserService.exportData()` — via `GET /api/v1/users/:id`
+- **IF** a user requests data export
+- **THEN** the system returns: profile (email, role, image, dates), created posts, API key metadata (name, creation date, last use — never the key itself)
+- **OTHERWISE** only admins can export other users' data
+- **Reference:** FR22, COMPLIANCE.md
+- **Implementation:** `UserService.exportData()` — via `GET /api/v1/users/:id`
 
 ## BR15: LGPD Account Deletion (Art. 17)
-- **SE** um user solicita exclusão de conta
-- **ENTÃO** cascade delete: postTerms → metaValues → comments → posts → apiKeys → user
-- **SENÃO** não é possível excluir o último user com role "Administrador"
-- **Referência:** FR22, COMPLIANCE.md
-- **Implementação:** `UserService.deleteAccount()` — via `DELETE /api/v1/users/:id`
+- **IF** a user requests account deletion
+- **THEN** cascade delete: postTerms → metaValues → comments → posts → apiKeys → user
+- **OTHERWISE** it is not possible to delete the last user with role "Administrator"
+- **Reference:** FR22, COMPLIANCE.md
+- **Implementation:** `UserService.deleteAccount()` — via `DELETE /api/v1/users/:id`
 
 ## BR16: API Key Security
-- **SE** uma API key é criada
-- **ENTÃO** apenas o hash SHA-256 é armazenado no banco, com prefixo `bl_` + 64 hex chars
-- **SENÃO** a chave plain text é retornada UMA única vez na criação — nunca mais
-- **Referência:** FR03, FR21
-- **Implementação:** `ApiKeyService.ts` — `createKey()` retorna plain key, `validateKey()` compara hash
+- **IF** an API key is created
+- **THEN** only the SHA-256 hash is stored in the database, with prefix `bl_` + 64 hex chars
+- **OTHERWISE** the plain text key is returned once at creation — never again
+- **Reference:** FR03, FR21
+- **Implementation:** `ApiKeyService.ts` — `createKey()` returns plain key, `validateKey()` compares hash
 
 ## BR17: Plugin DB Rate Limit
-- **SE** um plugin excede 50 requisições de banco por segundo
-- **ENTÃO** a requisição é bloqueada com erro RATE_LIMIT_EXCEEDED
-- **SENÃO** cada acesso ao banco tem jitter aleatório de 1-5ms para evitar thundering herd
-- **Referência:** FR10
-- **Implementação:** `PluginService.ts` — Bridge API `db.read` e `db.create` são rate-limited
+- **IF** a plugin exceeds 50 database requests per second
+- **THEN** the request is blocked with error RATE_LIMIT_EXCEEDED
+- **OTHERWISE** each database access has random jitter of 1-5ms to avoid thundering herd
+- **Reference:** FR10
+- **Implementation:** `PluginService.ts` — Bridge API `db.read` and `db.create` are rate-limited
 
 ## BR18: Webhook Retry
-- **SE** um webhook inbound falha no processamento
-- **ENTÃO** o sistema retenta com exponential backoff: 1s → 2s → 4s (máximo 3 tentativas)
-- **SENÃO** após 3 falhas, o webhook é registrado como falha no `NetworkAuditLog`
-- **Referência:** FR10
-- **Implementação:** `NetworkService.receiveWebhook()` — retry loop com backoff exponencial
+- **IF** an inbound webhook fails processing
+- **THEN** the system retries with exponential backoff: 1s → 2s → 4s (maximum 3 attempts)
+- **OTHERWISE** after 3 failures, the webhook is logged as failed in `NetworkAuditLog`
+- **Reference:** FR10
+- **Implementation:** `NetworkService.receiveWebhook()` — retry loop with exponential backoff
 
 ## BR19: Theme Permission Cache
-- **SE** um theme acessa dados do sistema via `ThemeDataService.get()`
-- **ENTÃO** a validação de permissão usa cache com TTL de 10 segundos
-- **SENÃO** cache é invalidado quando permissão muda de status (approved/denied)
-- **Referência:** FR11
-- **Implementação:** `ThemeDataService.ts` — `permissionCache` Map com 10s TTL
+- **IF** a theme accesses system data via `ThemeDataService.get()`
+- **THEN** permission validation uses cache with 10-second TTL
+- **OTHERWISE** cache is invalidated when permission changes status (approved/denied)
+- **Reference:** FR11
+- **Implementation:** `ThemeDataService.ts` — `permissionCache` Map with 10s TTL
 
 ## BR20: Comment IP Capture
-- **SE** um comentário é criado via API pública
-- **ENTÃO** o endereço IP do autor é capturado e armazenado no campo `ip`
-- **SENÃO** o IP é usado para identificação de spam (mesmo IP, múltiplos comentários)
-- **Referência:** FR14
-- **Implementação:** `CommentService.create()` — recebe `ip` param, armazena no DB
+- **IF** a comment is created via public API
+- **THEN** the author's IP address is captured and stored in the `ip` field
+- **OTHERWISE** the IP is used for spam identification (same IP, multiple comments)
+- **Reference:** FR14
+- **Implementation:** `CommentService.create()` — receives `ip` param, stores in DB
 
 ## BR21: Default Taxonomies (WordPress Parity)
-- **SE** o auto-install é executado (banco vazio)
-- **ENTÃO** são criadas automaticamente 2 taxonomias para o post type `post`:
-  - `category` (Categories) — taxonomia hierárquica
-  - `post_tag` (Tags) — taxonomia flat
-- **SENÃO** o post type `page` não recebe taxonomias padrão (igual ao WordPress)
-- **Referência:** FR07
-- **Implementação:** `init.ts` — `autoInstall()` cria taxonomias após criar post types
+- **IF** auto-install is executed (empty database)
+- **THEN** 2 taxonomies are automatically created for the `post` post type:
+  - `category` (Categories) — hierarchical taxonomy
+  - `post_tag` (Tags) — flat taxonomy
+- **OTHERWISE** the `page` post type does not receive default taxonomies (same as WordPress)
+- **Reference:** FR07
+- **Implementation:** `init.ts` — `autoInstall()` creates taxonomies after creating post types

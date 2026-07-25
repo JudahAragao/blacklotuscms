@@ -9,31 +9,31 @@ feature: "media-management"
 # Media Management Specification
 
 ## Description
-Sistema de gerenciamento de midia com upload de imagens (WebP + thumbnails) e arquivos genericos, storage multi-driver e biblioteca paginada.
+Media management system with image upload (WebP + thumbnails) and generic files, multi-driver storage and paginated library.
 
 ## Requirements
-- **REQ-01:** Upload de imagens com conversao automatica para WebP
-- **REQ-01a:** Upload de arquivos genericos (PDF, DOCX, XLSX, etc.) sem processamento de imagem
-- **REQ-02:** Geracao de thumbnails 300x300 via Sharp (apenas para imagens)
+- **REQ-01:** Image upload with automatic conversion to WebP
+- **REQ-01a:** Generic file upload (PDF, DOCX, XLSX, etc.) without image processing
+- **REQ-02:** Thumbnail generation 300x300 via Sharp (images only)
 - **REQ-03:** Storage drivers: local, S3, R2
-- **REQ-04:** Biblioteca de midia com paginacao
-- **REQ-05:** Exclusao de arquivo fisico e registro no banco (via server action admin, nao REST API)
-- **REQ-06:** RBAC para upload (media.upload) e exclusao (media.manage)
+- **REQ-04:** Media library with pagination
+- **REQ-05:** Physical file and database record deletion (via admin server action, not REST API)
+- **REQ-06:** RBAC for upload (media.upload) and deletion (media.manage)
 
 ## User Roles
-- **Administrador/Editor:** Upload e exclusao completa
-- **Autor:** Upload com permissao propria
-- **Contributor:** Sem acesso a midia
+- **Administrator/Editor:** Full upload and deletion
+- **Author:** Upload with own permission
+- **Contributor:** No media access
 
 ## Constraints
-- **C01:** Imagens sao convertidas para WebP automaticamente
-- **C02:** Thumbnails sao gerados em 300x300 com fit: cover (apenas imagens)
-- **C03:** Filename e sanitizado via sanitizeFilename
-- **C04:** Metadata (width, height, format) armazenada no banco para imagens
-- **C05:** Arquivos nao-imagem sao salvos com mimeType original e sem thumbnail
-- **C06:** MediaPicker accept attribute e dinamico baseado no field config validation.accept
-- **C07:** URLs de campos file/image/gallery são convertidas para absolutas no page route
-- **C08:** Deleção gerenciada via server actions admin (não REST API)
+- **C01:** Images are automatically converted to WebP
+- **C02:** Thumbnails are generated at 300x300 with fit: cover (images only)
+- **C03:** Filename is sanitized via sanitizeFilename
+- **C04:** Metadata (width, height, format) stored in database for images
+- **C05:** Non-image files are saved with original mimeType and no thumbnail
+- **C06:** MediaPicker accept attribute is dynamic based on field config validation.accept
+- **C07:** URLs from file/image/gallery fields are converted to absolute in page route
+- **C08:** Deletion managed via admin server actions (not REST API)
 
 ## Dependencies
 - **Depends on:** Storage Driver, Authentication

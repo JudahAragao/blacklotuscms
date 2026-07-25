@@ -9,36 +9,36 @@ feature: "route-service"
 # Route Service Specification
 
 ## Description
-Serviço de pattern matching que resolve URLs para templates + params, com cadeia de resolução: plugin routes → theme routes → default theme routes → CMS padrão.
+Pattern matching service that resolves URLs to templates + params, with resolution chain: plugin routes → theme routes → default theme routes → CMS default.
 
 ## Requirements
-- **REQ-01:** Pattern matching com params dinâmicos (`:slug`, `:id`, etc.)
-- **REQ-02:** Plugin routes registradas via `bridge.routes.register()` têm prioridade máxima
-- **REQ-03:** Theme routes declaradas em `routes.json` têm prioridade secundária
-- **REQ-04:** Default theme routes funcionam como fallback
-- **REQ-05:** RouteContext inclui `params`, `userId` e `role` (name + capabilities)
-- **REQ-06:** Paths são normalizados (slashes extras removidos)
-- **REQ-07:** Suporte a múltiplos params: `/user/:id/orders/:orderId`
+- **REQ-01:** Pattern matching with dynamic params (`:slug`, `:id`, etc.)
+- **REQ-02:** Plugin routes registered via `bridge.routes.register()` have highest priority
+- **REQ-03:** Theme routes declared in `routes.json` have secondary priority
+- **REQ-04:** Default theme routes work as fallback
+- **REQ-05:** RouteContext includes `params`, `userId` and `role` (name + capabilities)
+- **REQ-06:** Paths are normalized (extra slashes removed)
+- **REQ-07:** Multiple params support: `/user/:id/orders/:orderId`
 
 ## Resolution Chain
-1. **Plugin routes** (registradas via `bridge.routes.register`)
-2. **Theme routes** (declaradas em `routes.json` do tema ativo)
-3. **Default theme routes** (fallback do tema default)
-4. **CMS padrão** (single post, archive, etc.)
+1. **Plugin routes** (registered via `bridge.routes.register`)
+2. **Theme routes** (declared in active theme's `routes.json`)
+3. **Default theme routes** (default theme fallback)
+4. **CMS default** (single post, archive, etc.)
 
 ## RouteContext
 ```typescript
 interface RouteContext {
-  params: Record<string, string>;  // Params extraídos da URL
-  userId?: string;                 // ID do user autenticado (se houver)
-  role?: { name: string; capabilities: any } | null;  // Role do user
+  params: Record<string, string>;  // Params extracted from URL
+  userId?: string;                 // Authenticated user ID (if any)
+  role?: { name: string; capabilities: any } | null;  // User role
 }
 ```
 
 ## Constraints
-- **C01:** Número de segmentos do pattern deve ser igual ao da URL
-- **C02:** Segmentos estáticos devem corresponder exatamente
-- **C03:** Segmentos dinâmicos (`:param`) capturam o valor correspondente
+- **C01:** Pattern segment count must match URL
+- **C02:** Static segments must match exactly
+- **C03:** Dynamic segments (`:param`) capture corresponding value
 
 ## Dependencies
 - **Depends on:** Plugin System, Theme Engine

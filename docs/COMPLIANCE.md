@@ -1,7 +1,7 @@
 # Compliance - LGPD & GDPR
 
 ## Overview
-BlackLotusCMS includes features to support compliance com:
+BlackLotusCMS includes features to support compliance with:
 - **LGPD** (Lei Geral de Protecao de Dados) - Brazil
 - **GDPR** (General Data Protection Regulation) - European Union
 
@@ -23,7 +23,7 @@ BlackLotusCMS includes features to support compliance com:
 
 ## Data Subject Rights
 
-### Right to Acesso (Art. 15)
+### Right to Access (Art. 15)
 Users can request a copy of their personal data.
 
 **Implementation:**
@@ -65,18 +65,18 @@ Documented in this file and `specs/architecture/security.md`.
 ## Security Measures
 
 ### Technical Measures
-- Passwords hashed com bcrypt (cost 12)
-- API keys hashed com SHA-256
+- Passwords hashed with bcrypt (cost 12)
+- API keys hashed with SHA-256
 - JWT tokens for session management
 - Rate limiting on API endpoints (Redis recommended for multi-container)
-- Input validation com Zod schemas
-- HTML sanitization com DOMPurify + iframe domain allowlist
+- Input validation with Zod schemas
+- HTML sanitization with DOMPurify + iframe domain allowlist
 - Path traversal protection
 - CORS configuration
-- CSP nonces em producao (via `CSP_NONCE_ENABLED=true`)
-- NEXTAUTH_SECRET obrigatorio (app falha se ausente)
-- ADMIN_PASSWORD validado (rejeita defaults fracos em producao)
-- API Key re-validada em route handlers (headers injetados nao sao confiados)
+- CSP nonces in production (via `CSP_NONCE_ENABLED=true`)
+- NEXTAUTH_SECRET mandatory (app fails if absent)
+- ADMIN_PASSWORD validated (rejects weak defaults in production)
+- API Key re-validated in route handlers (injected headers are not directly trusted)
 
 ### Organizational Measures
 - Role-based access control (RBAC)
@@ -102,7 +102,7 @@ Documented in this file and `specs/architecture/security.md`.
 - **Optional:** AWS S3 / Cloudflare R2
 
 ### Safeguards
-- Data processing agreements com cloud providers
+- Data processing agreements with cloud providers
 - Encryption in transit (TLS)
 - Encryption at rest (S3 server-side encryption)
 
@@ -146,7 +146,7 @@ BlackLotusCMS does not set tracking cookies by default.
 
 ### Data Storage
 - [x] Local storage option
-- [x] S3/R2 com encryption
+- [x] S3/R2 with encryption
 - [x] Configurable storage driver via admin
 
 ### Logging

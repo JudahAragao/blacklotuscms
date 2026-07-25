@@ -26,14 +26,14 @@ module: "comments"
 { "id": "uuid", "status": "pending" }
 ```
 
-**Erros possíveis:**
+**Possible errors:**
 - `400` — VALIDATION_ERROR (Zod)
-- `400` — Captcha obrigatório não enviado
+- `400` — Required captcha not sent
 
 ### EP-02: List Comments for Post
 - **Method:** `GET`
 - **Path:** `/api/v1/public/comments?postId=uuid`
-- **Auth:** Public (apenas approved)
+- **Auth:** Public (approved only)
 - **RBAC:** N/A
 
 **Response 200:**
@@ -47,7 +47,7 @@ module: "comments"
 - **Auth:** Required
 - **RBAC:** `comment.manage`
 
-**Erros possíveis:**
+**Possible errors:**
 - `401` — AUTH_UNAUTHORIZED
 - `403` — AUTH_FORBIDDEN
 - `404` — RESOURCE_NOT_FOUND

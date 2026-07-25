@@ -96,13 +96,13 @@ interface FieldTypeSelectorProps {
 ### Categories
 | Category | Types |
 |----------|-------|
-| Básicos | text, number, textarea, email |
-| Conteúdo | wysiwyg, json |
-| Seleção | select, boolean |
-| Mídia | image, gallery, file |
+| Basic | text, number, textarea, email |
+| Content | wysiwyg, json |
+| Selection | select, boolean |
+| Media | image, gallery, file |
 | Visual | icon |
-| Organização | tab, section |
-| Estruturais | repeater, flexible_content |
+| Organization | tab, section |
+| Structural | repeater, flexible_content |
 
 ### Features
 - Search filtering across all types

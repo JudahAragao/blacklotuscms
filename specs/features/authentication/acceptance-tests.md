@@ -8,38 +8,38 @@ feature: "authentication"
 
 # Authentication Acceptance Tests
 
-## AT-01: Login com Credentials Valid
-- **GIVEN** usuario existente com email e senha corretos
-- **WHEN** envia POST /api/auth/[...nextauth] com credenciais
-- **THEN** JWT e retornado e sessao e criada
-- **Referencia:** FR01
+## AT-01: Login with Valid Credentials
+- **GIVEN** existing user with correct email and password
+- **WHEN** sends POST /api/auth/[...nextauth] with credentials
+- **THEN** JWT is returned and session is created
+- **Reference:** FR01
 
-## AT-02: Login com Credentials Invalid
-- **GIVEN** email inexistente ou senha incorreta
-- **WHEN** tenta autenticar
-- **THEN** retorna null (falha silenciosa)
-- **Referencia:** FR01
+## AT-02: Login with Invalid Credentials
+- **GIVEN** non-existent email or incorrect password
+- **WHEN** attempts to authenticate
+- **THEN** returns null (silent failure)
+- **Reference:** FR01
 
-## AT-03: Acesso com API Key Valid
-- **GIVEN** API Key ativa e nao expirada
-- **WHEN** requisicao com Bearer token valida
-- **THEN** headers x-api-user-id e x-api-user-role injetados
-- **Referencia:** FR03
+## AT-03: Access with Valid API Key
+- **GIVEN** active and non-expired API Key
+- **WHEN** request with valid Bearer token
+- **THEN** headers x-api-user-id and x-api-user-role injected
+- **Reference:** FR03
 
-## AT-04: Acesso com API Key Expirada
-- **GIVEN** API Key com expiresAt no passado
-- **WHEN** tenta autenticar
-- **THEN** chave e rejeitada, proximo auth check (session) e tentado
-- **Referencia:** FR03
+## AT-04: Access with Expired API Key
+- **GIVEN** API Key with expiresAt in the past
+- **WHEN** attempts to authenticate
+- **THEN** key is rejected, next auth check (session) is attempted
+- **Reference:** FR03
 
-## AT-05: Rate Limit Excedido
-- **GIVEN** API Key com rateLimit=60
-- **WHEN** mais de 60 requisicoes em 1 minuto
-- **THEN** retorna 429 com RATE_LIMIT_EXCEEDED
-- **Referencia:** FR24
+## AT-05: Rate Limit Exceeded
+- **GIVEN** API Key with rateLimit=60
+- **WHEN** more than 60 requests in 1 minute
+- **THEN** returns 429 with RATE_LIMIT_EXCEEDED
+- **Reference:** FR24
 
-## AT-06: Administrador Bypass
-- **GIVEN** usuario com role "Administrador"
-- **WHEN** qualquer verificacao de capability e executada
-- **THEN** returns true independente da capability
-- **Referencia:** FR02, BR03
+## AT-06: Administrator Bypass
+- **GIVEN** user with "Administrator" role
+- **WHEN** any capability check is executed
+- **THEN** returns true regardless of capability
+- **Reference:** FR02, BR03

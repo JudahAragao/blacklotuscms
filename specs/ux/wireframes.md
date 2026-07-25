@@ -8,32 +8,32 @@ status: approved
 # Wireframes (Conceptual)
 
 ## 1. Admin Dashboard
-- **Visuals:** Sidebar navigation, top bar com user menu
+- **Visuals:** Sidebar navigation, top bar with user menu
 - **Components:** Skeleton loader, cards
-- **Feature vinculada:** authentication
+- **Linked feature:** authentication
 
 ## 2. Post Editor
-- **Visuals:** Title input, TipTap editor, meta fields panel com tabs/seções, taxonomy sidebar
-- **Components:** PostEditor (com groupedFields: tab navigation + section dividers), RichTextEditor, MediaPicker
-- **Feature vinculada:** post-management
-- **Nota:** Campos do tipo Tab criam abas navegáveis; campos do tipo Section criam divisores visuais dentro da aba
+- **Visuals:** Title input, TipTap editor, meta fields panel with tabs/sections, taxonomy sidebar
+- **Components:** PostEditor (with groupedFields: tab navigation + section dividers), RichTextEditor, MediaPicker
+- **Linked feature:** post-management
+- **Note:** Tab-type fields create navigable tabs; Section-type fields create visual dividers within the tab
 
 ## 3. Media Library
-- **Visuals:** Grid de thumbnails com upload area
+- **Visuals:** Grid of thumbnails with upload area
 - **Components:** MediaUpload, MediaPicker
-- **Feature vinculada:** media-management
+- **Linked feature:** media-management
 
 ## 4. Public Page (Theme Default)
-- **Visuals:** Header com menu, content area, footer
+- **Visuals:** Header with menu, content area, footer
 - **Components:** Header, Footer, ThemeContent
-- **Feature vinculada:** theme-engine
+- **Linked feature:** theme-engine
 
-## 5. Instalacao Wizard
+## 5. Installation Wizard
 - **Visuals:** Multi-step form
 - **Components:** Form inputs, progress indicator
-- **Feature vinculada:** installation
+- **Linked feature:** installation
 
 ## 6. Plugin Manager
-- **Visuals:** Plugin list com toggle activate/deactivate
+- **Visuals:** Plugin list with activate/deactivate toggle
 - **Components:** PluginWrapper, PluginImportButton
-- **Feature vinculada:** plugin-system
+- **Linked feature:** plugin-system

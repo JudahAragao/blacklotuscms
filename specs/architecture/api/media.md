@@ -21,7 +21,7 @@ module: "media"
 [{ "id": "uuid", "name": "string", "url": "string", "thumbnail": "string|null", "mimeType": "string", "size": 12345 }]
 ```
 
-**Erros possíveis:**
+**Possible errors:**
 - `500` — DATABASE_ERROR
 
 ### EP-02: Upload Media
@@ -30,23 +30,23 @@ module: "media"
 - **Auth:** Required
 - **RBAC:** `media.upload`
 
-**Request:** multipart/form-data com campo "file"
+**Request:** multipart/form-data with "file" field
 
-**Response 201 (Imagem):**
+**Response 201 (Image):**
 ```json
 { "id": "uuid", "name": "string", "url": "/uploads/12345-image.webp", "thumbnail": "/uploads/thumb-12345-image.webp", "mimeType": "image/webp", "size": 45678 }
 ```
 
-**Response 201 (Arquivo generico):**
+**Response 201 (Generic file):**
 ```json
 { "id": "uuid", "name": "string", "url": "/uploads/12345-document.pdf", "thumbnail": null, "mimeType": "application/pdf", "size": 123456 }
 ```
 
-**Erros possíveis:**
-- `400` — File não enviado
+**Possible errors:**
+- `400` — File not sent
 - `401` — AUTH_UNAUTHORIZED
 - `403` — AUTH_FORBIDDEN
-- `500` — Erro no processamento do arquivo
+- `500` — Error processing file
 
 ### EP-03: Delete Media
 - **Method:** Server Action (Admin Panel)
@@ -55,7 +55,7 @@ module: "media"
 
 **Note:** Media deletion is handled via admin panel server actions, not via REST API endpoint. The `MediaService.delete()` method removes both the physical file and database record.
 
-**Erros possíveis:**
+**Possible errors:**
 - `401` — AUTH_UNAUTHORIZED
 - `403` — AUTH_FORBIDDEN
 - `404` — RESOURCE_NOT_FOUND

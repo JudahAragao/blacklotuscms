@@ -8,50 +8,50 @@ feature: "media-management"
 
 # Media Management Acceptance Tests
 
-## AT-01: Upload de Imagem
-- **GIVEN** usuario autenticado com permissao media.upload
-- **WHEN** envia arquivo JPEG via POST /api/v1/media
-- **THEN** arquivo e convertido para WebP, thumbnail gerado, registro criado com mimeType='image/webp'
-- **Referencia:** REQ-01
+## AT-01: Image Upload
+- **GIVEN** authenticated user with media.upload permission
+- **WHEN** sends JPEG file via POST /api/v1/media
+- **THEN** file is converted to WebP, thumbnail generated, record created with mimeType='image/webp'
+- **Reference:** REQ-01
 
-## AT-02: Upload Sem Permission
-- **GIVEN** usuario sem capability media.upload
-- **WHEN** envia arquivo via POST /api/v1/media
-- **THEN** retorna erro 403
-- **Referencia:** REQ-06
+## AT-02: Upload Without Permission
+- **GIVEN** user without media.upload capability
+- **WHEN** sends file via POST /api/v1/media
+- **THEN** returns error 403
+- **Reference:** REQ-06
 
-## AT-03: Exclusao de Media
-- **GIVEN** media existente no banco e storage
-- **WHEN** exclusao e solicitada com permissao media.manage
-- **THEN** arquivo fisico e registro sao removidos
-- **Referencia:** REQ-05
+## AT-03: Media Deletion
+- **GIVEN** media existing in database and storage
+- **WHEN** deletion is requested with media.manage permission
+- **THEN** physical file and record are removed
+- **Reference:** REQ-05
 
-## AT-04: Upload de Arquivo Generico (PDF)
-- **GIVEN** usuario autenticado com permissao media.upload
-- **WHEN** envia arquivo PDF via POST /api/v1/media
-- **THEN** arquivo e salvo com mimeType original, thumbnail=null, registro criado
-- **Referencia:** REQ-01a
+## AT-04: Generic File Upload (PDF)
+- **GIVEN** authenticated user with media.upload permission
+- **WHEN** sends PDF file via POST /api/v1/media
+- **THEN** file is saved with original mimeType, thumbnail=null, record created
+- **Reference:** REQ-01a
 
-## AT-05: Upload de Arquivo Generico (DOCX)
-- **GIVEN** usuario autenticado com permissao media.upload
-- **WHEN** envia arquivo DOCX via POST /api/v1/media
-- **THEN** arquivo e salvo com mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document', thumbnail=null
-- **Referencia:** REQ-01a
+## AT-05: Generic File Upload (DOCX)
+- **GIVEN** authenticated user with media.upload permission
+- **WHEN** sends DOCX file via POST /api/v1/media
+- **THEN** file is saved with mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document', thumbnail=null
+- **Reference:** REQ-01a
 
-## AT-06: MediaPicker Accept Dinamico
-- **GIVEN** campo customizado do tipo file com validation.accept='pdf, docx'
-- **WHEN** usuario abre MediaPicker para selecionar arquivo
-- **THEN** input file tem accept='.pdf,.docx'
-- **Referencia:** REQ-06
+## AT-06: Dynamic MediaPicker Accept
+- **GIVEN** custom file field with validation.accept='pdf, docx'
+- **WHEN** user opens MediaPicker to select file
+- **THEN** input file has accept='.pdf,.docx'
+- **Reference:** REQ-06
 
-## AT-07: MediaPicker Accept Todos
-- **GIVEN** campo customizado do tipo file sem validation.accept
-- **WHEN** usuario abre MediaPicker para selecionar arquivo
-- **THEN** input file tem accept='*'
-- **Referencia:** REQ-06
+## AT-07: MediaPicker Accept All
+- **GIVEN** custom file field without validation.accept
+- **WHEN** user opens MediaPicker to select file
+- **THEN** input file has accept='*'
+- **Reference:** REQ-06
 
-## AT-08: Validacao de Tipo de Arquivo
-- **GIVEN** campo file com validation.accept='pdf, docx'
-- **WHEN** usuario tenta salvar post com arquivo .xlsx
-- **THEN** validacao retorna erro 'File type ".xlsx" is not allowed'
-- **Referencia:** REQ-06
+## AT-08: File Type Validation
+- **GIVEN** file field with validation.accept='pdf, docx'
+- **WHEN** user tries to save post with .xlsx file
+- **THEN** validation returns error 'File type ".xlsx" is not allowed'
+- **Reference:** REQ-06

@@ -13,7 +13,7 @@ All protected endpoints require authentication via:
 ## Rate Limiting
 - Default: 60 requests per minute per API Key
 - Configurable per key via `rateLimit` field
-- Returns `429` com `RATE_LIMIT_EXCEEDED` code when exceeded
+- Returns `429` with `RATE_LIMIT_EXCEEDED` code when exceeded
 
 ---
 
@@ -103,12 +103,12 @@ POST /api/v1/media
 **Auth:** Required | **RBAC:** `media.upload`
 **Content-Type:** multipart/form-data
 
-**Response 201 (Imagem):**
+**Response 201 (Image):**
 ```json
 { "id": "uuid", "name": "photo.jpg", "url": "/uploads/12345-photo.webp", "thumbnail": "/uploads/thumb-12345-photo.webp", "mimeType": "image/webp", "size": 45678 }
 ```
 
-**Response 201 (Arquivo generico):**
+**Response 201 (Generic file):**
 ```json
 { "id": "uuid", "name": "doc.pdf", "url": "/uploads/12345-doc.pdf", "thumbnail": null, "mimeType": "application/pdf", "size": 123456 }
 ```
@@ -173,7 +173,7 @@ GET /api/v1/public/comments?postId=uuid
 
 ---
 
-## Busca (Public)
+## Search (Public)
 
 ### Global Search
 ```
@@ -190,7 +190,7 @@ GET /api/v1/public/search?q=query
 ```
 GET /api/v1/users/:id
 ```
-**Auth:** Required | **RBAC:** `user.manage` ou self
+**Auth:** Required | **RBAC:** `user.manage` or self
 
 **Response 200:**
 ```json
@@ -198,7 +198,7 @@ GET /api/v1/users/:id
   "id": "uuid",
   "email": "user@example.com",
   "image": null,
-  "role": { "id": "uuid", "name": "Autor", "capabilities": {} },
+  "role": { "id": "uuid", "name": "Author", "capabilities": {} },
   "createdAt": "2026-01-01T00:00:00Z"
 }
 ```
@@ -207,7 +207,7 @@ GET /api/v1/users/:id
 ```
 GET /api/v1/users/:id/data
 ```
-**Auth:** Required | **RBAC:** `user.manage` ou self
+**Auth:** Required | **RBAC:** `user.manage` or self
 
 **Response 200:**
 ```json
@@ -222,8 +222,8 @@ GET /api/v1/users/:id/data
 ```
 DELETE /api/v1/users/:id
 ```
-**Auth:** Required | **RBAC:** `user.manage` ou self
-**Note:** Cascade delete: postTerms → metaValues → comments → posts → apiKeys → user. Cannot delete last Administrador.
+**Auth:** Required | **RBAC:** `user.manage` or self
+**Note:** Cascade delete: postTerms → metaValues → comments → posts → apiKeys → user. Cannot delete last Administrator.
 
 ---
 
@@ -249,7 +249,7 @@ POST /api/v1/webhooks/:pluginName/:eventId
 { "received": true, "message": "Webhook queued for 1 handler(s)" }
 ```
 
-**Note:** Retry automático com exponential backoff (1s → 2s → 4s, max 3 tentativas).
+**Note:** Automatic retry with exponential backoff (1s → 2s → 4s, max 3 attempts).
 
 ---
 

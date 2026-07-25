@@ -8,17 +8,17 @@ feature: "comments"
 
 # Comments Error States
 
-## ERR-01: Validacao Zod
-- **Condition:** Dados invalidos
-- **Código HTTP:** 400
-- **Mensagem:** Detalhes dos fields
+## ERR-01: Zod Validation
+- **Condition:** Invalid data
+- **HTTP Code:** 400
+- **Message:** Field details
 
-## ERR-02: Captcha Obrigatorio
-- **Condition:** captcha_enabled e captchaToken ausente
-- **Código HTTP:** 400
-- **Mensagem:** "Required captcha not sent."
+## ERR-02: Mandatory Captcha
+- **Condition:** captcha_enabled and captchaToken missing
+- **HTTP Code:** 400
+- **Message:** "Required captcha not sent."
 
-## ERR-03: Sem Permission para Excluir
-- **Condition:** User sem comment.manage
-- **Código HTTP:** 403
-- **Mensagem:** "Sem permissão para excluir comentários"
+## ERR-03: No Permission to Delete
+- **Condition:** User without comment.manage
+- **HTTP Code:** 403
+- **Message:** "No permission to delete comments"

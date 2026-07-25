@@ -8,46 +8,46 @@ feature: "post-management"
 
 # Post Management Flows
 
-## Criar Post
+## Create Post
 
-1. **User preenche formulario**
-   - Entrada: title, slug, content, status, metaFields, terms
+1. **User fills out form**
+   - Input: title, slug, content, status, metaFields, terms
    - State: Valid form
 
-2. **Sistema valida com Zod**
+2. **System validates with Zod**
    - Valid: CreatePostSchema
    - State: Validated data
 
 3. **Hook post.before_validate**
-   - Transforma: Dados podem ser modificados por plugins
+   - Transform: Data can be modified by plugins
    - State: Transformed data
 
 4. **RBAC check**
-   - Verifica: canPerformAction(user, 'post.create')
+   - Verify: canPerformAction(user, 'post.create')
    - State: Authorized
 
 5. **Contributor draft lock**
-   - Se role = Contributor, status = 'draft'
+   - If role = Contributor, status = 'draft'
    - State: Status adjusted
 
-6. **Transaction: criar post + metaValues + terms**
+6. **Transaction: create post + metaValues + terms**
    - State: Post created in database
 
 7. **Hook post.created + revalidateTag('posts')**
    - State: Cache invalidated, plugins notified
 
-8. **Retorna post criado (201)**
+8. **Returns created post (201)**
 
-## Editar Post
+## Edit Post
 
-1. **Sistema busca post existente**
+1. **System finds existing post**
    - State: Post found
 
-2. **RBAC check com own verification**
-   - Verifica: canPerformAction(user, 'post.update', existingPost.authorId)
+2. **RBAC check with own verification**
+   - Verify: canPerformAction(user, 'post.update', existingPost.authorId)
    - State: Authorized
 
-3. **Validacao Zod + MetaFields validation**
+3. **Zod validation + MetaFields validation**
    - State: Validated data
 
 4. **Transaction: update post + upsert metaValues + replace terms**
@@ -56,23 +56,23 @@ feature: "post-management"
 5. **Hook post.updated + revalidateTag**
    - State: Cache invalidated
 
-## Deletar Post
+## Delete Post
 
-1. **RBAC check com own verification**
-   - Verifica: canPerformAction(user, 'post.delete', existingPost.authorId)
+1. **RBAC check with own verification**
+   - Verify: canPerformAction(user, 'post.delete', existingPost.authorId)
 
 2. **Transaction: delete metaValues + postTerms + comments + post**
    - State: Post removed
 
 3. **Hook post.deleted + revalidateTag**
 
-## Listar Posts Publicos
+## List Public Posts
 
-1. **Theme chama PostService.getLeanPostsByType(slug)**
-   - State: Query executada com filtro status=published, publishedAt <= now, expiresAt >= now ou null
+1. **Theme calls PostService.getLeanPostsByType(slug)**
+   - State: Query executed with filter status=published, publishedAt <= now, expiresAt >= now or null
 
 2. **ThemeDataService.validate('db.read.post')**
    - State: Permission validated
 
-3. **Cache via unstable_cache com tag 'posts'**
+3. **Cache via unstable_cache with tag 'posts'**
    - State: Data returned from cache or database

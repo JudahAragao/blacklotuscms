@@ -7,32 +7,32 @@ status: approved
 
 # User Flows - BlackLotusCMS
 
-## 1. Primeira Instalacao
+## 1. First Installation
 Docker up -> /install -> Form -> Database Setup -> Admin Created -> /auth/login
-- Feature vinculada: installation
-- Flow documentado em: specs/features/installation/flows.md
+- Linked feature: installation
+- Flow documented in: specs/features/installation/flows.md
 
-## 2. Criacao de Conteudo
+## 2. Content Creation
 Login -> Admin -> Posts -> New -> Editor -> Save -> Published
-- Feature vinculada: post-management
-- Flow documentado em: specs/features/post-management/flows.md
+- Linked feature: post-management
+- Flow documented in: specs/features/post-management/flows.md
 
-## 3. Upload de Media
+## 3. Media Upload
 Login -> Admin -> Media -> Upload -> WebP Convert -> Library
-- Feature vinculada: media-management
-- Flow documentado em: specs/features/media-management/flows.md
+- Linked feature: media-management
+- Flow documented in: specs/features/media-management/flows.md
 
-## 4. Instalacao de Plugin
+## 4. Plugin Installation
 Login -> Admin -> Plugins -> Upload ZIP -> Activate -> Sandbox Execute
-- Feature vinculada: plugin-system
-- Flow documentado em: specs/features/plugin-system/flows.md
+- Linked feature: plugin-system
+- Flow documented in: specs/features/plugin-system/flows.md
 
-## 5. Visitante Acessa Site
+## 5. Visitor Accesses Site
 / -> Theme Layout -> Posts List -> Post Single -> Comments
-- Feature vinculada: theme-engine
-- Flow documentado em: specs/features/theme-engine/flows.md
+- Linked feature: theme-engine
+- Flow documented in: specs/features/theme-engine/flows.md
 
-## 6. Busca Publica
+## 6. Public Search
 /search?q=query -> SearchService -> Results -> Theme Layout
-- Feature vinculada: search
-- Flow documentado em: specs/features/search/flows.md
+- Linked feature: search
+- Flow documented in: specs/features/search/flows.md

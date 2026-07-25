@@ -8,23 +8,23 @@ status: approved
 # Coding Standards - BlackLotusCMS
 
 ## 1. Services Pattern (Stable Proxy)
-Cada service segue o padrao "Stable Proxy":
+Each service follows the "Stable Proxy" pattern:
 
 ```typescript
 export class MyService {
   constructor(private readonly db = prisma, private readonly log = logger) {}
   
-  async doSomething() { /* logica */ }
+  async doSomething() { /* logic */ }
   
-  // Static proxy para compatibilidade
+  // Static proxy for compatibility
   static async doSomething() { return myService.doSomething(); }
 }
 
 export const myService = new MyService();
 ```
 
-## 2. RBAC em Services
-Toda operacao que modifica dados verifica permissao:
+## 2. RBAC in Services
+Every operation that modifies data checks permissions:
 
 ```typescript
 if (!canPerformAction(user, 'capability.name')) {
@@ -32,32 +32,32 @@ if (!canPerformAction(user, 'capability.name')) {
 }
 ```
 
-## 3. Validation com Zod
-Inputs de API sempre validados:
+## 3. Validation with Zod
+API inputs are always validated:
 
 ```typescript
 const validated = CreatePostSchema.parse(input);
 ```
 
 ## 4. Error Handling
-Usar BlackLotusCMSError com codigos padronizados:
+Use BlackLotusCMSError with standardized codes:
 
 ```typescript
 throw new BlackLotusCMSError('Post not found', 404, 'RESOURCE_NOT_FOUND');
 ```
 
 ## 5. Caching
-Dois padrões de cache são utilizados no projeto:
+Two cache patterns are used in the project:
 
 ### 5.1 unstable_cache (Next.js Data Cache)
-Usar unstable_cache com tags para revalidation de queries:
+Use unstable_cache with tags for query revalidation:
 
 ```typescript
 return unstable_cache(async () => { /* query */ }, ['key'], { tags: ['tag'], revalidate: 3600 })();
 ```
 
-### 5.2 Cache em memória com TTL
-Usado para permissões de themes (ThemeDataService). Evita queries ao banco a cada chamada de `validate()`:
+### 5.2 In-memory Cache with TTL
+Used for theme permissions (ThemeDataService). Avoids database queries on every `validate()` call:
 
 ```typescript
 const PERMISSION_CACHE_TTL = 10_000; // 10 seconds
@@ -69,19 +69,19 @@ interface CacheEntry {
 
 private permissionCache = new Map<string, CacheEntry>();
 
-// Uso: ThemeDataService.validate('db.read.post')
-// 1. Verifica cache -> se hit e approved, retorna true
-// 2. Se miss, busca no banco, armazena no cache com TTL
-// 3. Cache é limpo quando permission é aprovada/denegada/deletada
+// Usage: ThemeDataService.validate('db.read.post')
+// 1. Check cache -> if hit and approved, return true
+// 2. If miss, query database, store in cache with TTL
+// 3. Cache is cleared when permission is approved/denied/deleted
 ```
 
 ### 5.3 Dual-Store Context (React.cache + AsyncLocalStorage)
-O contexto do tema usa duas stores para resiliência contra perda de contexto em async boundaries:
+The theme context uses two stores for resilience against context loss in async boundaries:
 
 ```typescript
-// theme-context.ts — getThemeStore() prioriza React.cache
+// theme-context.ts — getThemeStore() prioritizes React.cache
 export function getThemeStore(): ThemeStore {
-  const reactStore = getReactStore();        // React.cache (primário)
+  const reactStore = getReactStore();        // React.cache (primary)
   if (reactStore.themeName) return reactStore;
   const nodeStore = themeStorage.getStore();  // AsyncLocalStorage (fallback)
   if (nodeStore) return nodeStore;
@@ -89,28 +89,28 @@ export function getThemeStore(): ThemeStore {
 }
 ```
 
-Regras:
-- `page.tsx`: apos `themeStorage.run()`, setar `getReactStore().themeName = themeName`
-- `ThemeRenderer`: apos setar o store, sincronizar `getReactStore()` com themeName e currentPost
-- Nunca confiar apenas no AsyncLocalStorage em contexto RSC — `unstable_cache` pode perder o contexto
+Rules:
+- `page.tsx`: after `themeStorage.run()`, set `getReactStore().themeName = themeName`
+- `ThemeRenderer`: after setting the store, synchronize `getReactStore()` with themeName and currentPost
+- Never rely solely on AsyncLocalStorage in RSC context — `unstable_cache` may lose the context
 
 ## 6. Hooks
-Services disparam hooks apos operacoes:
+Services dispatch hooks after operations:
 
 ```typescript
 await HookService.doAction('post.created', post);
 ```
 
 ## 7. Security
-- Sanitizar paths: `sanitizePath()`
-- Mascarar dados: `maskSensitiveData()`
-- Sanitizar HTML: `sanitizeHTML()` ou `sanitizeHtml()` com validacao de dominio para iframes
-- Validar inputs: Zod schemas
-- NEXTAUTH_SECRET obrigatorio — app falha se nao configurado
-- ADMIN_PASSWORD validado — rejeita 'admin123' em producao
-- API Key re-validada no route handler — headers injetados nunca sao confiaveis diretamente
-- CSP nonce habilitado via `CSP_NONCE_ENABLED=true` em producao
-- SecretsService sem metodo `save()` — secrets gerenciados apenas via env vars
+- Sanitize paths: `sanitizePath()`
+- Mask data: `maskSensitiveData()`
+- Sanitize HTML: `sanitizeHTML()` or `sanitizeHtml()` with domain validation for iframes
+- Validate inputs: Zod schemas
+- NEXTAUTH_SECRET mandatory — app fails if not configured
+- ADMIN_PASSWORD validated — rejects 'admin123' in production
+- API Key re-validated in route handler — injected headers are never directly trusted
+- CSP nonce enabled via `CSP_NONCE_ENABLED=true` in production
+- SecretsService has no `save()` method — secrets managed only via env vars
 
 ## 8. File Organization
 - `src/lib/` — Shared utilities, config, auth
@@ -127,7 +127,7 @@ await HookService.doAction('post.created', post);
 - `tasks/` — Task management
 
 ## 9. Compiled Plugins Pattern
-Plugins compilados seguem o padrão:
+Compiled plugins follow this pattern:
 ```typescript
 // plugins/my-plugin/index.ts
 export default async function init(bridge: any) {
@@ -139,7 +139,7 @@ export default async function init(bridge: any) {
 ```
 
 ## 10. Route Registration Pattern
-Rotas dinâmicas de plugins:
+Dynamic plugin routes:
 ```typescript
 bridge.routes.register({
   path: '/product/:slug',
@@ -154,7 +154,7 @@ bridge.routes.register({
 ```
 
 ## 11. Webhook Pattern
-Webhooks inbound para plugins:
+Inbound webhooks for plugins:
 ```typescript
 bridge.webhook.on('payment.completed', async (payload) => {
   // payload = { eventId, data, signature, timestamp, source }

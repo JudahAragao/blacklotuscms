@@ -26,7 +26,7 @@ module: "auth"
 - **Method:** `POST`
 - **Path:** (via admin settings)
 - **Auth:** Required
-- **RBAC:** `user.manage` ou proprio usuario
+- **RBAC:** `user.manage` or own user
 
 **Request:**
 ```json
@@ -37,20 +37,20 @@ module: "auth"
 ```json
 { "key": "bl_...", "id": "uuid" }
 ```
-Nota: A chave plain text e mostrada apenas uma vez.
+Note: The plain text key is shown only once.
 
-### EP-04: Validte API Key
+### EP-04: Validate API Key
 - **Method:** Via Proxy Middleware
-- **Path:** Qualquer `/api/v1/*` ou `/api/graphql`
-- **Auth:** Bearer token no header Authorization
-- **RBAC:** Baseado no role do usuario dono da chave
+- **Path:** Any `/api/v1/*` or `/api/graphql`
+- **Auth:** Bearer token in Authorization header
+- **RBAC:** Based on the role of the key owner user
 
 ### EP-05: List API Keys
 - **Method:** `GET`
 - **Auth:** Required
-- **RBAC:** `user.manage` ou proprio usuario
+- **RBAC:** `user.manage` or own user
 
 ### EP-06: Revoke API Key
 - **Method:** `DELETE`
 - **Auth:** Required
-- **RBAC:** `user.manage` ou proprio usuario
+- **RBAC:** `user.manage` or own user

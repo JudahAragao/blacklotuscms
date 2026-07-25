@@ -9,27 +9,27 @@ feature: "reading-settings"
 # Reading Settings Specification
 
 ## Description
-Configurações de leitura do site: página inicial, página de posts, e posts por página. Afeta sitemap (exclusão de páginas estáticas) e renderização de temas.
+Site reading settings: front page, posts page, and posts per page. Affects sitemap (static page exclusion) and theme rendering.
 
 ## Requirements
-- **REQ-01:** Configurar `page_on_front` (página exibida na home)
-- **REQ-02:** Configurar `page_for_posts` (página de listagem de posts)
-- **REQ-03:** Configurar `posts_per_page` (número de posts por página, default 10)
-- **REQ-04:** Páginas definidas como home/posts page são excluídas do sitemap
-- **REQ-05:** Configurações armazenadas na tabela Setting
+- **REQ-01:** Configure `page_on_front` (page displayed on home)
+- **REQ-02:** Configure `page_for_posts` (posts listing page)
+- **REQ-03:** Configure `posts_per_page` (number of posts per page, default 10)
+- **REQ-04:** Pages defined as home/posts page are excluded from sitemap
+- **REQ-05:** Settings stored in Setting table
 
 ## Settings Keys
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `page_on_front` | String (UUID) | — | ID do post tipo "page" para home |
-| `page_for_posts` | String (UUID) | — | ID do post tipo "page" para listagem |
-| `posts_per_page` | Number | 10 | Itens por página em archives |
+| `page_on_front` | String (UUID) | — | ID of "page" type post for home |
+| `page_for_posts` | String (UUID) | — | ID of "page" type post for listing |
+| `posts_per_page` | Number | 10 | Items per page in archives |
 
 ## Constraints
-- **C01:** Apenas posts do tipo "page" podem ser selecionados como home/posts page
-- **C02:** Validação: página selecionada deve existir e estar published
+- **C01:** Only posts of type "page" can be selected as home/posts page
+- **C02:** Validation: selected page must exist and be published
 
 ## Dependencies
 - **Depends on:** Post Management, Settings
-- **Blocks:** Sitemap (exclusão de páginas estáticas)
+- **Blocks:** Sitemap (static page exclusion)
 - **Related to:** SEO, Sitemap, Theme Engine

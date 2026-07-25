@@ -8,41 +8,41 @@ status: approved
 # Onboarding Guide - BlackLotusCMS
 
 ## Introduction
-Bem-vindo ao BlackLotusCMS. Um CMS moderno e extensivel construido com Next.js 16, Prisma e Pothos GraphQL.
+Welcome to BlackLotusCMS. A modern and extensible CMS built with Next.js 16, Prisma and Pothos GraphQL.
 
 ## Stack Overview
 - **Next.js 16:** App Router, Server Components, standalone output
-- **Prisma 7:** ORM com PrismaPg adapter (PostgreSQL)
+- **Prisma 7:** ORM with PrismaPg adapter (PostgreSQL)
 - **Pothos:** Type-safe GraphQL schema builder
 - **NextAuth 4:** JWT authentication
 - **TypeScript 6:** Strict mode
 - **Tailwind CSS 4:** Styling
 
 ## Core Concepts
-- **Zero .env:** Configuracao via .secrets.json, nao variaveis de ambiente
-- **Prisma Proxy:** Lazy initialization permite instalacao web-based
-- **Hook System:** Actions + Filters para extensibilidade (WordPress-style)
-- **Plugin Sandbox:** isolated-vm com Bridge API
-- **Theme Sistema:** React Server Components com CSS scoping
-- **RBAC:** Capability-based permissions em JSON
+- **Zero .env:** Configuration via .secrets.json, not environment variables
+- **Prisma Proxy:** Lazy initialization allows web-based installation
+- **Hook System:** Actions + Filters for extensibility (WordPress-style)
+- **Plugin Sandbox:** isolated-vm with Bridge API
+- **Theme System:** React Server Components with CSS scoping
+- **RBAC:** Capability-based permissions in JSON
 
 ## Development Workflow
-1. `bash setup_dev.sh` — configura tudo automaticamente (idempotente)
-2. `bun run dev` — inicia o servidor de desenvolvimento
+1. `bash setup_dev.sh` — configures everything automatically (idempotent)
+2. `bun run dev` — starts the development server
 
-O setup_dev.sh faz:
-- Verifica pré-requisitos (bun, docker, node, python3, make, g++)
-- Cria `.env` com secrets gerados automaticamente
-- Sobe PostgreSQL via Docker
-- Instala dependencias e compila isolated-vm
-- Gera Prisma client e aplica schema no banco
-- Gera registros de themes e plugins
-- Cria diretorio uploads/
+The setup_dev.sh script does:
+- Checks prerequisites (bun, docker, node, python3, make, g++)
+- Creates `.env` with automatically generated secrets
+- Starts PostgreSQL via Docker
+- Installs dependencies and compiles isolated-vm
+- Generates Prisma client and applies schema to database
+- Generates theme and plugin registries
+- Creates uploads/ directory
 
 ### Manual Setup (Fallback)
 1. `bun install`
 2. `npm rebuild isolated-vm`
-3. `cp .env.example .env` (editar configuracoes)
+3. `cp .env.example .env` (edit configuration)
 4. `docker run -d --name blacklotus-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=blacklotuscms -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:15-alpine`
 5. `bunx prisma generate && bunx prisma db push`
 6. `npm run generate`

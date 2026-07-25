@@ -6,11 +6,11 @@ status: approved
 module: "install"
 ---
 
-# API - Instalacao
+# API - Installation
 
 ## Endpoints
 
-### EP-01: Check Instalacao Status
+### EP-01: Check Installation Status
 - **Method:** `GET`
 - **Path:** `/api/install`
 - **Auth:** Public
@@ -20,10 +20,10 @@ module: "install"
 { "installed": true }
 ```
 
-### EP-02: Complete Instalacao
+### EP-02: Complete Installation
 - **Method:** `POST`
 - **Path:** `/api/install`
-- **Auth:** Public (apenas antes da installation)
+- **Auth:** Public (only before installation)
 
 **Request:**
 ```json
@@ -51,9 +51,9 @@ module: "install"
 { "success": true }
 ```
 
-**Erros possíveis:**
-- `400` — Validacao do formulario falhou
-- `500` — Falha ao conectar ao banco ou criar tabelas
+**Possible errors:**
+- `400` — Form validation failed
+- `500` — Failed to connect to database or create tables
 
 ### EP-03: Health Check
 - **Method:** `GET`

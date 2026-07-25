@@ -15,15 +15,15 @@ module: "plugins"
 - **Auth:** Required
 - **RBAC:** `plugin.manage`
 
-**Request:** multipart/form-data com campo "file" (ZIP)
+**Request:** multipart/form-data with "file" field (ZIP)
 
 **Response 200:**
 ```json
 { "success": true, "plugin": { "id": "uuid", "name": "string", "version": "string" } }
 ```
 
-**Erros possíveis:**
-- `400` — Plugin ZIP invalido ou corrompido
+**Possible errors:**
+- `400` — Invalid or corrupted plugin ZIP
 - `403` — AUTH_FORBIDDEN
 
 ### EP-02: Activate Plugin
@@ -41,4 +41,4 @@ module: "plugins"
 - **Auth:** Required
 - **RBAC:** `plugin.manage`
 
-**Gerencia permissions pendentes/aprovadas/denegadas entre plugins e o sistema.**
+**Manages pending/approved/denied permissions between plugins and the system.**

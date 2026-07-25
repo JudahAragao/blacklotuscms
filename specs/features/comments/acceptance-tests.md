@@ -8,20 +8,20 @@ feature: "comments"
 
 # Comments Acceptance Tests
 
-## AT-01: Comment Valid
-- **GIVEN** data validos (postId, author, email, content)
-- **WHEN** envia POST /api/v1/public/comments
-- **THEN** comentario criado com status pending ou approved
-- **Referencia:** FR14
+## AT-01: Valid Comment
+- **GIVEN** valid data (postId, author, email, content)
+- **WHEN** sends POST /api/v1/public/comments
+- **THEN** comment created with status pending or approved
+- **Reference:** FR14
 
 ## AT-02: Spam Detected
-- **GIVEN** comentario com 3 URLs
-- **WHEN** processado pelo anti-spam
+- **GIVEN** comment with 3 URLs
+- **WHEN** processed by anti-spam
 - **THEN** status = "spam"
-- **Referencia:** FR15
+- **Reference:** FR15
 
-## AT-03: Captcha Obrigatorio
+## AT-03: Mandatory Captcha
 - **GIVEN** captcha_enabled = true
-- **WHEN** envia sem captchaToken
-- **THEN** erro 400 retornado
-- **Referencia:** FR14
+- **WHEN** sends without captchaToken
+- **THEN** 400 error returned
+- **Reference:** FR14

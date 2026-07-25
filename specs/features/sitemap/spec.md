@@ -9,23 +9,23 @@ feature: "sitemap"
 # Sitemap Specification
 
 ## Description
-Geracao automatica de XML sitemap baseado em configuracoes de inclusao de PostTypes e Taxonomies.
+Automatic XML sitemap generation based on PostType and Taxonomy inclusion settings.
 
 ## Requirements
-- **REQ-01:** Geracao de XML sitemap
-- **REQ-02:** Inclusao configuravel por PostType
-- **REQ-03:** Exclusao de posts com noIndex
-- **REQ-04:** Apenas posts published
-- **REQ-05:** Inclusao configuravel por Taxonomias
-- **REQ-06:** Exclusao de paginas estaticas definidas como home/posts page
-- **REQ-07:** Correcao de barras duplas na URL (baseUrl + slug)
-- **REQ-08:** Inclusao de data de publicacao (createdAt) além de lastmod
+- **REQ-01:** XML sitemap generation
+- **REQ-02:** Configurable inclusion by PostType
+- **REQ-03:** Exclusion of posts with noIndex
+- **REQ-04:** Only published posts
+- **REQ-05:** Configurable inclusion by Taxonomies
+- **REQ-06:** Exclusion of static pages defined as home/posts page
+- **REQ-07:** Double-slash correction in URL (baseUrl + slug)
+- **REQ-08:** Publication date (createdAt) inclusion alongside lastmod
 
 ## Constraints
-- **C01:** PostTypes inclusao via setting sitemap_post_types
-- **C02:** Default: page e post
-- **C03:** Taxonomies inclusao via setting sitemap_taxonomies
-- **C04:** Paginas definidas em reading settings (page_on_front, page_for_posts) sao excluidas do sitemap
+- **C01:** PostTypes inclusion via sitemap_post_types setting
+- **C02:** Default: page and post
+- **C03:** Taxonomies inclusion via sitemap_taxonomies setting
+- **C04:** Pages defined in reading settings (page_on_front, page_for_posts) are excluded from sitemap
 
 ## Dependencies
 - **Depends on:** Post Management, Settings, Reading Settings

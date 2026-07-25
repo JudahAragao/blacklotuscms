@@ -10,83 +10,83 @@ status: approved
 ## 1. PostgreSQL (Database)
 
 - **Method:** TCP via PrismaPg adapter (connection pooling)
-- **Usage:** Database de data principal, todas as entidades
+- **Usage:** Main data database, all entities
 - **Auth Flow:** Connection string via .secrets.json (DATABASE_URL)
-- **Fallback:** Erro claro se DATABASE_URL não configurado; PrismaProxy permite lazy init
+- **Fallback:** Clear error if DATABASE_URL not configured; PrismaProxy allows lazy init
 
 ## 2. AWS S3 / Cloudflare R2 (Object Storage)
 
 - **Method:** AWS SDK v3 (@aws-sdk/client-s3, @aws-sdk/lib-storage)
-- **Usage:** Armazenamento de uploads de mídia (imagens processadas)
-- **Auth Flow:** Acesso Key + Secret Key configurados via admin ou .secrets.json
-- **Fallback:** Se S3/R2 falha, erro é logado e upload falha com 500; Storage driver configurável (local/s3/r2)
+- **Usage:** Media upload storage (processed images)
+- **Auth Flow:** Access Key + Secret Key configured via admin or .secrets.json
+- **Fallback:** If S3/R2 fails, error is logged and upload fails with 500; Configurable storage driver (local/s3/r2)
 
 ## 3. Sharp (Image Processing)
 
-- **Method:** Lib nativa Node.js
-- **Usage:** Conversão para WebP, geração de thumbnails 300x300, extração de metadata
-- **Auth Flow:** N/A (lib local)
-- **Fallback:** Erro de processamento lança BlackLotusCMSError 500
+- **Method:** Native Node.js library
+- **Usage:** Conversion to WebP, 300x300 thumbnail generation, metadata extraction
+- **Auth Flow:** N/A (local library)
+- **Fallback:** Processing error throws BlackLotusCMSError 500
 
 ## 4. DOMPurify (HTML Sanitization)
 
 - **Method:** isomorphic-dompurify (SSR + client compatible)
-- **Usage:** Sanitização de HTML em hooks, conteúdo de themes, queries de busca
-- **Auth Flow:** N/A (lib local)
-- **Fallback:** N/A (operação síncrona local)
+- **Usage:** HTML sanitization in hooks, theme content, search queries
+- **Auth Flow:** N/A (local library)
+- **Fallback:** N/A (synchronous local operation)
 
 ## 5. NextAuth (Authentication)
 
-- **Method:** next-auth v4 com @next-auth/prisma-adapter
-- **Usage:** Autenticação JWT, sessões, callbacks
+- **Method:** next-auth v4 with @next-auth/prisma-adapter
+- **Usage:** JWT authentication, sessions, callbacks
 - **Auth Flow:** CredentialsProvider -> JWT token -> session callback
 - **Fallback:** N/A (core dependency)
 
 ## 6. Apollo Server (GraphQL)
 
 - **Method:** @apollo/server v5 + @as-integrations/next
-- **Usage:** API GraphQL type-safe com Pothos schema builder
-- **Auth Flow:** Session via getServerSession ou headers injetados pelo proxy (API Key)
-- **Fallback:** Introspection desativada em produção
+- **Usage:** Type-safe GraphQL API with Pothos schema builder
+- **Auth Flow:** Session via getServerSession or headers injected by proxy (API Key)
+- **Fallback:** Introspection disabled in production
 
 ## 7. Pothos (Schema Builder)
 
 - **Method:** @pothos/core + @pothos/plugin-prisma + @pothos/plugin-scope-auth
-- **Usage:** Construção type-safe do schema GraphQL com Prisma types
+- **Usage:** Type-safe GraphQL schema construction with Prisma types
 - **Auth Flow:** Scope auth via authScopes (public, authenticated, hasCapability)
 - **Fallback:** N/A (build-time tool)
 
 ## 8. Zod (Validation)
 
 - **Method:** zod v4
-- **Usage:** Validção de todos os inputs de API (post, comment, install form)
+- **Usage:** Validation of all API inputs (post, comment, install form)
 - **Auth Flow:** N/A
-- **Fallback:** Erros de validação retornam 400 com details
+- **Fallback:** Validation errors return 400 with details
 
 ## 9. bcryptjs (Password Hashing)
 
 - **Method:** bcryptjs v3
-- **Usage:** Hash de senhas de users (cost factor 12)
+- **Usage:** User password hashing (cost factor 12)
 - **Auth Flow:** N/A
 - **Fallback:** N/A
 
 ## 10. isolated-vm (Plugin Sandbox)
 
-- **Method:** Lib Node.js para execução isolada de código
-- **Usage:** Sandbox para imported plugins (ZIP upload)
-- **Auth Flow:** Bridge API com permissões por método
-- **Fallback:** Compiled plugins (sem sandbox, mas com Bridge API proxy)
+- **Method:** Node.js library for isolated code execution
+- **Usage:** Sandbox for imported plugins (ZIP upload)
+- **Auth Flow:** Bridge API with per-method permissions
+- **Fallback:** Compiled plugins (without sandbox, but with Bridge API proxy)
 
 ## 11. Redis (Optional)
 
 - **Method:** redis v6 client
-- **Usage:** Cache distribuído para rate limiting multi-container (recomendado para produção)
+- **Usage:** Distributed cache for multi-container rate limiting (recommended for production)
 - **Auth Flow:** Connection string via .secrets.json
-- **Fallback:** In-memory cache (funcional para single-container)
+- **Fallback:** In-memory cache (functional for single-container)
 
 ## 12. Sharp (Image Processing)
 
-- **Method:** Lib nativa Node.js
-- **Usage:** Conversão WebP, thumbnails 300x300, extração de metadata
-- **Auth Flow:** N/A (lib local)
-- **Fallback:** Upload sem processamento se Sharp falhar
+- **Method:** Native Node.js library
+- **Usage:** WebP conversion, 300x300 thumbnails, metadata extraction
+- **Auth Flow:** N/A (local library)
+- **Fallback:** Upload without processing if Sharp fails

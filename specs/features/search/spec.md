@@ -6,24 +6,24 @@ status: approved
 feature: "search"
 ---
 
-# Busca Specification
+# Search Specification
 
 ## Description
-Busca global em titulos, conteudo e meta fields de posts publicados.
+Global search in titles, content and meta fields of published posts.
 
 ## Requirements
-- **REQ-01:** Busca case-insensitive em title, content
-- **REQ-02:** Busca em MetaValues (JSON contains)
-- **REQ-03:** Query minima de 3 caracteres
-- **REQ-04:** Limite configuravel (default 20)
-- **REQ-05:** Apenas posts published
-- **REQ-06:** Exclusão de posts com status "draft" ou "private"
-- **REQ-07:** Exclusão de posts com `expiresAt` no passado
-- **REQ-08:** Exclusão de posts com `noIndex = true`
+- **REQ-01:** Case-insensitive search in title, content
+- **REQ-02:** Search in MetaValues (JSON contains)
+- **REQ-03:** Minimum query of 3 characters
+- **REQ-04:** Configurable limit (default 20)
+- **REQ-05:** Only published posts
+- **REQ-06:** Exclusion of posts with status "draft" or "private"
+- **REQ-07:** Exclusion of posts with `expiresAt` in the past
+- **REQ-08:** Exclusion of posts with `noIndex = true`
 
 ## Constraints
-- **C01:** Query < 3 caracteres retorna array vazio
-- **C02:** Apenas posts com status "published"
+- **C01:** Query < 3 characters returns empty array
+- **C02:** Only posts with status "published"
 
 ## Dependencies
 - **Depends on:** Post Management, MetaFields

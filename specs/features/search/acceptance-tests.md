@@ -6,16 +6,16 @@ status: approved
 feature: "search"
 ---
 
-# Busca Acceptance Tests
+# Search Acceptance Tests
 
-## AT-01: Busca com Results
-- **GIVEN** posts publicados com titulo "Tecnologia"
-- **WHEN** busca por "tecnologia"
-- **THEN** posts correspondentes retornados
-- **Referencia:** FR16
+## AT-01: Search with Results
+- **GIVEN** published posts with title "Technology"
+- **WHEN** search for "technology"
+- **THEN** matching posts returned
+- **Reference:** FR16
 
-## AT-02: Query Muito Curta
-- **GIVEN** query "ab" (2 caracteres)
-- **WHEN** busca e executada
-- **THEN** array vazio retornado
-- **Referencia:** FR16
+## AT-02: Very Short Query
+- **GIVEN** query "ab" (2 characters)
+- **WHEN** search is executed
+- **THEN** empty array returned
+- **Reference:** FR16

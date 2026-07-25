@@ -6,63 +6,63 @@ status: approved
 feature: "installation"
 ---
 
-# Instalacao Flows
+# Installation Flows
 
-## Flow de Instalacao
+## Installation Flow
 
-1. **User acessa qualquer rota**
-   - Proxy verifica: SecretsService.isInstalled()
-   - State: Nao instalado
+1. **User accesses any route**
+   - Proxy checks: SecretsService.isInstalled()
+   - State: Not installed
 
-2. **Redirect para /install**
-   - State: Wizard exibido
+2. **Redirect to /install**
+   - State: Wizard displayed
 
-3. **User preenche formulario**
+3. **User fills out form**
    - Database config
    - Storage config
    - Admin credentials
-   - State: Form completo
+   - State: Form complete
 
-4. **Validacao do formulario**
+4. **Form validation**
    - InstallService.validateForm()
    - State: Validated data
 
-5. **Construcao do DATABASE_URL**
+5. **DATABASE_URL construction**
    - BuildDatabaseUrl()
-   - State: URL pronta
+   - State: URL ready
 
-6. **Geracao de NEXTAUTH_SECRET**
+6. **NEXTAUTH_SECRET generation**
    - crypto.randomBytes(32)
-   - State: Secret gerado
+   - State: Secret generated
 
 7. **Save SecretsService.save()**
-   - State: .secrets.json atualizado
+   - State: .secrets.json updated
 
 8. **Prisma db push**
-   - Schema aplicado ao banco
-   - State: Tabelas criadas
+   - Schema applied to database
+   - State: Tables created
 
 9. **resetPrismaInstance()**
-   - Prisma reconecta com nova URL
-   - State: Connection ativa
+   - Prisma reconnects with new URL
+   - State: Connection active
 
-10. **Criacao de roles default**
-    - 5 roles com capabilities JSON
-    - State: Roles criadas
+10. **Creation of default roles**
+    - 5 roles with JSON capabilities
+    - State: Roles created
 
-11. **Criacao de PostTypes default**
-    - post e page
-    - State: PostTypes criados
+11. **Creation of default PostTypes**
+    - post and page
+    - State: PostTypes created
 
-12. **Criacao de admin user**
+12. **Admin user creation**
     - Email + bcrypt hash
-    - State: Admin criado
+    - State: Admin created
 
 13. **Save settings (storage_driver, s3_config)**
-    - State: Settings salvas
+    - State: Settings saved
 
 14. **markAsInstalled()**
-    - Cria arquivo .installed
-    - State: Instalacao concluida
+    - Creates .installed file
+    - State: Installation complete
 
-15. **Redirect para /auth/login**
+15. **Redirect to /auth/login**

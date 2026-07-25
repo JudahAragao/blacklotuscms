@@ -118,7 +118,7 @@ type FieldConfig = {
     minItems?: number;
     maxItems?: number;
     layout?: 'table' | 'block'; // Default: 'block'
-    buttonLabel?: string;       // Default: 'Adicionar Item'
+    buttonLabel?: string;       // Default: 'Add Item'
     fields?: CreateFieldSchema[];
   };
   flexibleContent?: {
@@ -127,7 +127,7 @@ type FieldConfig = {
       label: string;
       fields?: CreateFieldSchema[];
     }[];
-    buttonLabel?: string;       // Default: 'Adicionar Layout'
+    buttonLabel?: string;       // Default: 'Add Layout'
   };
 };
 ```

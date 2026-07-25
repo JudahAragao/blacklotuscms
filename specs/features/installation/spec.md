@@ -6,31 +6,31 @@ status: approved
 feature: "installation"
 ---
 
-# Instalacao Specification
+# Installation Specification
 
 ## Description
-Sistema de installation web-based com wizard de configuration, criacao de schema no banco, roles default e usuario administrador.
+Web-based installation system with configuration wizard, schema creation in database, default roles and admin user.
 
 ## Requirements
-- **REQ-01:** Web-based wizard em /install
-- **REQ-02:** Configuration de banco (host/port/name/user/password ou connection string)
-- **REQ-03:** Configuration de storage (local/s3/r2)
-- **REQ-04:** Geracao automatica de NEXTAUTH_SECRET
-- **REQ-05:** Aplicacao de schema via prisma db push
-- **REQ-06:** Criacao de roles default (Administrador, Editor, Autor, Contributor, Assinante)
-- **REQ-07:** Criacao de PostTypes default (post, page)
-- **REQ-08:** Criacao de usuario administrador
-- **REQ-09:** Flag .installed para bloquear re-installation
-- **REQ-10:** Instalacao gate no proxy (redireciona para /install)
-- **REQ-11:** Auto-install de taxonomias default (category hierárquica, post_tag flat) para post type "post"
-- **REQ-12:** Auto-install via init.ts quando banco está vazio (sem roles existentes)
+- **REQ-01:** Web-based wizard at /install
+- **REQ-02:** Database configuration (host/port/name/user/password or connection string)
+- **REQ-03:** Storage configuration (local/s3/r2)
+- **REQ-04:** Automatic generation of NEXTAUTH_SECRET
+- **REQ-05:** Schema application via prisma db push
+- **REQ-06:** Creation of default roles (Administrator, Editor, Author, Contributor, Subscriber)
+- **REQ-07:** Creation of default PostTypes (post, page)
+- **REQ-08:** Creation of admin user
+- **REQ-09:** .installed flag to block re-installation
+- **REQ-10:** Installation gate in proxy (redirects to /install)
+- **REQ-11:** Auto-install of default taxonomies (hierarchical category, flat post_tag) for post type "post"
+- **REQ-12:** Auto-install via init.ts when database is empty (no existing roles)
 
 ## Constraints
-- **C01:** Instalacao e one-time (bloqueada apos conclusao)
-- **C02:** Schema aplicado com --accept-data-loss
-- **C03:** Prisma proxy permite lazy initialization
+- **C01:** Installation is one-time (blocked after completion)
+- **C02:** Schema applied with --accept-data-loss
+- **C03:** Prisma proxy allows lazy initialization
 
 ## Dependencies
-- **Depends on:** NONE (primeira feature executada)
-- **Blocks:** Todas as outras features (ate installation completa)
+- **Depends on:** NONE (first feature executed)
+- **Blocks:** All other features (until installation complete)
 - **Related to:** Secrets, Database

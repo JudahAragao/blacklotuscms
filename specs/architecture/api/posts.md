@@ -13,21 +13,21 @@ module: "posts"
 ### EP-01: List Posts by Type
 - **Method:** `GET`
 - **Path:** `/api/v1/posts/:type`
-- **Auth:** Public (apenas posts published)
-- **RBAC:** N/A (data públicos)
+- **Auth:** Public (published posts only)
+- **RBAC:** N/A (public data)
 
 **Response 200:**
 ```json
 [{ "id": "uuid", "title": "string", "slug": "string", "content": "string", "status": "published", "postType": { "id": "uuid", "name": "string", "slug": "string" } }]
 ```
 
-**Erros possíveis:**
+**Possible errors:**
 - `500` — DATABASE_ERROR
 
 ### EP-02: Create Post
 - **Method:** `POST`
 - **Path:** `/api/v1/posts/:type`
-- **Auth:** Required (session ou API Key)
+- **Auth:** Required (session or API Key)
 - **RBAC:** `post.create`
 
 **Request:**
@@ -40,13 +40,13 @@ module: "posts"
 { "id": "uuid", "title": "string", "slug": "string", "status": "draft" }
 ```
 
-**Erros possíveis:**
+**Possible errors:**
 - `400` — VALIDATION_ERROR
 - `401` — AUTH_UNAUTHORIZED
 - `403` — AUTH_FORBIDDEN
-- `404` — RESOURCE_NOT_FOUND (PostType não existe)
-- `409` — Slug duplicado
-- `422` — Validção de MetaFields falhou
+- `404` — RESOURCE_NOT_FOUND (PostType does not exist)
+- `409` — Duplicate slug
+- `422` — MetaFields validation failed
 
 ### EP-03: Get Post by ID
 - **Method:** `GET`
@@ -59,13 +59,13 @@ module: "posts"
 { "id": "uuid", "title": "string", "slug": "string", "content": "string", "metaValues": {}, "terms": [] }
 ```
 
-**Erros possíveis:**
+**Possible errors:**
 - `404` — RESOURCE_NOT_FOUND
 
 ### EP-04: GraphQL - Posts Query
 - **Method:** `POST`
 - **Path:** `/api/graphql`
-- **Auth:** Public (apenas posts published)
+- **Auth:** Public (published posts only)
 - **RBAC:** N/A
 
 **Query:**

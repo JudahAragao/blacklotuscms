@@ -8,32 +8,32 @@ feature: "plugin-system"
 
 # Plugin System Acceptance Tests
 
-## AT-01: Install Plugin Valid
-- **GIVEN** ZIP com plugin.json valido e index.js
-- **WHEN** admin faz upload
-- **THEN** plugin e registrado no banco
-- **Referencia:** FR10
+## AT-01: Install Valid Plugin
+- **GIVEN** ZIP with valid plugin.json and index.js
+- **WHEN** admin uploads
+- **THEN** plugin is registered in database
+- **Reference:** FR10
 
-## AT-02: Plugin com Manifest Invalid
-- **GIVEN** ZIP sem plugin.json
-- **WHEN** admin tenta install
-- **THEN** ZIP e removido e erro 400 retornado
-- **Referencia:** FR10
+## AT-02: Plugin with Invalid Manifest
+- **GIVEN** ZIP without plugin.json
+- **WHEN** admin attempts to install
+- **THEN** ZIP is removed and error 400 returned
+- **Reference:** FR10
 
-## AT-03: Ativar Plugin
-- **GIVEN** plugin instalado e desativado
-- **WHEN** admin ativa
-- **THEN** sandbox e executado e isActive = true
-- **Referencia:** FR10
+## AT-03: Activate Plugin
+- **GIVEN** installed and deactivated plugin
+- **WHEN** admin activates
+- **THEN** sandbox is executed and isActive = true
+- **Reference:** FR10
 
 ## AT-04: Plugin Exceeding Timeout
-- **GIVEN** plugin com loop infinito
-- **WHEN** executado no sandbox
-- **THEN** erro 408 retornado apos SANDBOX_TIMEOUT
-- **Referencia:** FR10, BR05
+- **GIVEN** plugin with infinite loop
+- **WHEN** executed in sandbox
+- **THEN** error 408 returned after SANDBOX_TIMEOUT
+- **Reference:** FR10, BR05
 
-## AT-05: Plugin Accessing Dados Sem Permission
-- **GIVEN** plugin sem PluginPermission aprovada
-- **WHEN** chama bridge.db.read('User', {})
-- **THEN** erro 403 retornado
-- **Referencia:** FR10, BR06
+## AT-05: Plugin Accessing Data Without Permission
+- **GIVEN** plugin without approved PluginPermission
+- **WHEN** calls bridge.db.read('User', {})
+- **THEN** error 403 returned
+- **Reference:** FR10, BR06

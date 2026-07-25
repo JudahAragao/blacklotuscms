@@ -5,7 +5,7 @@
 BlackLotusCMS supports two types of plugins:
 
 1. **Compiled Plugins** — live in `plugins/`, compiled alongside Next.js, can use npm packages
-2. **Sandboxed Plugins** — uploaded via ZIP or placed manually, run in isolated-vm sandbox, JS puro (no npm)
+2. **Sandboxed Plugins** — uploaded via ZIP or placed manually, run in isolated-vm sandbox, pure JS (no npm)
 
 Both types use the same `plugin.json` manifest format. The `sandbox` field controls execution mode.
 
@@ -96,8 +96,8 @@ export default async function init(bridge: any) {
 1. Add plugin to `plugins/my-plugin/` with `plugin.json` + `index.ts`
 2. Run `npm run build` (or `npm run dev`) — plugin is compiled automatically
 3. Go to Admin > Plugins
-4. Click "Ativar" on the compiled plugin
-5. Approve required permissions in "Solicitacoes de Acesso"
+4. Click "Activate" on the compiled plugin
+5. Approve required permissions in "Access Requests"
 
 ### Creating a Plugin (Scaffold)
 
@@ -334,8 +334,8 @@ bridge.log('Error:', error);
 ### bridge.auth
 | Method | Returns | Permission Required |
 |--------|---------|---------------------|
-| `getUser()` | User object or null | `sistema.auth.read` |
-| `isAuthenticated()` | boolean | `sistema.auth.read` |
+| `getUser()` | User object or null | `system.auth.read` |
+| `isAuthenticated()` | boolean | `system.auth.read` |
 
 ```javascript
 const user = await bridge.auth.getUser();
@@ -444,7 +444,7 @@ const config = await bridge.storage.get('config');
 
 #### bridge.hooks.registerAdminNav
 
-Registra um item de navegação no sidebar do admin. Requer permissão `system.ui.register.admin_nav`.
+Registers a navigation item in the admin sidebar. Requires `system.ui.register.admin_nav` permission.
 
 ```javascript
 // Register a sidebar navigation item
@@ -473,7 +473,7 @@ bridge.hooks.registerAdminNav({
 
 ### bridge.http (Outbound HTTP)
 
-Executa requisições HTTP externas em nome do plugin. Requer permissão `http.outbound.request`.
+Executes external HTTP requests on behalf of the plugin. Requires `http.outbound.request` permission.
 
 | Method | Returns | Permission Required |
 |--------|---------|---------------------|
@@ -499,16 +499,16 @@ bridge.log('Status:', response.status);
 bridge.log('Body:', response.body);
 ```
 
-**Segurança:**
-- Domínios devem estar na whitelist configurada pelo admin; se não estiver, o sistema cria automaticamente uma permissão pendente `http.domain.{hostname}` que o admin pode aprovar
-- Bloqueio de IPs internos (127.0.0.1, 10.*, 192.168.*, etc.)
-- Rate limit separado: 20 req/s (configurável)
+**Security:**
+- Domains must be in the allowlist configured by the admin; if not, the system automatically creates a pending `http.domain.{hostname}` permission that the admin can approve
+- Blocking of internal IPs (127.0.0.1, 10.*, 192.168.*, etc.)
+- Separate rate limit: 20 req/s (configurable)
 - Timeout: 10s default, max 30s
-- Tamanho máximo de resposta: 1MB
+- Maximum response size: 1MB
 
 ### bridge.webhook (Inbound Webhooks)
 
-Registra handlers para receber webhooks externos. Requer permissão `webhook.inbound.register`.
+Registers handlers to receive external webhooks. Requires `webhook.inbound.register` permission.
 
 | Method | Description | Permission Required |
 |--------|-------------|---------------------|
@@ -536,15 +536,15 @@ bridge.webhook.on('user.registered', async (payload) => {
 });
 ```
 
-**Endpoint gerado:** `POST /api/v1/webhooks/:pluginName/:eventId`
-**Segurança:**
-- Verificação HMAC-SHA256 (se webhookSecret configurado)
-- Tamanho máximo de payload: 2MB
-- Retry automático com exponential backoff (até 3 tentativas)
+**Generated endpoint:** `POST /api/v1/webhooks/:pluginName/:eventId`
+**Security:**
+- HMAC-SHA256 verification (if webhookSecret is configured)
+- Maximum payload size: 2MB
+- Automatic retry with exponential backoff (up to 3 attempts)
 
 ### bridge.routes (Dynamic Routes)
 
-Registra rotas customizadas que o CMS resolve antes da lógica padrão. Requer permissão `system.route.register`.
+Registers custom routes that the CMS resolves before the default logic. Requires `system.route.register` permission.
 
 | Method | Returns | Permission Required |
 |--------|---------|---------------------|
@@ -571,7 +571,7 @@ bridge.routes.register({
   path: '/product/:slug',
   template: 'post.product',
   handler: async (ctx) => {
-    // ctx.params = { slug: "camisa-azul" }
+    // ctx.params = { slug: "blue-shirt" }
     const product = await bridge.db.findOne('Post', { slug: ctx.params.slug });
     return { product };
   }
@@ -600,7 +600,7 @@ bridge.routes.register({
 **Handler context (`ctx`):**
 | Property | Type | Description |
 |----------|------|-------------|
-| `params` | `Record<string, string>` | Extracted route params (e.g., `{ slug: "camisa-azul" }`) |
+| `params` | `Record<string, string>` | Extracted route params (e.g., `{ slug: "blue-shirt" }`) |
 | `userId` | `string \| undefined` | Current user ID (if authenticated) |
 | `role` | `{ name: string; capabilities: any } \| null` | User's role with capabilities (if authenticated) |
 
@@ -611,7 +611,7 @@ bridge.routes.register({
 
 ### Customer Auth Pattern (Option B)
 
-Plugins de e-commerce podem criar autenticação de cliente separada usando a Bridge API:
+E-commerce plugins can create separate customer authentication using the Bridge API:
 
 ```javascript
 // 1. Create Customer role on plugin activation
@@ -706,7 +706,7 @@ await bridge.permissions.request('db.write.user');
 | `post.before_validate` | Before post validation | Post data |
 | `comment.before_save` | Before comment save | Comment data |
 | `content.title` | Title rendering | Title string |
-| `route_access` | Route access check | Acesso boolean |
+| `route_access` | Route access check | Access boolean |
 
 ## Sandboxing
 
@@ -716,19 +716,19 @@ await bridge.permissions.request('db.write.user');
 | Timeout | 30s | Max execution time |
 | Rate Limit | 50 req/s | DB queries per second |
 
-### Security: Rate Limit como Mecanismo de Proteção
+### Security: Rate Limit as a Protection Mechanism
 
-Todo acesso ao banco via Bridge API passa por uma cadeia de segurança:
+All database access via the Bridge API goes through a security chain:
 
 ```
-Bridge API call → checkRateLimit() → applyJitter() → hasPermission() → query ao banco
+Bridge API call → checkRateLimit() → applyJitter() → hasPermission() → database query
 ```
 
-- **`checkRateLimit()`** é chamado **antes** de qualquer verificação de permissão. Se o plugin exceder 50 queries/s, a requisição é bloqueada com `429 RATE_LIMIT_EXCEEDED` — sem chegar ao banco.
-- **`applyJitter()`** adiciona um delay aleatório de 1-5ms entre chamadas para mitigar thundering herd.
-- **`hasPermission()`** só é consultado após passar pelo rate limit, evitando queries desnecessárias ao banco.
+- **`checkRateLimit()`** is called **before** any permission check. If the plugin exceeds 50 queries/s, the request is blocked with `429 RATE_LIMIT_EXCEEDED` — without reaching the database.
+- **`applyJitter()`** adds a random delay of 1-5ms between calls to mitigate thundering herd.
+- **`hasPermission()`** is only consulted after passing the rate limit, avoiding unnecessary database queries.
 
-Isso significa que um plugin malicioso gera no máximo 50 queries/s ao banco (incluindo permission checks e operações de dados), e o rate limit é o principal mecanismo de proteção contra abuso de recursos.
+This means a malicious plugin generates at most 50 queries/s to the database (including permission checks and data operations), and the rate limit is the main protection mechanism against resource abuse.
 
 **Forbidden Fields:** `passwordHash`, `secret`, `token`, `apiKey` - always removed from data.
 
@@ -736,36 +736,36 @@ Isso significa que um plugin malicioso gera no máximo 50 queries/s ao banco (in
 
 Plugins must request permission for:
 - Database access (`db.read.*`, `db.write.*`)
-- Auth access (`sistema.auth.read`)
+- Auth access (`system.auth.read`)
 - Sensitive hooks (`route_access`)
 
 Permissions are managed via Admin > Plugins > Permissions.
 
-## Instalacao
+## Installation
 
-### Via ZIP Upload (Recomendado)
-1. Acesse Admin > Plugins
-2. Clique em "IMPORT EXTENSION"
-3. Selecione um arquivo `.zip` contendo o plugin
-4. O plugin sera extraido automaticamente para `/opt/apps/shared/plugins/<nome-do-plugin>/`
-5. Ative o plugin via Admin > Plugins
-6. Aprove as permissoes solicitadas na aba Permissions
+### Via ZIP Upload (Recommended)
+1. Access Admin > Plugins
+2. Click "IMPORT EXTENSION"
+3. Select a `.zip` file containing the plugin
+4. The plugin will be automatically extracted to `/opt/apps/shared/plugins/<plugin-name>/`
+5. Activate the plugin via Admin > Plugins
+6. Approve the requested permissions in the Permissions tab
 
-### Via Upload Manual
-1. Crie uma pasta em `plugins/my-plugin/` no servidor
-2. Adicione o manifesto `plugin.json`
-3. Adicione o arquivo de entrada (`index.js` ou o definido em `manifest.entry`)
-4. Reinicie a aplicação
-5. Ative o plugin via Admin > Plugins
+### Via Manual Upload
+1. Create a folder in `plugins/my-plugin/` on the server
+2. Add the `plugin.json` manifest
+3. Add the entry file (`index.js` or as defined in `manifest.entry`)
+4. Restart the application
+5. Activate the plugin via Admin > Plugins
 
-### Requisitos do ZIP
-- O arquivo deve ser um `.zip` valido
-- Deve conter um `plugin.json` na raiz ou em subpasta
-- Deve conter o arquivo de entrada (`index.js` por padrao)
-- O nome da pasta do plugin e derivado do nome do arquivo (sanitize: lowercase, espacos → hifens)
+### ZIP Requirements
+- The file must be a valid `.zip`
+- Must contain a `plugin.json` at the root or in a subfolder
+- Must contain the entry file (`index.js` by default)
+- The plugin folder name is derived from the file name (sanitize: lowercase, spaces → hyphens)
 
-### Persistencia
-Plugins sao instalados em `/opt/apps/shared/plugins/` (volume compartilhado entre blue/green). Os dados persistem entre restarts e redeployments.
+### Persistence
+Plugins are installed in `/opt/apps/shared/plugins/` (shared volume between blue/green). Data persists between restarts and redeployments.
 
 ## Security
 

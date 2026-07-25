@@ -8,170 +8,170 @@ feature: "plugin-system"
 
 # Plugin System Flows
 
-## Instalacao de Plugin
+## Plugin Installation
 
-1. **Admin faz upload de ZIP**
+1. **Admin uploads ZIP**
    - State: File received
 
 2. **RBAC check** (plugin.manage)
 
-3. **Extracao do ZIP para /plugins/[nome]**
+3. **ZIP extraction to /plugins/[name]**
    - State: Files extracted
 
-4. **Leitura do plugin.json (manifest)**
+4. **Read plugin.json (manifest)**
    - State: Valid manifest
 
-5. **Upsert no banco (Plugin table)**
+5. **Upsert in database (Plugin table)**
    - State: Plugin registered
 
-## Activation de Plugin
+## Plugin Activation
 
-1. **Admin clica activate**
+1. **Admin clicks activate**
    - State: Request received
 
 2. **RBAC check** (plugin.manage)
 
-3. **Leitura do entry file (index.js)**
+3. **Read entry file (index.js)**
    - State: Code loaded
 
-4. **Criacao/uso do PluginSandbox**
+4. **Create/use PluginSandbox**
    - State: Sandbox ready
 
-5. **Execucao via sandbox.execute(code, bridgeApi)**
+5. **Execute via sandbox.execute(code, bridgeApi)**
    - State: Plugin executed
 
 6. **Update isActive = true**
    - State: Active plugin
 
-## Acesso a Dados pelo Plugin
+## Plugin Data Access
 
-1. **Plugin chama bridge.db.read(model, query)**
+1. **Plugin calls bridge.db.read(model, query)**
    - State: Call received
 
 2. **checkRateLimit()**
-   - Verifica se o plugin excedeu 50 queries/s
-   - Se excedido: lança 429 RATE_LIMIT_EXCEEDED (sem chegar ao banco)
+   - Verifies if plugin exceeded 50 queries/s
+   - If exceeded: throws 429 RATE_LIMIT_EXCEEDED (without reaching database)
    - State: Rate limit passed
 
 3. **applyJitter()**
-   - Delay aleatório de 1-5ms para mitigar thundering herd
+   - Random delay of 1-5ms to mitigate thundering herd
    - State: Jitter applied
 
 4. **hasPermission(pluginName, 'system', capability)**
-   - Verifica PluginPermission no banco
+   - Verifies PluginPermission in database
    - State: Permission verified
 
-5. **Query ao banco**
-   - Executa a operação de dados
+5. **Database query**
+   - Executes the data operation
    - State: Data returned
 
 6. **sanitizeData()**
-   - Remove campos proibidos (passwordHash, secret, token, apiKey)
+   - Removes forbidden fields (passwordHash, secret, token, apiKey)
    - State: Secure data returned
 
 ## HTTP Outbound (bridge.http.request)
 
-1. **Plugin chama bridge.http.request(config)**
+1. **Plugin calls bridge.http.request(config)**
    - Config: { url, method, headers?, body?, timeout? }
    - State: Request received
 
-2. **Verifica permissão http.outbound.request**
-   - Se não tem: requestPermission() + lança erro
+2. **Check http.outbound.request permission**
+   - If not present: requestPermission() + throws error
    - State: Permission checked
 
-3. **Busca PluginNetworkConfig**
-   - Verifica allowedDomains e httpRateLimit
-   - Se não configurado: lança erro 403
+3. **Fetch PluginNetworkConfig**
+   - Checks allowedDomains and httpRateLimit
+   - If not configured: throws error 403
    - State: Config loaded
 
 4. **checkHttpRateLimit(pluginId)**
-   - Verifica se excedeu httpRateLimit (default 20/s)
-   - Se excedido: lança 429 RATE_LIMIT_EXCEEDED
+   - Verifies if exceeded httpRateLimit (default 20/s)
+   - If exceeded: throws 429 RATE_LIMIT_EXCEEDED
    - State: Rate limit passed
 
 5. **validateUrl(url, allowedDomains)**
-   - Bloqueia IPs internos (SSRF protection)
-   - Verifica domínio na whitelist
-   - Se não permitido: lança erro 403
+   - Blocks internal IPs (SSRF protection)
+   - Verifies domain in whitelist
+   - If not allowed: throws error 403
    - State: URL validated
 
 6. **fetch(url, options)**
-   - Timeout configurável (default 10s, max 30s)
-   - Resposta max 1MB
+   - Configurable timeout (default 10s, max 30s)
+   - Maximum response 1MB
    - State: Response received
 
 7. **Audit log**
-   - Registra em NetworkAuditLog (tipo: http.outbound)
+   - Records in NetworkAuditLog (type: http.outbound)
    - State: Logged
 
 ## Webhook Inbound (bridge.webhook.on)
 
-### Registro de Handler
+### Handler Registration
 
-1. **Plugin chama bridge.webhook.on(eventId, callback)**
+1. **Plugin calls bridge.webhook.on(eventId, callback)**
    - State: Handler registration requested
 
-2. **Verifica permissão webhook.inbound.register**
-   - Se não tem: requestPermission() + lança erro
+2. **Check webhook.inbound.register permission**
+   - If not present: requestPermission() + throws error
    - State: Permission checked
 
-3. **Registra handler no NetworkService**
-   - Armazena callback no Map<eventId, handlers[]>
+3. **Register handler in NetworkService**
+   - Stores callback in Map<eventId, handlers[]>
    - State: Handler registered
 
-4. **Cria WebhookEndpoint no banco**
-   - URL gerada: /api/v1/webhooks/:pluginName/:eventId
+4. **Create WebhookEndpoint in database**
+   - Generated URL: /api/v1/webhooks/:pluginName/:eventId
    - State: Endpoint created
 
-### Recebimento de Webhook
+### Webhook Reception
 
-1. **Externo faz POST /api/v1/webhooks/:pluginName/:eventId**
+1. **External POST /api/v1/webhooks/:pluginName/:eventId**
    - Body: JSON payload
-   - Header: X-Webhook-Signature (opcional)
+   - Header: X-Webhook-Signature (optional)
    - State: Request received
 
-2. **WebhookService valida assinatura** (se webhookSecret configurado)
-   - HMAC-SHA256 com secret do plugin
-   - Se inválido: lança erro 401
+2. **WebhookService validates signature** (if webhookSecret configured)
+   - HMAC-SHA256 with plugin secret
+   - If invalid: throws error 401
    - State: Signature verified
 
-3. **Verifica tamanho do payload**
+3. **Verify payload size**
    - Max 512KB
-   - Se excedido: lança erro 413
+   - If exceeded: throws error 413
    - State: Payload validated
 
-4. **Enfileira mensagem**
-   - Adiciona na fila com retry (max 3 tentativas)
+4. **Queue message**
+   - Adds to queue with retry (max 3 attempts)
    - Exponential backoff: 1s, 2s, 4s
    - State: Queued
 
-5. **Plugin processa via handler registrado**
-   - Callback executada com payload
+5. **Plugin processes via registered handler**
+   - Callback executed with payload
    - State: Processed
 
 6. **Audit log**
-   - Registra em NetworkAuditLog (tipo: webhook.inbound)
+   - Records in NetworkAuditLog (type: webhook.inbound)
    - State: Logged
 
-## Boot na Inicializacao
+## Boot on Startup
 
-1. **PluginService.boot() busca plugins ativos no banco**
+1. **PluginService.boot() fetches active plugins from database**
    - State: Plugin list from database
 
-2. **Para cada plugin: verifica manifest.sandbox**
-   - `sandbox: true` (ou ausente) → carrega via PluginSandbox (isolated-vm)
-   - `sandbox: false` → carrega via CompiledPluginLoader (Node.js direto)
+2. **For each plugin: verify manifest.sandbox**
+   - `sandbox: true` (or absent) → loads via PluginSandbox (isolated-vm)
+   - `sandbox: false` → loads via CompiledPluginLoader (direct Node.js)
    - State: Plugin loaded
 
-3. **PluginService.boot() escaneia diretorio plugins/**
-   - Para cada pasta com plugin.json + index.ts:
-   - Se nao existe no banco → auto-registra (isActive: true)
-   - Verifica manifest.sandbox para metodo de carga
+3. **PluginService.boot() scans plugins/ directory**
+   - For each folder with plugin.json + index.ts:
+   - If not in database → auto-registers (isActive: true)
+   - Verifies manifest.sandbox for loading method
    - State: Filesystem plugins registered
 
-4. **PluginService.bootCompiledPlugins() carrega plugins compiled**
-   - Importa pluginRegistry de src/generated/plugin-registry.ts
-   - Pula plugins com sandbox: true (ja carregados pelo boot)
-   - Verifica se esta ativo no banco e permissoes aprovadas
-   - Carrega via CompiledPluginLoader.load()
+4. **PluginService.bootCompiledPlugins() loads compiled plugins**
+   - Imports pluginRegistry from src/generated/plugin-registry.ts
+   - Skips plugins with sandbox: true (already loaded by boot)
+   - Verifies if active in database and permissions approved
+   - Loads via CompiledPluginLoader.load()
    - State: Compiled plugins loaded

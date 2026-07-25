@@ -1,20 +1,20 @@
-# Desenvolvimento de temas
+# Theme Development
 
-Temas são parte do código-fonte e entram na build única do BlackLotusCMS. Não há upload de ZIP, instalação pelo painel ou compilação de layouts em runtime.
+Themes are part of the source code and are included in the single BlackLotusCMS build. There is no ZIP upload, panel installation, or runtime layout compilation.
 
-## Fluxo
+## Workflow
 
-1. Crie ou copie uma pasta em `themes/meu-tema/`.
-2. Inclua `theme.json`, `theme.ts`, `style.css`, layouts e assets.
-3. Execute `npm run dev` ou `npm run build`.
-4. Ative no painel um dos temas incluídos na build.
+1. Create or copy a folder in `themes/my-theme/`.
+2. Include `theme.json`, `theme.ts`, `style.css`, layouts and assets.
+3. Run `npm run dev` or `npm run build`.
+4. Activate one of the themes included in the build via the panel.
 
-Os hooks `predev`, `prebuild` e `pretest` executam `themes:generate`. Ele valida as pastas e gera o registry estático e o CSS isolado em `src/generated/`; esses arquivos não devem ser editados manualmente.
+The `predev`, `prebuild` and `pretest` hooks run `themes:generate`. It validates the folders and generates the static registry and isolated CSS in `src/generated/`; these files should not be edited manually.
 
-## Estrutura
+## Structure
 
 ```text
-themes/meu-tema/
+themes/my-theme/
 ├── theme.json
 ├── theme.ts
 ├── style.css
@@ -29,26 +29,26 @@ themes/meu-tema/
     └── 404.tsx
 ```
 
-`theme.ts` exporta os layouts do tema. Os nomes reconhecidos são `page`, `post`, `archive`, `search`, `category`, `blog` e `notFound`. O nome da pasta é o ID: use apenas minúsculas, números e hífens. O tema `default` é obrigatório.
+`theme.ts` exports the theme layouts. Recognized names are `page`, `post`, `archive`, `search`, `category`, `blog` and `notFound`. The folder name is the ID: use only lowercase, numbers and hyphens. The `default` theme is mandatory.
 
-## Manifesto
+## Manifest
 
 ```json
 {
-  "name": "Meu tema",
+  "name": "My theme",
   "version": "1.0.0",
   "themeApiVersion": 1,
-  "author": "Nome",
-  "description": "Descrição",
+  "author": "Name",
+  "description": "Description",
   "favicon": "assets/favicon.ico"
 }
 ```
 
-`themeApiVersion` indica a versão do contrato de temas. Atualmente apenas `1` é suportado.
+`themeApiVersion` indicates the theme contract version. Currently only `1` is supported.
 
-## Rotas customizadas (routes.json)
+## Custom routes (routes.json)
 
-Themes podem declarar rotas customizadas que resolvem parâmetros dinâmicos (ex: `/product/:slug`).
+Themes can declare custom routes that resolve dynamic parameters (e.g., `/product/:slug`).
 
 ```json
 {
@@ -62,39 +62,39 @@ Themes podem declarar rotas customizadas que resolvem parâmetros dinâmicos (ex
 }
 ```
 
-**Convenção de naming:**
-- `page.{nome}` → `layouts/page.{nome}.tsx` (estilo página)
-- `post.{nome}` → `layouts/post.{nome}.tsx` (estilo post)
+**Naming convention:**
+- `page.{name}` → `layouts/page.{name}.tsx` (page-style)
+- `post.{name}` → `layouts/post.{name}.tsx` (post-style)
 
-**Params dinâmicos:**
-- `:slug` → extrai o valor da URL como `ctx.params.slug`
-- `:id` → extrai o valor como `ctx.params.id`
-- Múltiplos params suportados: `/user/:id/orders/:orderId`
+**Dynamic params:**
+- `:slug` → extracts the URL value as `ctx.params.slug`
+- `:id` → extracts the value as `ctx.params.id`
+- Multiple params supported: `/user/:id/orders/:orderId`
 
-**Templates necessários:**
-Cada rota declarada precisa de um template correspondente em `layouts/`:
-- `/checkout` → precisa de `layouts/page.checkout.tsx`
-- `/product/:slug` → precisa de `layouts/post.product.tsx`
+**Required templates:**
+Each declared route needs a corresponding template in `layouts/`:
+- `/checkout` → needs `layouts/page.checkout.tsx`
+- `/product/:slug` → needs `layouts/post.product.tsx`
 
-**Resolução:**
+**Resolution:**
 1. Plugin routes (via `bridge.routes.register`)
 2. Theme routes (`routes.json`)
 3. Default theme routes (fallback)
-4. Lógica padrão do CMS
+4. Default CMS logic
 
-## CSS puro, isolamento e assets
+## Pure CSS, isolation and assets
 
-Todo `style.css` entra na build e é isolado no root ativo:
+All `style.css` files are included in the build and isolated in the active root:
 
 ```html
-<div data-bl-theme="meu-tema" class="blacklotuscms-theme">…</div>
+<div data-bl-theme="my-theme" class="blacklotuscms-theme">…</div>
 ```
 
-CSS puro é suportado. `:root` é convertido para o root do tema; não use `html` ou `body`. Animações recebem o namespace `bl-<id-do-tema>-`; referências inline no JSX usam esse nome gerado. Prefira classes e variáveis próprias, por exemplo `--meu-accent` e `.meu-hero`. Para assets, use `/api/themes/meu-tema/assets/...`.
+Pure CSS is supported. `:root` is converted to the theme root; do not use `html` or `body`. Animations receive the namespace `bl-<theme-id>-`; inline references in JSX use this generated name. Prefer custom classes and variables, e.g., `--my-accent` and `.my-hero`. For assets, use `/api/themes/my-theme/assets/...`.
 
 ## Tailwind CSS v4
 
-Tailwind é compilado uma vez para todos os temas. Use os tokens semânticos oficiais:
+Tailwind is compiled once for all themes. Use the official semantic tokens:
 
 ```text
 background, foreground, primary, primary-foreground,
@@ -106,15 +106,15 @@ destructive, destructive-foreground
 
 ```tsx
 <section className="bg-card text-foreground border border-border">
-  <h1 className="font-display text-primary">Título</h1>
+  <h1 className="font-display text-primary">Title</h1>
 </section>
 ```
 
-O `style.css` do tema sobrescreve os valores em `.blacklotuscms-theme`. Para valores exclusivos use CSS normal ou utilities arbitrárias, como `bg-[var(--meu-surface)]`. Não crie nomes Tailwind novos somente no `style.css`: eles não existem para o compilador.
+The theme's `style.css` overrides values in `.blacklotuscms-theme`. For exclusive values use regular CSS or arbitrary utilities, like `bg-[var(--my-surface)]`. Do not create new Tailwind names only in `style.css`: they don't exist for the compiler.
 
-## Configurações visuais
+## Visual Settings
 
-Settings fornecidos por integrações são expostos como `--theme-setting-<chave>` (chave em kebab-case; valor string ou número). Eles nunca substituem diretamente tokens internos. O tema pode consumi-los explicitamente:
+Settings provided by integrations are exposed as `--theme-setting-<key>` (key in kebab-case; string or number value). They never directly replace internal tokens. The theme can consume them explicitly:
 
 ```css
 .blacklotuscms-theme {
@@ -122,53 +122,53 @@ Settings fornecidos por integrações são expostos como `--theme-setting-<chave
 }
 ```
 
-A build falha para manifesto/ID inválido, `themeApiVersion` incompatível, ausência de `default`, uso de `html` ou `body`, e referências a variáveis CSS não declaradas. Essas falhas devem bloquear o deploy.
+The build fails for invalid manifest/ID, incompatible `themeApiVersion`, missing `default`, use of `html` or `body`, and references to undeclared CSS variables. These failures should block deployment.
 
-O painel não edita arquivos de tema: layouts, manifestos e CSS são alterados no repositório e entram na próxima build.
+The panel does not edit theme files: layouts, manifests and CSS are changed in the repository and included in the next build.
 
-## Acessando dados de campos customizados
+## Accessing custom field data
 
-Campos customizados (MetaFields) ficam disponíveis em `data.meta` como um objeto key-value:
+Custom fields (MetaFields) are available in `data.meta` as a key-value object:
 
 ```tsx
-// Ex: campo "hero_image" do tipo image
+// E.g., "hero_image" field of type image
 <img src={data.meta.hero_image} alt="Hero" />
 
-// Ex: campo "documentos" do tipo file
-<a href={data.meta.documentos} target="_blank">Download</a>
+// E.g., "documents" field of type file
+<a href={data.meta.documents} target="_blank">Download</a>
 
-// Ex: campo "galeria" do tipo gallery
-{data.meta.galeria?.map((url: string) => (
+// E.g., "gallery" field of type gallery
+{data.meta.gallery?.map((url: string) => (
   <img key={url} src={url} />
 ))}
 ```
 
-**URLs completas:** Valores de campos `file`, `image` e `gallery` são retornados como URLs absolutas (ex: `https://domain.com/uploads/12345-file.pdf`). Isso garante funcionamento correto em `<img src>`, `<a href>` e contextos externos (RSS, APIs).
+**Full URLs:** Values from `file`, `image` and `gallery` fields are returned as absolute URLs (e.g., `https://domain.com/uploads/12345-file.pdf`). This ensures correct rendering in `<img src>`, `<a href>` and external contexts (RSS, APIs).
 
-## Theme Helpers (Estilo ACF)
+## Theme Helpers (ACF-style)
 
-O módulo `@/lib/theme-helpers` fornece funções helper para acessar campos customizados em layouts de tema, similar ao ACF do WordPress.
+The `@/lib/theme-helpers` module provides helper functions for accessing custom fields in theme layouts, similar to WordPress ACF.
 
 ```tsx
 import { getField, haveRows, getRows } from '@/lib/theme-helpers';
 ```
 
-### Funções Disponíveis
+### Available Functions
 
-| Função | Descrição |
-|--------|-----------|
-| `getField(name)` | Retorna o valor de um campo |
-| `theField(name)` | Alias de `getField` (para JSX) |
-| `haveRows(name)` | Retorna `true` se repeater tem linhas |
-| `getRows(name)` | Retorna array de linhas do repeater |
-| `getSubField(name)` | Retorna valor de subcampo (dentro de rowContext) |
-| `theSubField(name)` | Alias de `getSubField` |
-| `getRowIndex()` | Retorna índice da row atual |
-| `getFieldObject(name)` | Retorna `{ name, type, config, value }` |
-| `getFieldName(name)` | Retorna nome do campo |
-| `getFieldType(name)` | Retorna tipo do campo |
+| Function | Description |
+|----------|-------------|
+| `getField(name)` | Returns the field value |
+| `theField(name)` | Alias of `getField` (for JSX) |
+| `haveRows(name)` | Returns `true` if repeater has rows |
+| `getRows(name)` | Returns array of rows from the repeater |
+| `getSubField(name)` | Returns subfield value (within rowContext) |
+| `theSubField(name)` | Alias of `getSubField` |
+| `getRowIndex()` | Returns index of the current row |
+| `getFieldObject(name)` | Returns `{ name, type, config, value }` |
+| `getFieldName(name)` | Returns field name |
+| `getFieldType(name)` | Returns field type |
 
-### Exemplo: Campos Simples
+### Example: Simple Fields
 
 ```tsx
 import { getField, theField } from '@/lib/theme-helpers';
@@ -176,30 +176,30 @@ import { getField, theField } from '@/lib/theme-helpers';
 export default async function PostLayout({ data }) {
   return (
     <div>
-      <h1>{getField('titulo')}</h1>
-      <p>{theField('subtitulo')}</p>
+      <h1>{getField('title')}</h1>
+      <p>{theField('subtitle')}</p>
       <img src={getField('hero_image')} alt="" />
     </div>
   );
 }
 ```
 
-### Exemplo: Repeater
+### Example: Repeater
 
 ```tsx
 import { getRows, getField } from '@/lib/theme-helpers';
 
-export default async function ProjetosLayout({ data }) {
-  const projetos = getRows('projetos');
+export default async function ProjectsLayout({ data }) {
+  const projects = getRows('projects');
 
   return (
     <div>
       <h1>{getField('page_title')}</h1>
-      {projetos.map((projeto, i) => (
+      {projects.map((project, i) => (
         <div key={i}>
-          <h2>{projeto.titulo}</h2>
-          <p>{projeto.descricao}</p>
-          <img src={projeto.foto} alt="" />
+          <h2>{project.title}</h2>
+          <p>{project.description}</p>
+          <img src={project.photo} alt="" />
         </div>
       ))}
     </div>
@@ -207,7 +207,7 @@ export default async function ProjetosLayout({ data }) {
 }
 ```
 
-### Exemplo: Flexible Content
+### Example: Flexible Content
 
 ```tsx
 import { getRows, getField } from '@/lib/theme-helpers';
@@ -232,24 +232,24 @@ export default async function PageLayout({ data }) {
 }
 ```
 
-## Template Hierarchy (Estilo WordPress)
+## Template Hierarchy (WordPress-style)
 
-O sistema de temas suporta uma hierarchy de templates similar ao WordPress. Arquivos de layout usam **pontos** no nome para indicar templates especializados por PostType.
+The theme system supports a template hierarchy similar to WordPress. Layout files use **dots** in the name to indicate specialized templates per PostType.
 
-### Convenção de Nomenclatura
+### Naming Convention
 
-| Arquivo | Uso |
-|---------|-----|
-| `post.tsx` | Post individual genérico (fallback para qualquer PostType) |
-| `post.blog.tsx` | Post individual do PostType "blog" |
-| `post.projetos.tsx` | Post individual do PostType "projetos" |
-| `page.tsx` | Página genérica (fallback) |
-| `page.blog.tsx` | Listagem/archive do PostType "blog" |
-| `page.projetos.tsx` | Listagem/archive do PostType "projetos" |
+| File | Use |
+|------|-----|
+| `post.tsx` | Generic individual post (fallback for any PostType) |
+| `post.blog.tsx` | Individual post for PostType "blog" |
+| `post.projects.tsx` | Individual post for PostType "projects" |
+| `page.tsx` | Generic page (fallback) |
+| `page.blog.tsx` | Listing/archive for PostType "blog" |
+| `page.projects.tsx` | Listing/archive for PostType "projects" |
 
-### Como Exportar
+### How to Export
 
-No `layouts/index.ts`, usar **string export names**:
+In `layouts/index.ts`, use **string export names**:
 
 ```ts
 export { default as post } from './post';
@@ -260,20 +260,20 @@ export { default as "page.blog" } from './page.blog';
 
 ### Fallback Chain
 
-Quando um post individual é acessado, o ThemeRenderer tenta na ordem:
+When an individual post is accessed, the ThemeRenderer tries in order:
 
-1. `post.{postType.slug}` (ex: `post.blog`)
-2. `post` (genérico)
-3. `default.post` (tema default)
+1. `post.{postType.slug}` (e.g., `post.blog`)
+2. `post` (generic)
+3. `default.post` (default theme)
 
-Exemplo: PostType "blog" → tenta `post.blog.tsx` → se não existir, usa `post.tsx`.
+Example: PostType "blog" → tries `post.blog.tsx` → if it doesn't exist, uses `post.tsx`.
 
-### Exemplo Completo
+### Complete Example
 
 ```
-/blog              → page.blog.tsx (listagem)
-/blog/meu-artigo   → post.blog.tsx (individual)
-/projetos          → page.projetos.tsx (listagem)
-/projetos/x        → post.projetos.tsx (individual)
-/sobre             → page.tsx (genérico, PostType "page")
+/blog              → page.blog.tsx (listing)
+/blog/my-article   → post.blog.tsx (individual)
+/projects          → page.projects.tsx (listing)
+/projects/x        → post.projects.tsx (individual)
+/about             → page.tsx (generic, PostType "page")
 ```

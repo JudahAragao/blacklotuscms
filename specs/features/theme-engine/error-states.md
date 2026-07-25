@@ -10,43 +10,43 @@ feature: "theme-engine"
 
 ## ERR-01: Theme Not Found in Registry
 - **Condition:** Theme name exists in database but not in generated `themeRegistry`
-- **Código HTTP:** N/A (renderização continua)
-- **Ação do sistema:** Fallback para theme `default` — `themeRegistry.default`
-- **Nota:** Pode ocorrer se um tema foi removido do código mas ainda está ativo no banco
+- **HTTP Code:** N/A (rendering continues)
+- **System Action:** Fallback to `default` theme — `themeRegistry.default`
+- **Note:** May occur if a theme was removed from code but is still active in database
 
 ## ERR-02: Theme Permission Denied
-- **Condition:** Theme sem permissão aprovada para capability solicitada
-- **Código HTTP:** 403
-- **Mensagem:** "Theme '[name]' does not have approved permission for '[capability]'"
-- **Código:** AUTH_FORBIDDEN
+- **Condition:** Theme without approved permission for requested capability
+- **HTTP Code:** 403
+- **Message:** "Theme '[name]' does not have approved permission for '[capability]'"
+- **Code:** AUTH_FORBIDDEN
 
 ## ERR-03: Layout Not Found
-- **Condition:** Layout key não existe no exports do tema
-- **Código HTTP:** N/A (fallback automático)
-- **Ação do sistema:** Tenta `themeRegistry[theme].post`, depois `themeRegistry.default.post`
+- **Condition:** Layout key does not exist in theme exports
+- **HTTP Code:** N/A (automatic fallback)
+- **System Action:** Tries `themeRegistry[theme].post`, then `themeRegistry.default.post`
 
 ## ERR-04: Invalid Theme Manifest
-- **Condition:** `theme.json` ausente, sem `name`/`version`, ou `themeApiVersion` incompatível
-- **Código HTTP:** N/A (bloqueia build)
-- **Ação do sistema:** `themes:generate` lança erro e build falha
+- **Condition:** `theme.json` missing, without `name`/`version`, or incompatible `themeApiVersion`
+- **HTTP Code:** N/A (blocks build)
+- **System Action:** `themes:generate` throws error and build fails
 
 ## ERR-05: Undeclared CSS Variables
-- **Condition:** `style.css` usa `var(--xxx)` mas não declara `--xxx`
-- **Código HTTP:** N/A (bloqueia build)
-- **Ação do sistema:** `themes:generate` lança erro com lista de variáveis faltantes
+- **Condition:** `style.css` uses `var(--xxx)` but does not declare `--xxx`
+- **HTTP Code:** N/A (blocks build)
+- **System Action:** `themes:generate` throws error with list of missing variables
 
 ## ERR-06: Invalid Theme ID
-- **Condition:** Nome da pasta contém caracteres inválidos (maiúsculas, underscores, etc.)
-- **Código HTTP:** N/A (bloqueia build)
-- **Ação do sistema:** `themes:generate` lança erro — IDs devem ser kebab-case
+- **Condition:** Folder name contains invalid characters (uppercase, underscores, etc.)
+- **HTTP Code:** N/A (blocks build)
+- **System Action:** `themes:generate` throws error — IDs must be kebab-case
 
 ## ERR-07: Missing Default Theme
-- **Condition:** Pasta `themes/default/` não existe
-- **Código HTTP:** N/A (bloqueia build)
-- **Ação do sistema:** `themes:generate` lança erro — `default` é obrigatório
+- **Condition:** `themes/default/` folder does not exist
+- **HTTP Code:** N/A (blocks build)
+- **System Action:** `themes:generate` throws error — `default` is mandatory
 
 ## ERR-08: Theme Context Lost During Cache Hit
-- **Condition:** `unstable_cache` retorna resultado cacheado e o AsyncLocalStorage context é perdido
-- **Código HTTP:** N/A (conteúdo pode ficar vazio)
-- **Ação do sistema:** getThemeStore() prioriza React.cache (que sobrevive async boundaries) como fallback. page.tsx e ThemeRenderer sincronizam getReactStore() apos themeStorage.run()
-- **Status:** Resolvido em 2026-07-19 via dual-store synchronization
+- **Condition:** `unstable_cache` returns cached result and AsyncLocalStorage context is lost
+- **HTTP Code:** N/A (content may become empty)
+- **System Action:** getThemeStore() prioritizes React.cache (which survives async boundaries) as fallback. page.tsx and ThemeRenderer synchronize getReactStore() after themeStorage.run()
+- **Status:** Resolved on 2026-07-19 via dual-store synchronization

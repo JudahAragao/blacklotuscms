@@ -5,95 +5,95 @@ author: "BlackLotusCMS Team"
 status: approved
 ---
 
-# Sistema Design - BlackLotusCMS
+# System Design - BlackLotusCMS
 
 ## Architecture Overview
 
-BlackLotusCMS é um CMS headless construído sobre Next.js 16 (App Router) com Prisma ORM e Pothos GraphQL. A arquitetura segue o padrão "Zero .env" onde toda configuração é carregada de `.secrets.json`. O sistema é fully containerized com Docker multi-stage build.
+BlackLotusCMS is a headless CMS built on Next.js 16 (App Router) with Prisma ORM and Pothos GraphQL. The architecture follows the "Zero .env" pattern where all configuration is loaded from `.secrets.json`. The system is fully containerized with Docker multi-stage build.
 
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router, Server Components, standalone output)
-- **Database:** PostgreSQL 15 via Prisma ORM com PrismaPg adapter (connection pooling)
-- **GraphQL:** Apollo Server 5 + Pothos (type-safe schema builder com Prisma plugin)
+- **Database:** PostgreSQL 15 via Prisma ORM with PrismaPg adapter (connection pooling)
+- **GraphQL:** Apollo Server 5 + Pothos (type-safe schema builder with Prisma plugin)
 - **Auth:** NextAuth v4 (JWT strategy, CredentialsProvider, PrismaAdapter)
-- **Validation:** Zod v4 (schemas em src/schemas/)
-- **Styling:** Tailwind CSS v4 (compilado uma vez para todos os temas)
+- **Validation:** Zod v4 (schemas in src/schemas/)
+- **Styling:** Tailwind CSS v4 (compiled once for all themes)
 - **Rich Text:** TipTap (editor component)
 - **Images:** Sharp (WebP conversion, thumbnails)
-- **Storage:** Local filesystem ou AWS S3/Cloudflare R2
+- **Storage:** Local filesystem or AWS S3/Cloudflare R2
 - **Sandbox:** isolated-vm (plugin execution)
 - **Security:** DOMPurify (HTML sanitization), bcryptjs (password hashing)
 - **Language:** TypeScript 6 (strict mode)
 
 ## Prisma Proxy Pattern
 
-O Prisma client é implementado como um Proxy que permite lazy initialization. Isso é essencial porque o DATABASE_URL só está disponível após a instalação web-based.
+The Prisma client is implemented as a Proxy that allows lazy initialization. This is essential because the DATABASE_URL is only available after the web-based installation.
 
-1. `src/lib/prisma.ts` exporta um Proxy que intercepta todas as propriedades
-2. Na primeira acesso, `createPrismaInstance()` é chamado com a URL do config
-3. `resetPrismaInstance()` permite reinicialização após instalação
-4. O pool de conexões é gerenciado pelo PrismaPg adapter
+1. `src/lib/prisma.ts` exports a Proxy that intercepts all properties
+2. On first access, `createPrismaInstance()` is called with the config URL
+3. `resetPrismaInstance()` allows reinitialization after installation
+4. The connection pool is managed by the PrismaPg adapter
 
 ## Hook System (Actions + Filters)
 
-Inspirado no WordPress, o HookService fornece pontos de extensibilidade:
+Inspired by WordPress, the HookService provides extensibility points:
 
-1. **Actions** (`doAction`): Executam código em resposta a eventos (post.created, post.updated, etc.)
-2. **Filters** (`applyFilters`): Transformam data em pipeline (post.before_validate, etc.)
-3. **UI Components** (`registerComponent`): Registram componentes em slots (admin.header, public.sidebar, etc.)
-4. **Audit Log**: Todas as chamadas de hook são registradas com source, type e timestamp
-5. **Auto-sanitization**: Filtros que processam conteúdo (title, body, etc.) são automaticamente sanitizados com DOMPurify
+1. **Actions** (`doAction`): Execute code in response to events (post.created, post.updated, etc.)
+2. **Filters** (`applyFilters`): Transform data in pipeline (post.before_validate, etc.)
+3. **UI Components** (`registerComponent`): Register components in slots (admin.header, public.sidebar, etc.)
+4. **Audit Log**: All hook calls are logged with source, type and timestamp
+5. **Auto-sanitization**: Filters that process content (title, body, etc.) are automatically sanitized with DOMPurify
 
 ## Theme Engine (Build-Time + Dual-Store Context)
 
-O sistema de temas é 100% build-time. Não há upload, instalação ou edição em runtime.
+The theme system is 100% build-time. There is no upload, installation, or runtime editing.
 
-### Geração Estática
-1. Script `scripts/generate-theme-registry.mjs` descobre pastas em `themes/`
-2. Para cada tema, lê `theme.json`, `theme.ts` e `style.css`
-3. Valida manifesto, `themeApiVersion`, variáveis CSS declaradas vs. usadas
-4. Namespace `@keyframes` com prefixo `bl-<id>-`
-5. Gera `src/generated/theme-registry.ts` (imports estáticos dos layouts)
-6. Gera `src/generated/theme-styles.css` (CSS isolado)
+### Static Generation
+1. Script `scripts/generate-theme-registry.mjs` discovers folders in `themes/`
+2. For each theme, reads `theme.json`, `theme.ts` and `style.css`
+3. Validates manifest, `themeApiVersion`, CSS variables declared vs. used
+4. Namespaces `@keyframes` with prefix `bl-<id>-`
+5. Generates `src/generated/theme-registry.ts` (static imports of layouts)
+6. Generates `src/generated/theme-styles.css` (isolated CSS)
 
-### Contexto Dual-Store (React.cache + AsyncLocalStorage)
-O contexto do tema é mantido em duas stores para resiliência:
-- **React.cache (primário):** Sobrevive a `unstable_cache` e outras async boundaries do RSC
-- **AsyncLocalStorage (fallback):** Compatibilidade com testes e contextos non-RSC
-- `getThemeStore()` prioriza React.cache quando `themeName` está setado
-- `page.tsx` e `ThemeRenderer` sincronizam ambas stores apos `themeStorage.run()`
+### Dual-Store Context (React.cache + AsyncLocalStorage)
+The theme context is maintained in two stores for resilience:
+- **React.cache (primary):** Survives `unstable_cache` and other RSC async boundaries
+- **AsyncLocalStorage (fallback):** Compatibility with tests and non-RSC contexts
+- `getThemeStore()` prioritizes React.cache when `themeName` is set
+- `page.tsx` and `ThemeRenderer` synchronize both stores after `themeStorage.run()`
 
-### Isolamento CSS
-- **Camada 1 (fallback):** Selector replacement — `.blacklotuscms-theme` → `.blacklotuscms-theme[data-bl-theme="id"]`
-- **Camada 2 (Chrome 118+):** `@scope ([data-bl-theme="id"])` para shadow-dom-like isolation
-- CSS variables são aplicadas diretamente ao wrapper element (sem CSS nesting)
+### CSS Isolation
+- **Layer 1 (fallback):** Selector replacement — `.blacklotuscms-theme` → `.blacklotuscms-theme[data-bl-theme="id"]`
+- **Layer 2 (Chrome 118+):** `@scope ([data-bl-theme="id"])` for shadow-dom-like isolation
+- CSS variables are applied directly to wrapper element (no CSS nesting)
 
-### Hooks Automáticos
-- `predev` → `themes:generate` antes de `npm run dev`
-- `prebuild` → `themes:generate` antes de `npm run build`
-- `pretest` → `themes:generate` antes de `npm run test`
+### Automatic Hooks
+- `predev` → `themes:generate` before `npm run dev`
+- `prebuild` → `themes:generate` before `npm run build`
+- `pretest` → `themes:generate` before `npm run test`
 
 ## Component Diagram
 
-1. **Proxy Layer (src/proxy.ts):** Intercepta todas as requisições, valida instalação, autenticação, API keys e rate limiting
-2. **App Router (src/app/):** Rotas organizadas em (admin), (public), api, auth, install
-3. **Services (src/core/services/):** 23+ serviços de negócio com RBAC integrado (PostService, UserService, PluginService, NetworkService, RouteService, ShortcodeService, etc.)
-4. **GraphQL (src/app/api/graphql/):** Apollo Server com Pothos schema
-5. **REST API (src/app/api/v1/):** Endpoints REST com withApiAuth middleware
+1. **Proxy Layer (src/proxy.ts):** Intercepts all requests, validates installation, authentication, API keys and rate limiting
+2. **App Router (src/app/):** Routes organized in (admin), (public), api, auth, install
+3. **Services (src/core/services/):** 23+ business services with integrated RBAC (PostService, UserService, PluginService, NetworkService, RouteService, ShortcodeService, etc.)
+4. **GraphQL (src/app/api/graphql/):** Apollo Server with Pothos schema
+5. **REST API (src/app/api/v1/):** REST endpoints with withApiAuth middleware
 6. **Plugin System (src/core/sandbox/ + src/core/services/PluginService.ts):** Dual-mode loading — `sandbox: true` via `PluginSandbox` (isolated-vm), `sandbox: false` via `CompiledPluginLoader` (Node.js). Filesystem auto-registration for plugins not in database.
-7. **Theme Renderer (src/components/ThemeRenderer.tsx):** Import estático de layouts via registry gerado + CSS isolado
-8. **Route Service (src/core/services/RouteService.ts):** Pattern matching para rotas dinâmicas de plugins e themes
-9. **Network Service (src/core/services/NetworkService.ts):** HTTP outbound, webhooks inbound, audit log
+7. **Theme Renderer (src/components/ThemeRenderer.tsx):** Static import of layouts via generated registry + isolated CSS
+8. **Route Service (src/core/services/RouteService.ts):** Pattern matching for dynamic plugin and theme routes
+9. **Network Service (src/core/services/NetworkService.ts):** HTTP outbound, inbound webhooks, audit log
 
 ## Data Flow
 
-1. **Request -> Proxy:** Todas as requisições passam pelo proxy que valida instalação e autenticação
-2. **Route Matching:** RouteService verifica plugin routes → theme routes → default → CMS padrão
-3. **Route Handler:** Requisições chegam às rotas (admin, public, api, auth)
-4. **Route -> Service:** Rotas delegam lógica de negócio aos serviços
-5. **Service -> Prisma:** Serviços acessam o banco via Prisma proxy
-6. **Service -> HookService:** Serviços disparam actions/filters para plugins
-7. **Theme -> ThemeDataService:** Themes acessam data via permissão validada
-8. **Plugin -> CompiledPluginLoader/Sandbox:** Plugins executam com Bridge API proxy
-9. **Plugin -> NetworkService:** HTTP outbound e webhooks inbound passam pelo NetworkService
+1. **Request -> Proxy:** All requests pass through the proxy which validates installation and authentication
+2. **Route Matching:** RouteService checks plugin routes → theme routes → default → standard CMS
+3. **Route Handler:** Requests arrive at routes (admin, public, api, auth)
+4. **Route -> Service:** Routes delegate business logic to services
+5. **Service -> Prisma:** Services access the database via Prisma proxy
+6. **Service -> HookService:** Services dispatch actions/filters to plugins
+7. **Theme -> ThemeDataService:** Themes access data via validated permission
+8. **Plugin -> CompiledPluginLoader/Sandbox:** Plugins execute with Bridge API proxy
+9. **Plugin -> NetworkService:** HTTP outbound and inbound webhooks pass through the NetworkService

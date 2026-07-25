@@ -27,9 +27,9 @@ status: approved
 - **Utility:** clsx for conditional classes
 
 ### Components (Admin)
-- **Rich Text Editor:** TipTap com extensions (highlight, image, link, placeholder, underline)
-- **Media Picker:** Custom component com upload preview
-- **Post Editor:** Full editor com meta fields, taxonomy selection
+- **Rich Text Editor:** TipTap with extensions (highlight, image, link, placeholder, underline)
+- **Media Picker:** Custom component with upload preview
+- **Post Editor:** Full editor with meta fields, taxonomy selection
 - **Skeleton:** Loading states
 - **Toaster:** Sonner for notifications (dark theme, top-right)
 
