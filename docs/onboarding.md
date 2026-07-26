@@ -19,7 +19,7 @@ Welcome to BlackLotusCMS. A modern and extensible CMS built with Next.js 16, Pri
 - **Tailwind CSS 4:** Styling
 
 ## Core Concepts
-- **Zero .env:** Configuration via .secrets.json, not environment variables
+- **Environment Variables:** Configuration via `.env` file
 - **Prisma Proxy:** Lazy initialization allows web-based installation
 - **Hook System:** Actions + Filters for extensibility (WordPress-style)
 - **Plugin Sandbox:** isolated-vm with Bridge API
@@ -30,14 +30,14 @@ Welcome to BlackLotusCMS. A modern and extensible CMS built with Next.js 16, Pri
 1. `bash setup_dev.sh` — configures everything automatically (idempotent)
 2. `bun run dev` — starts the development server
 
-The setup_dev.sh script does:
-- Checks prerequisites (bun, docker, node, python3, make, g++)
-- Creates `.env` with automatically generated secrets
-- Starts PostgreSQL via Docker
-- Installs dependencies and compiles isolated-vm
-- Generates Prisma client and applies schema to database
-- Generates theme and plugin registries
-- Creates uploads/ directory
+The setup_dev.sh does:
+- Check prerequisites (bun, docker, node, python3, make, g++)
+- Create `.env` with auto-generated secrets
+- Start PostgreSQL via Docker
+- Install dependencies and compile isolated-vm
+- Generate Prisma client and apply schema to database
+- Generate theme and plugin registries
+- Create uploads/ directory
 
 ### Manual Setup (Fallback)
 1. `bun install`
@@ -51,12 +51,11 @@ The setup_dev.sh script does:
 
 ## Key Files & Directories
 - `src/proxy.ts` — Middleware/reverse proxy (auth, installation gate)
-- `src/lib/secrets.ts` — Zero .env secrets management
+- `src/lib/config.ts` — Environment configuration
 - `src/lib/auth.ts` — NextAuth configuration
 - `src/lib/builder.ts` — Pothos GraphQL builder
 - `src/lib/schema.ts` — GraphQL schema definitions
 - `src/lib/prisma.ts` — Prisma proxy client
-- `src/lib/config.ts` — Zod-validated configuration
 - `src/core/services/` — 20 business logic services
 - `src/core/sandbox/PluginSandbox.ts` — Plugin isolation
 - `src/schemas/` — Zod validation schemas

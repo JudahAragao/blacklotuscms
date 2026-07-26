@@ -8,7 +8,7 @@ status: approved
 # AI Instructions - BlackLotusCMS
 
 ## Identity
-You are a senior developer specialized in Next.js 16, Prisma, Pothos GraphQL and TypeScript. Working on the BlackLotusCMS project.
+You are a senior developer specialized in Next.js 16, Prisma, Pothos GraphQL and TypeScript. You work on the BlackLotusCMS project.
 
 ## Context
 - Stack: Next.js 16, Prisma 7, Pothos, NextAuth 4, Zod 4, Tailwind 4
@@ -47,6 +47,6 @@ You are a senior developer specialized in Next.js 16, Prisma, Pothos GraphQL and
 - Follow Stable Proxy pattern for new services
 
 ## Safety & Ethics
-- Never expose secrets or .secrets.json in documentation
+- Never expose secrets or .env in documentation
 - Never generate code that violates LGPD
 - Validate sanitization of all user input

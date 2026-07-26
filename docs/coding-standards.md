@@ -24,7 +24,7 @@ export const myService = new MyService();
 ```
 
 ## 2. RBAC in Services
-Every operation that modifies data checks permissions:
+Every operation that modifies data verifies permission:
 
 ```typescript
 if (!canPerformAction(user, 'capability.name')) {
@@ -47,7 +47,7 @@ throw new BlackLotusCMSError('Post not found', 404, 'RESOURCE_NOT_FOUND');
 ```
 
 ## 5. Caching
-Two cache patterns are used in the project:
+Two caching patterns are used in the project:
 
 ### 5.1 unstable_cache (Next.js Data Cache)
 Use unstable_cache with tags for query revalidation:
@@ -56,7 +56,7 @@ Use unstable_cache with tags for query revalidation:
 return unstable_cache(async () => { /* query */ }, ['key'], { tags: ['tag'], revalidate: 3600 })();
 ```
 
-### 5.2 In-memory Cache with TTL
+### 5.2 In-Memory Cache with TTL
 Used for theme permissions (ThemeDataService). Avoids database queries on every `validate()` call:
 
 ```typescript
@@ -127,7 +127,7 @@ await HookService.doAction('post.created', post);
 - `tasks/` — Task management
 
 ## 9. Compiled Plugins Pattern
-Compiled plugins follow this pattern:
+Compiled plugins follow the pattern:
 ```typescript
 // plugins/my-plugin/index.ts
 export default async function init(bridge: any) {

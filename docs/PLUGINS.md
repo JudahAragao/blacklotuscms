@@ -18,11 +18,11 @@ Compiled plugins are part of the codebase and compiled at build time. They can u
 Compiled plugins execute in the **same V8 context** as the Next.js application. This is intentional — it allows plugins to use npm packages and have full Node.js API access.
 
 **Trade-offs:**
-- ✅ Full access to npm packages (resend, stripe, etc.)
-- ✅ Native Node.js API access (fs, crypto, etc.)
-- ✅ No memory/timeout limits (bounded only by host resources)
-- ❌ No V8 sandbox isolation (code runs in main process)
-- ❌ Cannot contain malicious code (trust boundary = codebase)
+- Full access to npm packages (resend, stripe, etc.)
+- Native Node.js API access (fs, crypto, etc.)
+- No memory/timeout limits (bounded only by host resources)
+- No V8 sandbox isolation (code runs in main process)
+- Cannot contain malicious code (trust boundary = codebase)
 
 **Protection chain (same as imported plugins):**
 1. `checkRateLimit()` — 50 DB queries/second max
@@ -500,7 +500,7 @@ bridge.log('Body:', response.body);
 ```
 
 **Security:**
-- Domains must be in the allowlist configured by the admin; if not, the system automatically creates a pending `http.domain.{hostname}` permission that the admin can approve
+- Domains must be on the allowlist configured by the admin; if not, the system automatically creates a pending `http.domain.{hostname}` permission that the admin can approve
 - Blocking of internal IPs (127.0.0.1, 10.*, 192.168.*, etc.)
 - Separate rate limit: 20 req/s (configurable)
 - Timeout: 10s default, max 30s
@@ -716,19 +716,19 @@ await bridge.permissions.request('db.write.user');
 | Timeout | 30s | Max execution time |
 | Rate Limit | 50 req/s | DB queries per second |
 
-### Security: Rate Limit as a Protection Mechanism
+### Security: Rate Limit as Protection Mechanism
 
-All database access via the Bridge API goes through a security chain:
+All database access via Bridge API goes through a security chain:
 
 ```
 Bridge API call → checkRateLimit() → applyJitter() → hasPermission() → database query
 ```
 
 - **`checkRateLimit()`** is called **before** any permission check. If the plugin exceeds 50 queries/s, the request is blocked with `429 RATE_LIMIT_EXCEEDED` — without reaching the database.
-- **`applyJitter()`** adds a random delay of 1-5ms between calls to mitigate thundering herd.
+- **`applyJitter()`** adds a random 1-5ms delay between calls to mitigate thundering herd.
 - **`hasPermission()`** is only consulted after passing the rate limit, avoiding unnecessary database queries.
 
-This means a malicious plugin generates at most 50 queries/s to the database (including permission checks and data operations), and the rate limit is the main protection mechanism against resource abuse.
+This means a malicious plugin generates at most 50 queries/s to the database (including permission checks and data operations), and the rate limit is the primary protection mechanism against resource abuse.
 
 **Forbidden Fields:** `passwordHash`, `secret`, `token`, `apiKey` - always removed from data.
 
@@ -760,12 +760,12 @@ Permissions are managed via Admin > Plugins > Permissions.
 
 ### ZIP Requirements
 - The file must be a valid `.zip`
-- Must contain a `plugin.json` at the root or in a subfolder
+- Must contain a `plugin.json` at root or in a subfolder
 - Must contain the entry file (`index.js` by default)
-- The plugin folder name is derived from the file name (sanitize: lowercase, spaces → hyphens)
+- The plugin folder name is derived from the file name (sanitized: lowercase, spaces → hyphens)
 
 ### Persistence
-Plugins are installed in `/opt/apps/shared/plugins/` (shared volume between blue/green). Data persists between restarts and redeployments.
+Plugins are installed in `/opt/apps/shared/plugins/` (shared volume between blue/green). Data persists across restarts and redeployments.
 
 ## Security
 

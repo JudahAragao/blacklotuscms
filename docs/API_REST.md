@@ -108,7 +108,7 @@ POST /api/v1/media
 { "id": "uuid", "name": "photo.jpg", "url": "/uploads/12345-photo.webp", "thumbnail": "/uploads/thumb-12345-photo.webp", "mimeType": "image/webp", "size": 45678 }
 ```
 
-**Response 201 (Generic file):**
+**Response 201 (Generic File):**
 ```json
 { "id": "uuid", "name": "doc.pdf", "url": "/uploads/12345-doc.pdf", "thumbnail": null, "mimeType": "application/pdf", "size": 123456 }
 ```

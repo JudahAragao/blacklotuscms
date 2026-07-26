@@ -1,6 +1,6 @@
 # Theme Development
 
-Themes are part of the source code and are included in the single BlackLotusCMS build. There is no ZIP upload, panel installation, or runtime layout compilation.
+Themes are part of the source code and are included in the single build of BlackLotusCMS. There is no ZIP upload, panel installation, or runtime layout compilation.
 
 ## Workflow
 
@@ -29,7 +29,7 @@ themes/my-theme/
     └── 404.tsx
 ```
 
-`theme.ts` exports the theme layouts. Recognized names are `page`, `post`, `archive`, `search`, `category`, `blog` and `notFound`. The folder name is the ID: use only lowercase, numbers and hyphens. The `default` theme is mandatory.
+`theme.ts` exports the theme layouts. The recognized names are `page`, `post`, `archive`, `search`, `category`, `blog` and `notFound`. The folder name is the ID: use only lowercase, numbers and hyphens. The `default` theme is required.
 
 ## Manifest
 
@@ -46,7 +46,7 @@ themes/my-theme/
 
 `themeApiVersion` indicates the theme contract version. Currently only `1` is supported.
 
-## Custom routes (routes.json)
+## Custom Routes (routes.json)
 
 Themes can declare custom routes that resolve dynamic parameters (e.g., `/product/:slug`).
 
@@ -82,15 +82,15 @@ Each declared route needs a corresponding template in `layouts/`:
 3. Default theme routes (fallback)
 4. Default CMS logic
 
-## Pure CSS, isolation and assets
+## Pure CSS, Isolation and Assets
 
-All `style.css` files are included in the build and isolated in the active root:
+Every `style.css` is included in the build and isolated in the active root:
 
 ```html
 <div data-bl-theme="my-theme" class="blacklotuscms-theme">…</div>
 ```
 
-Pure CSS is supported. `:root` is converted to the theme root; do not use `html` or `body`. Animations receive the namespace `bl-<theme-id>-`; inline references in JSX use this generated name. Prefer custom classes and variables, e.g., `--my-accent` and `.my-hero`. For assets, use `/api/themes/my-theme/assets/...`.
+Pure CSS is supported. `:root` is converted to the theme root; do not use `html` or `body`. Animations receive the namespace `bl-<theme-id>-`; inline references in JSX use this generated name. Prefer custom classes and variables, such as `--my-accent` and `.my-hero`. For assets, use `/api/themes/my-theme/assets/...`.
 
 ## Tailwind CSS v4
 
@@ -110,7 +110,7 @@ destructive, destructive-foreground
 </section>
 ```
 
-The theme's `style.css` overrides values in `.blacklotuscms-theme`. For exclusive values use regular CSS or arbitrary utilities, like `bg-[var(--my-surface)]`. Do not create new Tailwind names only in `style.css`: they don't exist for the compiler.
+The theme's `style.css` overrides values in `.blacklotuscms-theme`. For exclusive values use normal CSS or arbitrary utilities, such as `bg-[var(--my-surface)]`. Do not create new Tailwind names only in `style.css`: they do not exist for the compiler.
 
 ## Visual Settings
 
@@ -122,32 +122,32 @@ Settings provided by integrations are exposed as `--theme-setting-<key>` (key in
 }
 ```
 
-The build fails for invalid manifest/ID, incompatible `themeApiVersion`, missing `default`, use of `html` or `body`, and references to undeclared CSS variables. These failures should block deployment.
+The build fails for invalid manifest/ID, incompatible `themeApiVersion`, missing `default`, use of `html` or `body`, and references to undeclared CSS variables. These failures must block the deploy.
 
 The panel does not edit theme files: layouts, manifests and CSS are changed in the repository and included in the next build.
 
-## Accessing custom field data
+## Accessing Custom Field Data
 
 Custom fields (MetaFields) are available in `data.meta` as a key-value object:
 
 ```tsx
-// E.g., "hero_image" field of type image
+// Example: "hero_image" field of type image
 <img src={data.meta.hero_image} alt="Hero" />
 
-// E.g., "documents" field of type file
+// Example: "documents" field of type file
 <a href={data.meta.documents} target="_blank">Download</a>
 
-// E.g., "gallery" field of type gallery
+// Example: "gallery" field of type gallery
 {data.meta.gallery?.map((url: string) => (
   <img key={url} src={url} />
 ))}
 ```
 
-**Full URLs:** Values from `file`, `image` and `gallery` fields are returned as absolute URLs (e.g., `https://domain.com/uploads/12345-file.pdf`). This ensures correct rendering in `<img src>`, `<a href>` and external contexts (RSS, APIs).
+**Full URLs:** Values of `file`, `image` and `gallery` fields are returned as absolute URLs (e.g., `https://domain.com/uploads/12345-file.pdf`). This ensures correct behavior in `<img src>`, `<a href>` and external contexts (RSS, APIs).
 
 ## Theme Helpers (ACF-style)
 
-The `@/lib/theme-helpers` module provides helper functions for accessing custom fields in theme layouts, similar to WordPress ACF.
+The `@/lib/theme-helpers` module provides helper functions to access custom fields in theme layouts, similar to WordPress ACF.
 
 ```tsx
 import { getField, haveRows, getRows } from '@/lib/theme-helpers';
@@ -157,13 +157,13 @@ import { getField, haveRows, getRows } from '@/lib/theme-helpers';
 
 | Function | Description |
 |----------|-------------|
-| `getField(name)` | Returns the field value |
-| `theField(name)` | Alias of `getField` (for JSX) |
+| `getField(name)` | Returns the value of a field |
+| `theField(name)` | Alias for `getField` (for JSX) |
 | `haveRows(name)` | Returns `true` if repeater has rows |
-| `getRows(name)` | Returns array of rows from the repeater |
+| `getRows(name)` | Returns array of rows from repeater |
 | `getSubField(name)` | Returns subfield value (within rowContext) |
-| `theSubField(name)` | Alias of `getSubField` |
-| `getRowIndex()` | Returns index of the current row |
+| `theSubField(name)` | Alias for `getSubField` |
+| `getRowIndex()` | Returns index of current row |
 | `getFieldObject(name)` | Returns `{ name, type, config, value }` |
 | `getFieldName(name)` | Returns field name |
 | `getFieldType(name)` | Returns field type |
@@ -234,7 +234,7 @@ export default async function PageLayout({ data }) {
 
 ## Template Hierarchy (WordPress-style)
 
-The theme system supports a template hierarchy similar to WordPress. Layout files use **dots** in the name to indicate specialized templates per PostType.
+The theme system supports a template hierarchy similar to WordPress. Layout files use **dots** in the name to indicate specialized templates by PostType.
 
 ### Naming Convention
 

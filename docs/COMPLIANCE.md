@@ -2,7 +2,7 @@
 
 ## Overview
 BlackLotusCMS includes features to support compliance with:
-- **LGPD** (Lei Geral de Protecao de Dados) - Brazil
+- **LGPD** (Lei Geral de Proteção de Dados) - Brazil
 - **GDPR** (General Data Protection Regulation) - European Union
 
 ## Data Processing
@@ -76,7 +76,7 @@ Documented in this file and `specs/architecture/security.md`.
 - CSP nonces in production (via `CSP_NONCE_ENABLED=true`)
 - NEXTAUTH_SECRET mandatory (app fails if absent)
 - ADMIN_PASSWORD validated (rejects weak defaults in production)
-- API Key re-validated in route handlers (injected headers are not directly trusted)
+- API Key re-validated in route handlers (injected headers are not trusted)
 
 ### Organizational Measures
 - Role-based access control (RBAC)
@@ -156,19 +156,17 @@ BlackLotusCMS does not set tracking cookies by default.
 
 ## Configuration
 
-### Secrets Management (.secrets.json)
-All configuration is stored in `.secrets.json` via the Zero .env Architecture:
+### Environment Variables (.env)
+All configuration is stored in `.env` file:
 
-```json
-{
-  "DATABASE_URL": "postgresql://user:pass@host:5432/db",
-  "NEXTAUTH_SECRET": "auto-generated",
-  "NEXTAUTH_URL": "http://localhost:3000",
-  "STORAGE_DRIVER": "local",
-  "UPLOAD_DIR": "./uploads",
-  "SANDBOX_MEMORY_LIMIT": "512",
-  "SANDBOX_TIMEOUT": "30"
-}
+```bash
+DATABASE_URL=postgresql://user:pass@host:5432/db
+NEXTAUTH_SECRET=auto-generated
+NEXTAUTH_URL=http://localhost:3000
+STORAGE_DRIVER=local
+UPLOAD_DIR=./uploads
+SANDBOX_MEMORY_LIMIT=512
+SANDBOX_TIMEOUT=30
 ```
 
 ### Data Retention Settings
