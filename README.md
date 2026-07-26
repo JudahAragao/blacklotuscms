@@ -1,7 +1,5 @@
 # BlackLotusCMS
 
-> **⚠️ WARNING: This project is for testing and exploration purposes only. It is not production-ready.**
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-blue)](https://www.typescriptlang.org/)
@@ -11,7 +9,7 @@ BlackLotusCMS is a modern, high-performance, and extensible Content Management S
 ## Features
 
 - **Next.js 16 (App Router):** React Server Components for zero-bloat frontend.
-- **Zero .env Architecture:** Configuration via `.secrets.json`, no environment variables.
+- **Environment Variables:** Configuration via `.env` file.
 - **Custom Post Types:** Flexible content modeling with taxonomies and custom fields.
 - **Type-Safe GraphQL:** Pothos + Prisma for end-to-end type safety.
 - **Plugin System:** Secure execution via isolated-vm sandbox.
@@ -48,7 +46,7 @@ Done. The `setup_dev.sh` does everything automatically:
 - Generates Prisma client and applies schema to the database
 - Generates theme and plugin records
 - Creates `uploads/` directory
-- Creates `.secrets.json` and `.installed`
+- Creates `.env` and `.installed`
 
 The script is idempotent — you can run it as many times as you want. On the first run it does everything; on subsequent runs it skips already completed steps.
 
@@ -109,7 +107,6 @@ blacklotuscms/
 │   │   ├── errors.ts          # Error handling
 │   │   ├── logger.ts          # Structured logging
 │   │   ├── prisma.ts          # Prisma client proxy
-│   │   ├── secrets.ts         # Zero .env secrets management
 │   │   └── storage.ts         # Multi-driver storage
 │   ├── schemas/               # Zod validation schemas
 │   └── types/                 # TypeScript types and DTOs
@@ -151,7 +148,7 @@ flowchart TD
 | Component | File | Purpose |
 |-----------|------|---------|
 | Proxy | `src/proxy.ts` | Auth, rate limiting, installation gate |
-| Secrets | `src/lib/secrets.ts` | Zero .env configuration |
+| Config | `src/lib/config.ts` | Environment configuration |
 | Auth | `src/lib/auth.ts` | NextAuth JWT setup |
 | GraphQL | `src/lib/builder.ts` | Pothos schema builder |
 | Prisma | `src/lib/prisma.ts` | Lazy database client |
